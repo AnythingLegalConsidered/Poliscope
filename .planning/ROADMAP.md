@@ -27,9 +27,9 @@ Plans:
 - **Plans:** 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Python env + modules partages + ingestion deputes
-- [ ] 02-02-PLAN.md — Ingestion seances + interventions
-- [ ] 02-03-PLAN.md — Tagging thematique + orchestrateur pipeline
+- [x] 02-01-PLAN.md — Python env + modules partages + ingestion deputes
+- [x] 02-02-PLAN.md — Ingestion seances + interventions
+- [x] 02-03-PLAN.md — Tagging thematique + orchestrateur pipeline
 
 ### Phase 3 — API Backend
 **Objectif** : API routes Nuxt qui exposent les donnees pour le frontend.
