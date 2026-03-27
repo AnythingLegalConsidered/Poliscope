@@ -42,9 +42,9 @@ Plans:
 - **Plans:** 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Pagination utility + debates endpoints
-- [ ] 03-02-PLAN.md — Deputies endpoints with filters and profile
-- [ ] 03-03-PLAN.md — Full-text search endpoint
+- [x] 03-01-PLAN.md — Pagination utility + debates endpoints
+- [x] 03-02-PLAN.md — Deputies endpoints with filters and profile
+- [x] 03-03-PLAN.md — Full-text search endpoint
 
 ### Phase 4 — UI Debats (Thread View)
 **Objectif** : Page principale — les debats affiches comme des threads Twitter.
