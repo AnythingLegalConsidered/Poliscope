@@ -2,11 +2,11 @@
 
 ## Current Position
 - **Milestone** : 1 — MVP Debats AN
-- **Phase** : 2 — Ingestion des donnees AN (in progress)
-- **Next** : Execute 02-03 (keyword tagging)
-- **Status** : Plan 02-02 complete, 2/3 plans done
+- **Phase** : 2 — Ingestion des donnees AN (COMPLETE)
+- **Next** : Phase 3 planning
+- **Status** : All 3 plans done
 
-Progress: Phase 2 [##.] 2/3 plans done
+Progress: Phase 2 [###] 3/3 plans done
 
 ## Decisions
 | ID | Decision | Context |
@@ -18,10 +18,11 @@ Progress: Phase 2 [##.] 2/3 plans done
 
 ## Session Continuity
 - **Last session**: 2026-03-27
-- **Stopped at**: 02-02 checkpoint approved, ready for 02-03
-- **Resume**: `.planning/phases/02-ingestion-data-an/02-03-PLAN.md`
+- **Stopped at**: Phase 2 complete, ready for Phase 3
+- **Resume**: Phase 3 planning
 
 ## History
+- 2026-03-27 : Completed 02-03 — Keyword tagging (12 tags, 787 assignments) + pipeline orchestrator (commits 6b8a383 + ea73f54)
 - 2026-03-27 : Completed 02-02 — Debate + intervention ingestion from DILA (5 debates, 2479 interventions, commit be82fa2)
 - 2026-03-27 : Completed 02-01 — Python env + deputy ingestion (618 deputies, commits fdcb43d + c82a200)
 - 2026-03-27 : Phase 2 planned (3 plans, 3 waves) — verified PASS (2 blockers fixed: interventions idempotence strategy, updated_at helper)
