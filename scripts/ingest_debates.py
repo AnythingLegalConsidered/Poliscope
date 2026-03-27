@@ -399,7 +399,12 @@ def insert_interventions(conn, debate_id: int, interventions: list[dict]) -> int
 
     Returns number of interventions inserted.
     """
-    # Idempotence: delete existing interventions for this debate
+    # Idempotence: delete tags then interventions for this debate
+    conn.execute(
+        "DELETE FROM intervention_tags WHERE intervention_id IN "
+        "(SELECT id FROM interventions WHERE debate_id = %s)",
+        (debate_id,),
+    )
     conn.execute("DELETE FROM interventions WHERE debate_id = %s", (debate_id,))
 
     if not interventions:
