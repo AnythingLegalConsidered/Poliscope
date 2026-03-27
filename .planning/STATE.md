@@ -2,11 +2,11 @@
 
 ## Current Position
 - **Milestone** : 1 — MVP Debats AN
-- **Phase** : 3 — API Backend (PLANNED)
-- **Next** : Phase 3 execution
-- **Status** : 3 plans ready (3 waves)
+- **Phase** : 3 — API Backend (IN PROGRESS)
+- **Next** : Execute 03-02 (deputies endpoints)
+- **Status** : 1/3 plans done
 
-Progress: Phase 3 [___] 0/3 plans done
+Progress: Phase 3 [█__] 1/3 plans done
 
 ## Decisions
 | ID | Decision | Context |
@@ -15,13 +15,16 @@ Progress: Phase 3 [___] 0/3 plans done
 | D-0201-02 | nosdeputes.fr = 16th legislature | All 618 deputies have mandat_fin, is_active=false correct |
 | D-0202-01 | Pivoted from nosdeputes.fr to DILA for debates | nosdeputes.fr /seances/json returns empty for 17th legislature; DILA has CRI XML archives |
 | D-0202-02 | DILA CRI XML format: .taz archives | Nested tar with CRI_*.xml, Orateur href for deputy matching |
+| D-0301-01 | Use relative imports in server/api (../../db/schema) | Nuxt 4 resolves ~ alias to app/ not project root — breaks server imports |
+| D-0301-02 | getPaginationParams takes H3Event directly | Cleaner API, avoids double getQuery() call in handler |
 
 ## Session Continuity
 - **Last session**: 2026-03-27
-- **Stopped at**: Phase 3 planned, ready for execution
-- **Resume**: Phase 3 execution
+- **Stopped at**: Phase 3, plan 01 complete
+- **Resume**: Execute 03-02-PLAN.md (deputies endpoints)
 
 ## History
+- 2026-03-27 : Completed 03-01 — Pagination utility + GET /api/debates + GET /api/debates/:id (commits 5446b8d + c79932f)
 - 2026-03-27 : Completed 02-03 — Keyword tagging (12 tags, 787 assignments) + pipeline orchestrator (commits 6b8a383 + ea73f54)
 - 2026-03-27 : Completed 02-02 — Debate + intervention ingestion from DILA (5 debates, 2479 interventions, commit be82fa2)
 - 2026-03-27 : Completed 02-01 — Python env + deputy ingestion (618 deputies, commits fdcb43d + c82a200)
