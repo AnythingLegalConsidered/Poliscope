@@ -3,11 +3,11 @@
 ## Current Position
 - **Milestone** : 1 — MVP Debats AN
 - **Phase** : 4 — UI Debats Thread View (In progress)
-- **Plan** : 04-01 complete (shared UI components)
-- **Next** : 04-02 — Debates list page
-- **Status** : 1/3 plans done in phase 4
+- **Plan** : 04-03 Task 1 complete — debate thread page built; awaiting checkpoint:human-verify
+- **Next** : Human verification of full debates UI (/ and /debates/:id)
+- **Status** : 2/3 plans done in phase 4 (04-01 + 04-03 Task 1; 04-02 also needed for checkpoint)
 
-Progress: Phase 4 [█░░] 1/3 plans done
+Progress: Phase 4 [█░█] 2/3 plans done (checkpoint pending)
 
 ## Decisions
 | ID | Decision | Context |
@@ -24,13 +24,16 @@ Progress: Phase 4 [█░░] 1/3 plans done
 | D-0303-02 | websearch_to_tsquery over to_tsquery | Handles unescaped user input safely, no manual pre-processing needed |
 | D-0401-01 | Group colors via inline JS (getGroupColor) not CSS variables | Dynamic data per group; CSS variables would be unused/inflexible |
 | D-0401-02 | whitespace-pre-wrap in InterventionCard (not v-html) | XSS-safe, handles multiline debate transcript text |
+| D-0403-01 | No virtual scrolling on debate thread page | Browser handles ~1000 simple nodes; deferred as premature optimization |
+| D-0403-02 | v-bind spread on InterventionCard | API response shape matches component props exactly — no manual binding needed |
 
 ## Session Continuity
 - **Last session**: 2026-03-28
-- **Stopped at**: Phase 4, plan 01 complete — shared UI components built
-- **Resume**: 04-02-PLAN.md (debates list page)
+- **Stopped at**: Phase 4, plan 03 Task 1 complete — debate thread page built; checkpoint:human-verify reached
+- **Resume**: After human approves checkpoint — phase 4 complete
 
 ## History
+- 2026-03-28 : Completed 04-03 Task 1 — debate thread page /debates/[id] with route validation, useFetch, InterventionCard thread, SEO title (commit b93b901); checkpoint pending
 - 2026-03-28 : Completed 04-01 — @vueuse/core + GroupBadge, InterventionCard, LoadingSpinner + 11-group color system (commits 2e896ad + 5418968)
 - 2026-03-27 : Completed 03-03 — GET /api/search FTS endpoint with French language, ts_rank, ts_headline highlights (commit 588bcf6)
 - 2026-03-27 : Completed 03-02 — GET /api/deputies + GET /api/deputies/:id with tag distribution (commits c176d96 + 478e375)
