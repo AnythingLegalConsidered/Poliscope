@@ -4,3 +4,6 @@
   --color-primary: #1a365d;
   --color-accent: #e53e3e;
 }
+
+/* Political group colors are handled via JS util (app/utils/groupColors.ts)
+   using inline styles for dynamic color assignment per group acronym. */
