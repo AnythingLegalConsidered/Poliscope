@@ -1,0 +1,130 @@
+import { eq, desc, inArray, sql } from 'drizzle-orm'
+import { deputies, interventions, debates, interventionTags, tags } from '../../db/schema'
+
+export default defineEventHandler(async (event) => {
+  const rawId = getRouterParam(event, 'id')
+  const id = Number(rawId)
+
+  if (!rawId || isNaN(id)) {
+    throw createError({ statusCode: 400, message: 'Invalid deputy ID' })
+  }
+
+  const { page, limit, offset } = getPaginationParams(event)
+
+  try {
+    // Fetch the deputy
+    const deputyRows = await db
+      .select()
+      .from(deputies)
+      .where(eq(deputies.id, id))
+      .limit(1)
+
+    if (!deputyRows.length) {
+      throw createError({ statusCode: 404, message: 'Deputy not found' })
+    }
+
+    const deputy = deputyRows[0]
+
+    // Fetch interventions with debate info (left join), paginated, ordered by createdAt DESC
+    const interventionRows = await db
+      .select({
+        id: interventions.id,
+        debateId: interventions.debateId,
+        deputyId: interventions.deputyId,
+        speakerName: interventions.speakerName,
+        speakerRole: interventions.speakerRole,
+        content: interventions.content,
+        orderInDebate: interventions.orderInDebate,
+        createdAt: interventions.createdAt,
+        debateTitle: debates.title,
+        debateDate: debates.date,
+        totalCount: sql<number>`count(*) over()`,
+      })
+      .from(interventions)
+      .leftJoin(debates, eq(interventions.debateId, debates.id))
+      .where(eq(interventions.deputyId, id))
+      .orderBy(desc(interventions.createdAt))
+      .limit(limit)
+      .offset(offset)
+
+    const totalInterventions = interventionRows.length > 0 ? Number(interventionRows[0].totalCount) : 0
+
+    // Batch fetch tags for the returned interventions (avoid N+1)
+    const interventionIds = interventionRows.map(i => i.id)
+    const tagMap = new Map<number, { id: number; name: string; slug: string }[]>()
+
+    if (interventionIds.length > 0) {
+      const tagRows = await db
+        .select({
+          interventionId: interventionTags.interventionId,
+          tagId: tags.id,
+          tagName: tags.name,
+          tagSlug: tags.slug,
+        })
+        .from(interventionTags)
+        .innerJoin(tags, eq(interventionTags.tagId, tags.id))
+        .where(inArray(interventionTags.interventionId, interventionIds))
+
+      for (const row of tagRows) {
+        if (!tagMap.has(row.interventionId)) {
+          tagMap.set(row.interventionId, [])
+        }
+        tagMap.get(row.interventionId)!.push({
+          id: row.tagId,
+          name: row.tagName,
+          slug: row.tagSlug,
+        })
+      }
+    }
+
+    // Enrich interventions with debate context and tags
+    const enrichedInterventions = interventionRows.map(row => ({
+      id: row.id,
+      debateId: row.debateId,
+      deputyId: row.deputyId,
+      speakerName: row.speakerName,
+      speakerRole: row.speakerRole,
+      content: row.content,
+      orderInDebate: row.orderInDebate,
+      createdAt: row.createdAt,
+      debate: {
+        title: row.debateTitle,
+        date: row.debateDate,
+      },
+      tags: tagMap.get(row.id) ?? [],
+    }))
+
+    // Compute tag distribution for this deputy across all their interventions
+    const tagStatsRows = await db
+      .select({
+        name: tags.name,
+        slug: tags.slug,
+        count: sql<number>`count(*)`,
+      })
+      .from(interventionTags)
+      .innerJoin(tags, eq(interventionTags.tagId, tags.id))
+      .innerJoin(interventions, eq(interventionTags.interventionId, interventions.id))
+      .where(eq(interventions.deputyId, id))
+      .groupBy(tags.name, tags.slug)
+      .orderBy(desc(sql`count(*)`))
+
+    const tagStats = tagStatsRows.map(row => ({
+      name: row.name,
+      slug: row.slug,
+      count: Number(row.count),
+    }))
+
+    return {
+      deputy,
+      interventions: paginatedResponse(enrichedInterventions, totalInterventions, page, limit),
+      tagStats,
+    }
+  }
+  catch (error) {
+    // Re-throw H3 errors as-is
+    if ((error as { statusCode?: number }).statusCode) {
+      throw error
+    }
+    throw createError({ statusCode: 500, message: 'Failed to fetch deputy' })
+  }
+})
