@@ -25,6 +25,9 @@ Progress: Phase 4 [█░█] 2/3 plans done (checkpoint pending)
 | D-0401-01 | Group colors via inline JS (getGroupColor) not CSS variables | Dynamic data per group; CSS variables would be unused/inflexible |
 | D-0401-02 | whitespace-pre-wrap in InterventionCard (not v-html) | XSS-safe, handles multiline debate transcript text |
 | D-0403-01 | No virtual scrolling on debate thread page | Browser handles ~1000 simple nodes; deferred as premature optimization |
+| D-0402-01 | Date in computed with fr-FR + Europe/Paris timezone | Explicit locale and timezone in computed prevents SSR/client hydration mismatch |
+| D-0402-02 | useFetch watch: [page] re-fetches automatically | No manual refresh() call needed; avoids double-fetch bugs |
+| D-0403-01 | No virtual scrolling on debate thread page | Browser handles ~1000 simple nodes; deferred as premature optimization |
 | D-0403-02 | v-bind spread on InterventionCard | API response shape matches component props exactly — no manual binding needed |
 
 ## Session Continuity
@@ -34,6 +37,7 @@ Progress: Phase 4 [█░█] 2/3 plans done (checkpoint pending)
 
 ## History
 - 2026-03-28 : Completed 04-03 Task 1 — debate thread page /debates/[id] with route validation, useFetch, InterventionCard thread, SEO title (commit b93b901); checkpoint pending
+- 2026-03-28 : Completed 04-02 — DebateCard component + home page with useFetch/useIntersectionObserver infinite scroll (commits 9fb6a35 + f3cde7a)
 - 2026-03-28 : Completed 04-01 — @vueuse/core + GroupBadge, InterventionCard, LoadingSpinner + 11-group color system (commits 2e896ad + 5418968)
 - 2026-03-27 : Completed 03-03 — GET /api/search FTS endpoint with French language, ts_rank, ts_headline highlights (commit 588bcf6)
 - 2026-03-27 : Completed 03-02 — GET /api/deputies + GET /api/deputies/:id with tag distribution (commits c176d96 + 478e375)
