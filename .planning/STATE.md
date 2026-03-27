@@ -3,10 +3,10 @@
 ## Current Position
 - **Milestone** : 1 — MVP Debats AN
 - **Phase** : 3 — API Backend (IN PROGRESS)
-- **Next** : Execute 03-02 (deputies endpoints)
-- **Status** : 1/3 plans done
+- **Next** : Execute 03-03 (full-text search endpoint)
+- **Status** : 2/3 plans done
 
-Progress: Phase 3 [█__] 1/3 plans done
+Progress: Phase 3 [██_] 2/3 plans done
 
 ## Decisions
 | ID | Decision | Context |
@@ -17,13 +17,16 @@ Progress: Phase 3 [█__] 1/3 plans done
 | D-0202-02 | DILA CRI XML format: .taz archives | Nested tar with CRI_*.xml, Orateur href for deputy matching |
 | D-0301-01 | Use relative imports in server/api (../../db/schema) | Nuxt 4 resolves ~ alias to app/ not project root — breaks server imports |
 | D-0301-02 | getPaginationParams takes H3Event directly | Cleaner API, avoids double getQuery() call in handler |
+| D-0302-01 | tagStats uses separate GROUP BY query (not in-memory post-process) | Covers all deputy interventions, not just current page |
+| D-0302-02 | Interventions in deputy detail ordered by createdAt DESC | Most recent first is natural for profile browsing |
 
 ## Session Continuity
 - **Last session**: 2026-03-27
-- **Stopped at**: Phase 3, plan 01 complete
-- **Resume**: Execute 03-02-PLAN.md (deputies endpoints)
+- **Stopped at**: Phase 3, plan 02 complete
+- **Resume**: Execute 03-03-PLAN.md (full-text search endpoint)
 
 ## History
+- 2026-03-27 : Completed 03-02 — GET /api/deputies + GET /api/deputies/:id with tag distribution (commits c176d96 + 478e375)
 - 2026-03-27 : Completed 03-01 — Pagination utility + GET /api/debates + GET /api/debates/:id (commits 5446b8d + c79932f)
 - 2026-03-27 : Completed 02-03 — Keyword tagging (12 tags, 787 assignments) + pipeline orchestrator (commits 6b8a383 + ea73f54)
 - 2026-03-27 : Completed 02-02 — Debate + intervention ingestion from DILA (5 debates, 2479 interventions, commit be82fa2)
