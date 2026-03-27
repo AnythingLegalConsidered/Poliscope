@@ -39,6 +39,12 @@ Plans:
 - GET /api/deputies/:id — profil + interventions
 - GET /api/search — recherche full-text avec filtres
 - **Livrable** : API testable qui retourne les donnees correctement
+- **Plans:** 3 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Pagination utility + debates endpoints
+- [ ] 03-02-PLAN.md — Deputies endpoints with filters and profile
+- [ ] 03-03-PLAN.md — Full-text search endpoint
 
 ### Phase 4 — UI Debats (Thread View)
 **Objectif** : Page principale — les debats affiches comme des threads Twitter.
