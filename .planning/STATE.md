@@ -2,11 +2,12 @@
 
 ## Current Position
 - **Milestone** : 1 — MVP Debats AN
-- **Phase** : 3 — API Backend (COMPLETE)
-- **Next** : Phase 4 — Frontend
-- **Status** : 3/3 plans done
+- **Phase** : 4 — UI Debats Thread View (In progress)
+- **Plan** : 04-01 complete (shared UI components)
+- **Next** : 04-02 — Debates list page
+- **Status** : 1/3 plans done in phase 4
 
-Progress: Phase 3 [███] 3/3 plans done
+Progress: Phase 4 [█░░] 1/3 plans done
 
 ## Decisions
 | ID | Decision | Context |
@@ -21,13 +22,16 @@ Progress: Phase 3 [███] 3/3 plans done
 | D-0302-02 | Interventions in deputy detail ordered by createdAt DESC | Most recent first is natural for profile browsing |
 | D-0303-01 | Use db.execute(sql`...`) for FTS query | Drizzle query builder cannot express ts_rank/ts_headline/optional WHERE fragments cleanly |
 | D-0303-02 | websearch_to_tsquery over to_tsquery | Handles unescaped user input safely, no manual pre-processing needed |
+| D-0401-01 | Group colors via inline JS (getGroupColor) not CSS variables | Dynamic data per group; CSS variables would be unused/inflexible |
+| D-0401-02 | whitespace-pre-wrap in InterventionCard (not v-html) | XSS-safe, handles multiline debate transcript text |
 
 ## Session Continuity
-- **Last session**: 2026-03-27
-- **Stopped at**: Phase 3, plan 03 complete — Phase 3 done
-- **Resume**: Plan Phase 4 (Frontend)
+- **Last session**: 2026-03-28
+- **Stopped at**: Phase 4, plan 01 complete — shared UI components built
+- **Resume**: 04-02-PLAN.md (debates list page)
 
 ## History
+- 2026-03-28 : Completed 04-01 — @vueuse/core + GroupBadge, InterventionCard, LoadingSpinner + 11-group color system (commits 2e896ad + 5418968)
 - 2026-03-27 : Completed 03-03 — GET /api/search FTS endpoint with French language, ts_rank, ts_headline highlights (commit 588bcf6)
 - 2026-03-27 : Completed 03-02 — GET /api/deputies + GET /api/deputies/:id with tag distribution (commits c176d96 + 478e375)
 - 2026-03-27 : Completed 03-01 — Pagination utility + GET /api/debates + GET /api/debates/:id (commits 5446b8d + c79932f)
