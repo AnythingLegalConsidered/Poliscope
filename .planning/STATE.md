@@ -2,11 +2,11 @@
 
 ## Current Position
 - **Milestone** : 1 — MVP Debats AN
-- **Phase** : 3 — API Backend (IN PROGRESS)
-- **Next** : Execute 03-03 (full-text search endpoint)
-- **Status** : 2/3 plans done
+- **Phase** : 3 — API Backend (COMPLETE)
+- **Next** : Phase 4 — Frontend
+- **Status** : 3/3 plans done
 
-Progress: Phase 3 [██_] 2/3 plans done
+Progress: Phase 3 [███] 3/3 plans done
 
 ## Decisions
 | ID | Decision | Context |
@@ -19,13 +19,16 @@ Progress: Phase 3 [██_] 2/3 plans done
 | D-0301-02 | getPaginationParams takes H3Event directly | Cleaner API, avoids double getQuery() call in handler |
 | D-0302-01 | tagStats uses separate GROUP BY query (not in-memory post-process) | Covers all deputy interventions, not just current page |
 | D-0302-02 | Interventions in deputy detail ordered by createdAt DESC | Most recent first is natural for profile browsing |
+| D-0303-01 | Use db.execute(sql`...`) for FTS query | Drizzle query builder cannot express ts_rank/ts_headline/optional WHERE fragments cleanly |
+| D-0303-02 | websearch_to_tsquery over to_tsquery | Handles unescaped user input safely, no manual pre-processing needed |
 
 ## Session Continuity
 - **Last session**: 2026-03-27
-- **Stopped at**: Phase 3, plan 02 complete
-- **Resume**: Execute 03-03-PLAN.md (full-text search endpoint)
+- **Stopped at**: Phase 3, plan 03 complete — Phase 3 done
+- **Resume**: Plan Phase 4 (Frontend)
 
 ## History
+- 2026-03-27 : Completed 03-03 — GET /api/search FTS endpoint with French language, ts_rank, ts_headline highlights (commit 588bcf6)
 - 2026-03-27 : Completed 03-02 — GET /api/deputies + GET /api/deputies/:id with tag distribution (commits c176d96 + 478e375)
 - 2026-03-27 : Completed 03-01 — Pagination utility + GET /api/debates + GET /api/debates/:id (commits 5446b8d + c79932f)
 - 2026-03-27 : Completed 02-03 — Keyword tagging (12 tags, 787 assignments) + pipeline orchestrator (commits 6b8a383 + ea73f54)
