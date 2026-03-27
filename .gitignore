@@ -1,43 +1,24 @@
-# Dependencies
-node_modules/
-.pnp
-.pnp.js
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
 
-# Build
-dist/
-build/
-.next/
-.nuxt/
-.output/
-
-# Environment
-.env
-.env.local
-.env.*.local
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Python
-__pycache__/
-*.pyc
-.venv/
-venv/
-
-# Data
-*.db
-*.sqlite
+# Node dependencies
+node_modules
 
 # Logs
+logs
 *.log
-npm-debug.log*
 
-# Planning (GSD)
-.planning/
+# Misc
+.DS_Store
+.fleet
+.idea
+
+# Local env files
+.env
+.env.*
+!.env.example

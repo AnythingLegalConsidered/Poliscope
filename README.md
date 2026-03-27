@@ -1,19 +1,75 @@
-# Poliscope
+# Nuxt Minimal Starter
 
-Plateforme de suivi politique en temps réel. Scrollez les débats de l'Assemblée Nationale comme un fil Twitter — chaque intervention résumée, chaque vote tracké.
+Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
-## Vision
+## Setup
 
-- **Phase 1** : Débats de l'Assemblée Nationale en format thread/scroll
-- **Phase 2** : Extension au Sénat, débats TV, déclarations publiques
-- **Phase 3** : Profils complets par politique (votes, prises de position, activité)
+Make sure to install dependencies:
 
-## Stack (à définir)
+```bash
+# npm
+npm install
 
-- Frontend : à déterminer
-- Backend : à déterminer
-- Data : APIs ouvertes (data.assemblee-nationale.fr, nosdeputes.fr)
+# pnpm
+pnpm install
 
-## Licence
+# yarn
+yarn install
 
-À définir
+# bun
+bun install
+```
+
+## Development Server
+
+Start the development server on `http://localhost:3000`:
+
+```bash
+# npm
+npm run dev
+
+# pnpm
+pnpm dev
+
+# yarn
+yarn dev
+
+# bun
+bun run dev
+```
+
+## Production
+
+Build the application for production:
+
+```bash
+# npm
+npm run build
+
+# pnpm
+pnpm build
+
+# yarn
+yarn build
+
+# bun
+bun run build
+```
+
+Locally preview production build:
+
+```bash
+# npm
+npm run preview
+
+# pnpm
+pnpm preview
+
+# yarn
+yarn preview
+
+# bun
+bun run preview
+```
+
+Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
