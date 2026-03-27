@@ -2,11 +2,11 @@
 
 ## Current Position
 - **Milestone** : 1 — MVP Debats AN
-- **Phase** : 2 — Ingestion des donnees AN (COMPLETE)
-- **Next** : Phase 3 planning
-- **Status** : All 3 plans done
+- **Phase** : 3 — API Backend (PLANNED)
+- **Next** : Phase 3 execution
+- **Status** : 3 plans ready (3 waves)
 
-Progress: Phase 2 [###] 3/3 plans done
+Progress: Phase 3 [___] 0/3 plans done
 
 ## Decisions
 | ID | Decision | Context |
@@ -18,8 +18,8 @@ Progress: Phase 2 [###] 3/3 plans done
 
 ## Session Continuity
 - **Last session**: 2026-03-27
-- **Stopped at**: Phase 2 complete, ready for Phase 3
-- **Resume**: Phase 3 planning
+- **Stopped at**: Phase 3 planned, ready for execution
+- **Resume**: Phase 3 execution
 
 ## History
 - 2026-03-27 : Completed 02-03 — Keyword tagging (12 tags, 787 assignments) + pipeline orchestrator (commits 6b8a383 + ea73f54)
