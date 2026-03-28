@@ -13,4 +13,29 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
   },
+  modules: ['@nuxtjs/sitemap'],
+  site: {
+    url: process.env.NUXT_SITE_URL || 'https://poliscope.fr',
+    name: 'Poliscope',
+  },
+  app: {
+    head: {
+      htmlAttrs: { lang: 'fr' },
+      charset: 'utf-8',
+      viewport: 'width=device-width, initial-scale=1',
+      titleTemplate: '%s — Poliscope',
+      meta: [
+        { name: 'description', content: "Explorez les débats et l'activité des députés de l'Assemblée nationale" },
+      ],
+    },
+  },
+  sitemap: {
+    sources: ['/api/__sitemap__/urls'],
+  },
+  routeRules: {
+    '/api/debates': { cache: { maxAge: 300 } },
+    '/api/debates/**': { cache: { maxAge: 300 } },
+    '/api/deputies': { cache: { maxAge: 3600 } },
+    '/api/deputies/**': { cache: { maxAge: 600 } },
+  },
 })
