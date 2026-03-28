@@ -19,24 +19,24 @@ const formattedDate = computed(() => {
 <template>
   <NuxtLink
     :to="'/debates/' + id"
-    class="block bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow duration-200 cursor-pointer"
+    class="block bg-parchment rounded-xl border border-stone-border p-4 hover:border-bronze/40 transition-colors duration-200 cursor-pointer"
   >
-    <h2 class="text-base font-semibold text-gray-900 line-clamp-2 mb-2">
+    <h2 class="text-base font-semibold text-ink line-clamp-2 mb-2 font-heading">
       {{ title }}
     </h2>
 
-    <p class="text-sm text-gray-600 mb-2">
+    <p class="text-sm text-ink-muted mb-2">
       {{ formattedDate }}
     </p>
 
     <div class="flex items-center justify-between mt-auto">
-      <span v-if="sessionType" class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+      <span v-if="sessionType" class="text-xs text-ink-muted bg-marble-dark px-2 py-0.5 rounded-full uppercase tracking-wider">
         {{ sessionType }}
       </span>
       <span v-else class="flex-1" />
 
-      <span class="text-xs text-gray-400">
-        {{ legislature }}e legislature
+      <span class="text-xs text-ink-muted/60">
+        {{ legislature }}e législature
       </span>
     </div>
   </NuxtLink>

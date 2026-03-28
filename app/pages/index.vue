@@ -47,9 +47,9 @@ useIntersectionObserver(
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold text-primary mb-6">
-      Debats de l'Assemblee nationale
+  <div class="max-w-7xl mx-auto">
+    <h1 class="text-2xl font-bold text-ink mb-6 font-heading">
+      Débats de l'Assemblée nationale
     </h1>
 
     <!-- Debates grid -->
@@ -67,9 +67,9 @@ useIntersectionObserver(
     <!-- Empty state -->
     <p
       v-else-if="status !== 'pending'"
-      class="text-gray-500 text-center py-12"
+      class="text-ink-muted text-center py-12"
     >
-      Aucun debat trouve
+      Aucun débat trouvé
     </p>
 
     <!-- Loading spinner -->
@@ -80,9 +80,9 @@ useIntersectionObserver(
     <!-- All debates loaded message -->
     <p
       v-if="!hasMore && allDebates.length > 0"
-      class="text-center text-sm text-gray-400 py-6"
+      class="text-center text-sm text-ink-muted/60 py-6"
     >
-      Tous les debats charges
+      Tous les débats chargés
     </p>
 
     <!-- Infinite scroll sentinel -->

@@ -29,28 +29,28 @@ const formattedDate = computed(() => {
 
     <!-- Error state -->
     <div v-else-if="error" class="py-8 text-center">
-      <p v-if="error.statusCode === 404" class="text-gray-600">Debat introuvable.</p>
-      <p v-else class="text-gray-600">Une erreur est survenue. Veuillez reessayer.</p>
+      <p v-if="error.statusCode === 404" class="text-ink-muted">Débat introuvable.</p>
+      <p v-else class="text-ink-muted">Une erreur est survenue. Veuillez réessayer.</p>
     </div>
 
     <!-- Debate content -->
     <div v-else-if="data">
       <!-- Page header -->
-      <div class="pb-4 mb-4 border-b border-gray-200">
-        <NuxtLink to="/" class="text-primary hover:underline text-sm">
-          &larr; Retour aux debats
+      <div class="pb-4 mb-4 border-b border-stone-border">
+        <NuxtLink to="/" class="text-bronze hover:text-bronze-dark text-sm transition-colors duration-200">
+          &larr; Retour aux débats
         </NuxtLink>
 
-        <h1 class="text-xl font-bold text-gray-900 mt-2">
+        <h1 class="text-xl font-bold text-ink mt-2 font-heading">
           {{ data.debate?.title }}
         </h1>
 
-        <div class="mt-1 text-sm text-gray-500">
+        <div class="mt-1 text-sm text-ink-muted">
           <span>{{ formattedDate }}</span>
           <span v-if="data.debate?.sessionType"> · {{ data.debate.sessionType }}</span>
         </div>
 
-        <p class="mt-1 text-sm text-gray-500">
+        <p class="mt-1 text-sm text-ink-muted">
           {{ data.interventions?.length ?? 0 }} interventions
         </p>
       </div>
@@ -65,7 +65,7 @@ const formattedDate = computed(() => {
       </div>
 
       <!-- Empty state -->
-      <div v-else class="py-8 text-center text-gray-500 text-sm">
+      <div v-else class="py-8 text-center text-ink-muted text-sm">
         Aucune intervention
       </div>
     </div>

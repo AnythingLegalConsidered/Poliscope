@@ -33,18 +33,18 @@ const initials = computed(() => {
 </script>
 
 <template>
-  <div class="flex gap-3 py-4 border-b border-gray-100">
+  <div class="flex gap-3 py-4 border-b border-stone-border/50">
     <!-- Avatar column -->
     <div class="flex-shrink-0">
       <img
         v-if="deputy?.photoUrl"
         :src="deputy.photoUrl"
         :alt="displayName"
-        class="w-10 h-10 rounded-full object-cover"
+        class="w-10 h-10 rounded-full object-cover border border-stone-border"
       />
       <div
         v-else
-        class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold"
+        class="w-10 h-10 rounded-full bg-bronze flex items-center justify-center text-white text-sm font-bold"
       >
         {{ initials }}
       </div>
@@ -54,13 +54,13 @@ const initials = computed(() => {
     <div class="flex-1 min-w-0">
       <!-- Header line -->
       <div class="flex items-center gap-2 flex-wrap mb-1">
-        <span class="font-semibold text-sm">{{ displayName }}</span>
+        <span class="font-semibold text-sm text-ink">{{ displayName }}</span>
         <GroupBadge v-if="deputy?.group" :group="deputy.group" />
-        <span v-if="speakerRole" class="text-xs text-gray-500">{{ speakerRole }}</span>
+        <span v-if="speakerRole" class="text-xs text-ink-muted">{{ speakerRole }}</span>
       </div>
 
       <!-- Intervention content -->
-      <p class="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{{ content }}</p>
+      <p class="text-sm text-ink/85 leading-relaxed whitespace-pre-wrap">{{ content }}</p>
     </div>
   </div>
 </template>

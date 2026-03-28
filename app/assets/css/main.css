@@ -1,8 +1,39 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;700&display=swap');
 
 @theme {
-  --color-primary: #1a365d;
-  --color-accent: #e53e3e;
+  /* Marbre & Bronze palette — inspired by DataCommune */
+  --color-marble: #FAF6F0;
+  --color-marble-dark: #EDE5D8;
+  --color-parchment: #F5EEE3;
+  --color-bronze: #A0744F;
+  --color-bronze-dark: #8B6139;
+  --color-bronze-light: #E8D5C0;
+  --color-gold: #C9A84C;
+  --color-terracotta: #B85C3A;
+  --color-ink: #2A1F14;
+  --color-ink-muted: #6B5B4D;
+  --color-stone-border: #D4C4AD;
+  --color-column: #1E1A15;
+
+  /* Semantic aliases */
+  --color-primary: #A0744F;
+  --color-accent: #C9A84C;
+
+  /* Typography */
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+/* Base typography */
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background-color: var(--color-marble);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
 }
 
 /* Political group colors are handled via JS util (app/utils/groupColors.ts)

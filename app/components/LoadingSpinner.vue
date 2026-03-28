@@ -1,7 +1,7 @@
 <template>
   <div class="py-8 text-center">
     <svg
-      class="animate-spin w-6 h-6 text-primary inline-block"
+      class="animate-spin w-6 h-6 text-bronze inline-block"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
