@@ -147,7 +147,7 @@ Plans:
 Plans:
 - [x] 09-01-PLAN.md — Rename deputies -> actors (hand-written migration) + stored tsvector FTS + delete schema duplicate + update API routes
 - [x] 09-02-PLAN.md — Add tables (organs, legislatures, scrutins, votes, questions, amendments, cross_references) + debates.chamber + additive migration
-- [ ] 09-03-PLAN.md — Gap closure: fix index name inconsistency + apply migrations to live DB + verify data integrity
+- [x] 09-03-PLAN.md — Gap closure: fix index name inconsistency + apply migrations to live DB + verify data integrity
 
 ---
 

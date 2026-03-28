@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
 - **Phase** : 9 — Schema BDD Universel
-- **Plan** : 2/2 — COMPLETE
-- **Status** : Phase complete — ready for Phase 10
-- **Last activity** : 2026-03-28 — Completed 09-02 (7 new tables: organs, legislatures, scrutins, votes, questions, amendments, cross_references)
+- **Plan** : 3/3 — COMPLETE
+- **Status** : Phase 9 complete (gap closure done) — ready for Phase 10
+- **Last activity** : 2026-03-28 — Completed 09-03 gap closure (migrations applied to live DB, 12 tables, FTS verified)
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [████░░░░░░░░░░░░] 4/16 plans
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [█████░░░░░░░░░░░] 5/17 plans
 
 ## Accumulated Context
 
@@ -66,7 +66,7 @@ Progress: Milestone 1 [███████████████████
 - **Phase 11** : Format XML Senat (Akoma Ntoso) non valide — echantillonner 2-3 CR recents avant implementation
 - **Phase 12** : Schema Dosleg dump PostgreSQL 8.4 non inspecte — tester compatibilite avec PG17 avant ingestion
 - **Phase 13** : Compatibilite @scalar/nuxt avec Nuxt 4 a confirmer (30 min check)
-- **Schema** : Rename `deputies -> actors` est HIGH RISK — toujours tester sur snapshot prod avant migration LXC
+- **Schema** : ~~Rename `deputies -> actors`~~ DONE — migration appliquee avec succes (618 actors, zero perte)
 
 ### Pending Todos
 
@@ -75,11 +75,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-03-28
-- **Stopped at** : Phase 9 complete (2/2 plans) — Phase 10 ready
-- **Resume** : Execute 10-ingestion-an — Phase 10 ingestion AN (tricoteuses, CRI XML parsing)
+- **Stopped at** : Phase 9 fully complete (3/3 plans, gaps closed, migrations applied) — Phase 10 ready
+- **Resume** : Plan Phase 10 — ingestion acteurs AN + organes
 
 ## History
 
+- 2026-03-28 : Completed 09-03 gap closure — fix idx_interventions_fts name, apply migrations 0001+0002 to live DB (psql SSH), verified 618 actors + 2479 interventions + FTS indexes + API endpoints
 - 2026-03-28 : Completed 09-02 — 7 new tables (legislatures, organs, scrutins, votes, questions, amendments, cross_references), debates.chamber, additive migration 0002 (zero DROP TABLE)
 - 2026-03-28 : Completed 09-01 — rename deputies->actors (safe migration), stored tsvector FTS columns, all 6 API routes -> shared/schema
 - 2026-03-28 : Phase 8 complete — verification PASSED (7/7 must-haves). LXC 200 poliscope-db provisioned (PG17.9), monorepo pnpm, E2E 11/11
