@@ -142,11 +142,12 @@ Plans:
   4. `drizzle-kit generate` produit des migrations incrementales (pas de DROP TABLE sur les donnees existantes)
   5. Les index FTS francais (`search_vector tsvector`) existent sur acteurs et interventions — `EXPLAIN ANALYZE` confirme un index scan
 
-**Plans:** 2 plans
+**Plans:** 3 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — Rename deputies -> actors (hand-written migration) + stored tsvector FTS + delete schema duplicate + update API routes
-- [ ] 09-02-PLAN.md — Add tables (organs, legislatures, scrutins, votes, questions, amendments, cross_references) + debates.chamber + additive migration
+- [x] 09-01-PLAN.md — Rename deputies -> actors (hand-written migration) + stored tsvector FTS + delete schema duplicate + update API routes
+- [x] 09-02-PLAN.md — Add tables (organs, legislatures, scrutins, votes, questions, amendments, cross_references) + debates.chamber + additive migration
+- [ ] 09-03-PLAN.md — Gap closure: fix index name inconsistency + apply migrations to live DB + verify data integrity
 
 ---
 
@@ -281,7 +282,7 @@ Plans:
 | 6. Recherche & Filtres | v1.0 | 2/2 | Complete | 2026-03-28 |
 | 7. Polish & Lancement | v1.0 | 2/2 | Complete | 2026-03-28 |
 | 8. Monorepo & Infra LXC | v2.0 | 2/2 | Complete | 2026-03-28 |
-| 9. Schema BDD Universel | v2.0 | 0/2 | Not started | - |
+| 9. Schema BDD Universel | v2.0 | 2/3 | Gap closure | - |
 | 10. Ingestion Acteurs & Organes | v2.0 | 0/2 | Not started | - |
 | 11. Ingestion Debats CRI | v2.0 | 0/2 | Not started | - |
 | 12. Ingestion Votes & Scrutins | v2.0 | 0/2 | Not started | - |
