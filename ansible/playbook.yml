@@ -1,0 +1,205 @@
+---
+# =============================================================================
+# Poliscope Infrastructure Playbook
+# =============================================================================
+# Play 1: Create Debian 12 LXC on PVE02
+# Play 2: Install and configure PostgreSQL 17 on the LXC
+#
+# Prerequisites:
+#   1. Fill in ansible/group_vars/all.yml (IPs, password, subnet)
+#   2. Fill in ansible/inventory.ini (actual IP addresses)
+#   3. Install collections: ansible-galaxy collection install -r requirements.yml
+#
+# Run:
+#   ansible-playbook -i inventory.ini playbook.yml
+#
+# Idempotent: safe to re-run. Existing containers / PG config are not re-created.
+# =============================================================================
+
+
+# =============================================================================
+# PLAY 1 — Create LXC container on PVE02
+# =============================================================================
+- name: Create poliscope LXC on PVE02
+  hosts: pve02
+  gather_facts: false
+
+  tasks:
+
+    - name: Download Debian 12 template if not present
+      ansible.builtin.shell:
+        cmd: "pveam download local {{ lxc_template_name }}"
+        creates: "/var/lib/vz/template/cache/{{ lxc_template_name }}"
+
+    - name: Create LXC container
+      community.proxmox.proxmox:
+        vmid: "{{ lxc_vmid }}"
+        node: "{{ pve_node }}"
+        api_host: "{{ pve_api_host }}"
+        api_user: "{{ pve_api_user }}"
+        api_password: "{{ pve_api_password }}"
+        # For API token auth, replace api_password with:
+        # api_token_id: "{{ pve_api_token_id }}"
+        # api_token_secret: "{{ pve_api_token_secret }}"
+        hostname: "{{ lxc_hostname }}"
+        ostemplate: "{{ lxc_template }}"
+        cores: "{{ lxc_cores }}"
+        memory: "{{ lxc_memory }}"
+        disk: "{{ lxc_disk }}"
+        netif: '{"net0":"name=eth0,bridge={{ lxc_bridge }},ip={{ lxc_ip }}/{{ lxc_cidr }},gw={{ lxc_gw }}"}'
+        pubkey: "{{ lookup('file', ssh_pubkey_path) }}"
+        onboot: true
+        state: present
+
+    - name: Start LXC container
+      community.proxmox.proxmox:
+        vmid: "{{ lxc_vmid }}"
+        node: "{{ pve_node }}"
+        api_host: "{{ pve_api_host }}"
+        api_user: "{{ pve_api_user }}"
+        api_password: "{{ pve_api_password }}"
+        state: started
+
+    - name: Wait for SSH to become available on LXC
+      ansible.builtin.wait_for:
+        host: "{{ lxc_ip }}"
+        port: 22
+        delay: 5
+        timeout: 120
+
+
+# =============================================================================
+# PLAY 2 — Configure PostgreSQL 17 on the LXC
+# =============================================================================
+- name: Configure PostgreSQL 17 on poliscope-db LXC
+  hosts: lxc
+  become: true
+  gather_facts: true
+
+  handlers:
+    - name: restart postgresql
+      ansible.builtin.service:
+        name: postgresql
+        state: restarted
+
+  tasks:
+
+    # -------------------------------------------------------------------------
+    # System prerequisites
+    # -------------------------------------------------------------------------
+    - name: Install prerequisites
+      ansible.builtin.apt:
+        name:
+          - curl
+          - ca-certificates
+          - gnupg
+          - python3-psycopg2
+          - ufw
+        update_cache: true
+        state: present
+
+    # -------------------------------------------------------------------------
+    # PostgreSQL 17 from PGDG repository
+    # -------------------------------------------------------------------------
+    - name: Add PGDG signing key
+      ansible.builtin.apt_key:
+        url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+        keyring: /usr/share/keyrings/postgresql-archive-keyring.gpg
+        state: present
+
+    - name: Add PGDG apt repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt bookworm-pgdg main"
+        filename: pgdg
+        state: present
+
+    - name: Install PostgreSQL 17
+      ansible.builtin.apt:
+        name:
+          - postgresql-17
+          - postgresql-client-17
+        update_cache: true
+        state: present
+
+    - name: Ensure PostgreSQL service is started and enabled
+      ansible.builtin.service:
+        name: postgresql
+        state: started
+        enabled: true
+
+    # -------------------------------------------------------------------------
+    # Remote access configuration
+    # -------------------------------------------------------------------------
+    - name: Set listen_addresses to allow remote connections
+      ansible.builtin.lineinfile:
+        path: /etc/postgresql/17/main/postgresql.conf
+        regexp: "^#?listen_addresses"
+        line: "listen_addresses = '*'"
+        state: present
+      notify: restart postgresql
+
+    - name: Allow LAN subnet in pg_hba.conf (scram-sha-256)
+      community.postgresql.postgresql_pg_hba:
+        dest: /etc/postgresql/17/main/pg_hba.conf
+        contype: host
+        databases: "{{ pg_db }}"
+        users: "{{ pg_user }}"
+        source: "{{ lan_subnet }}"
+        method: scram-sha-256
+        state: present
+      notify: restart postgresql
+
+    # -------------------------------------------------------------------------
+    # Database and user creation
+    # -------------------------------------------------------------------------
+    - name: Create poliscope database
+      community.postgresql.postgresql_db:
+        name: "{{ pg_db }}"
+        state: present
+      become_user: postgres
+
+    - name: Create poliscope user with password
+      community.postgresql.postgresql_user:
+        name: "{{ pg_user }}"
+        password: "{{ pg_password }}"
+        state: present
+      become_user: postgres
+
+    - name: Grant ALL privileges on poliscope database to poliscope user
+      community.postgresql.postgresql_privs:
+        database: "{{ pg_db }}"
+        roles: "{{ pg_user }}"
+        type: database
+        privs: ALL
+        state: present
+      become_user: postgres
+
+    # -------------------------------------------------------------------------
+    # Firewall (UFW) — allow only required ports from LAN
+    # -------------------------------------------------------------------------
+    - name: Allow SSH (port 22) from anywhere
+      community.general.ufw:
+        rule: allow
+        port: '22'
+        proto: tcp
+        state: enabled
+
+    - name: Allow PostgreSQL (port 5432) from LAN only
+      community.general.ufw:
+        rule: allow
+        port: '5432'
+        src: "{{ lan_subnet }}"
+        proto: tcp
+
+    - name: Allow Nuxt dev server (port 3000) from LAN only
+      community.general.ufw:
+        rule: allow
+        port: '3000'
+        src: "{{ lan_subnet }}"
+        proto: tcp
+
+    - name: Enable UFW with default deny policy
+      community.general.ufw:
+        state: enabled
+        default: deny
+        direction: incoming

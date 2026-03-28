@@ -1,0 +1,48 @@
+---
+# =============================================================================
+# LXC container configuration
+# =============================================================================
+lxc_vmid: 200
+lxc_hostname: poliscope-db
+lxc_ip: "<LXC_IP>"          # e.g. 192.168.1.200
+lxc_gw: "<GATEWAY_IP>"      # e.g. 192.168.1.1
+lxc_cidr: 24
+
+# =============================================================================
+# PVE02 API authentication
+# By default uses root password auth (simpler for first run).
+# For API token auth (more secure), comment out pve_api_password and uncomment:
+#   pve_api_user: "ansible@pve"
+#   pve_api_token_id: "automation"
+#   pve_api_token_secret: "<TOKEN_SECRET>"
+# =============================================================================
+pve_node: pve02
+pve_api_host: "<PVE02_IP>"   # e.g. 192.168.1.10
+pve_api_user: "root@pam"
+pve_api_password: "<PVE02_ROOT_PASSWORD>"
+# pve_api_user: "ansible@pve"
+# pve_api_token_id: "automation"
+# pve_api_token_secret: "<TOKEN_SECRET>"
+
+# =============================================================================
+# LXC resources
+# =============================================================================
+lxc_cores: 4
+lxc_memory: 4096
+lxc_disk: "local-lvm:100"
+lxc_template: "local:vztmpl/debian-12-standard_12.7-1_amd64.tar.zst"
+lxc_template_name: "debian-12-standard_12.7-1_amd64.tar.zst"
+lxc_bridge: vmbr0
+
+# =============================================================================
+# PostgreSQL
+# =============================================================================
+pg_db: poliscope
+pg_user: poliscope
+pg_password: "<CHANGE_ME>"   # Choose a strong password
+lan_subnet: "<LAN_SUBNET>/24" # e.g. 192.168.1.0/24
+
+# =============================================================================
+# SSH
+# =============================================================================
+ssh_pubkey_path: "~/.ssh/id_ed25519.pub"
