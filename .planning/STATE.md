@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Permettre a n'importe qui de chercher et lire ce qu'un parlementaire a dit sur n'importe quel sujet, en quelques clics.
-**Current focus:** Phase 8 — Monorepo & Infra LXC (Milestone 2 start)
+**Current focus:** Phase 9 — Schema BDD Universel
 
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
-- **Phase** : 8 — Monorepo & Infra LXC
-- **Plan** : 1/2 — 08-01 DONE, 08-02 at checkpoint (human-action)
-- **Status** : In progress — PAUSED at 08-02 Task 2 (run Ansible playbook)
-- **Last activity** : 2026-03-28 — Completed 08-01 (monorepo restructure), 08-02 at Task 2 checkpoint
+- **Phase** : 9 — Schema BDD Universel
+- **Plan** : 0/2 — not started
+- **Status** : Ready to plan
+- **Last activity** : 2026-03-28 — Phase 8 complete (monorepo + LXC PG17)
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [█░░░░░░░░░░░░░░░] 1/16 plans
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [██░░░░░░░░░░░░░░] 2/16 plans
 
 ## Accumulated Context
 
@@ -46,7 +46,6 @@ Progress: Milestone 1 [███████████████████
 
 ### Blockers / Risks
 
-- **Phase 8 (08-02)** : CHECKPOINT — Ansible playbook pret, attend execution manuelle sur PVE02 (remplir IPs + mot de passe, lancer playbook, verifier psql)
 - **Phase 10** : URL Tricoteuses a valider (migration Framagit -> git.en-root.org, retourne 403 en research)
 - **Phase 11** : Format XML Senat (Akoma Ntoso) non valide — echantillonner 2-3 CR recents avant implementation
 - **Phase 12** : Schema Dosleg dump PostgreSQL 8.4 non inspecte — tester compatibilite avec PG17 avant ingestion
@@ -60,10 +59,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-03-28
-- **Stopped at** : 08-02 Task 2 checkpoint (human-action) — Ansible playbook pret, attend execution
-- **Resume** : Apres avoir rempli les variables et execute le playbook → signaler "done" pour continuer
+- **Stopped at** : Phase 8 complete — Phase 9 ready to plan
+- **Resume** : `plan-phase 9` — Schema BDD Universel
 
 ## History
+
+- 2026-03-28 : Phase 8 complete — verification PASSED (7/7 must-haves). LXC 200 poliscope-db provisioned (PG17.9), monorepo pnpm, E2E 11/11
 
 - 2026-03-28 : Completed 08-01 — pnpm monorepo: packages/shared + packages/web + packages/ingestion, pnpm build passes
 - 2026-03-28 : Completed 08-02 (partial) — Ansible playbook LXC + PG17 cree, checkpoint Task 2 (execution manuelle)
