@@ -21,8 +21,8 @@ test.describe('Deputies list and detail', () => {
 
     const initialCount = await cards.count()
 
-    // Fill search input with a common name fragment
-    const searchInput = page.locator('input[type="search"]')
+    // Fill the page-level search input (not the header one)
+    const searchInput = page.locator('main input[type="search"]')
     await searchInput.fill('Martin')
 
     // Wait for debounce + re-fetch

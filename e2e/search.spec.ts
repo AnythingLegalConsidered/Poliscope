@@ -15,7 +15,7 @@ test.describe('Search flow', () => {
   })
 
   test('search results page shows results', async ({ page, goto }) => {
-    await goto('/search?q=assemblee', { waitUntil: 'hydration' })
+    await goto('/search?q=budget', { waitUntil: 'hydration' })
 
     // Wait for results to render (query triggers on load)
     const resultCards = page.locator('[data-testid="search-result-card"]')

@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
   runtimeConfig: {
-    databaseUrl: '', // Auto-mapped from NUXT_DATABASE_URL
+    databaseUrl: process.env.NUXT_DATABASE_URL || '',
   },
   typescript: {
     strict: true,
@@ -33,9 +33,9 @@ export default defineNuxtConfig({
     sources: ['/api/__sitemap__/urls'],
   },
   routeRules: {
-    '/api/debates': { cache: { maxAge: 300 } },
-    '/api/debates/**': { cache: { maxAge: 300 } },
-    '/api/deputies': { cache: { maxAge: 3600 } },
-    '/api/deputies/**': { cache: { maxAge: 600 } },
+    '/api/debates': { headers: { 'cache-control': 'public, max-age=300' } },
+    '/api/debates/**': { headers: { 'cache-control': 'public, max-age=300' } },
+    '/api/deputies': { headers: { 'cache-control': 'public, max-age=3600' } },
+    '/api/deputies/**': { headers: { 'cache-control': 'public, max-age=600' } },
   },
 })
