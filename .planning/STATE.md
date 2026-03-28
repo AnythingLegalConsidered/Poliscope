@@ -1,12 +1,12 @@
 # Poliscope — State
 
 ## Current Position
-- **Milestone** : 2 — Polish & Lancement
-- **Phase** : 7 — Polish & Lancement (In progress)
-- **Plan** : 07-02 complete — 2/? plans done
-- **Status** : In progress
+- **Milestone** : 1 — MVP Debats AN
+- **Phase** : 7 — Polish & Lancement (Complete)
+- **Plan** : 07-02 complete — 2/2 plans done
+- **Status** : Phase complete — Milestone 1 complete
 
-Progress: Phase 7 [██░] 2/? plans done | Overall [████████████████] ~17+ plans
+Progress: Phase 7 [██] 2/2 plans done | Overall [█████████████████] 17/17 plans
 
 ## Decisions
 | ID | Decision | Context |
@@ -48,10 +48,11 @@ Progress: Phase 7 [██░] 2/? plans done | Overall [████████
 
 ## Session Continuity
 - **Last session**: 2026-03-28
-- **Stopped at**: Phase 7 plan 02 complete + Milestone 2 planifie (roadmap, PROJECT.md, MILESTONES.md, README)
-- **Resume**: Verifier phase 7 complete, puis Phase 8 (M2)
+- **Stopped at**: Phase 7 complete — verification PASSED (14/14 must-haves)
+- **Resume**: Milestone 1 complete — next milestone planning
 
 ## History
+- 2026-03-28 : Phase 7 complete — verification PASSED (14/14 must-haves)
 - 2026-03-28 : Completed 07-02 — Playwright E2E suite: 11 tests across 4 spec files, data-testid on all card components (commits 6b51669 + fdd9da7)
 - 2026-03-28 : Completed 07-01 — Global SEO (@nuxtjs/sitemap, useSeoMeta, routeRules caching, robots.txt) + about/legal pages + footer nav (commits 5960a1e + 4553c38 + 1ae013f)
 - 2026-03-28 : Phase 6 complete — verification PASSED (10/10 must-haves)

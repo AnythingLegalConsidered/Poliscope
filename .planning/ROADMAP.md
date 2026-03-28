@@ -97,7 +97,7 @@ Plans:
 
 Plans:
 - [x] 07-01-PLAN.md — SEO + performance caching + sitemap + content pages (about, legal)
-- [ ] 07-02-PLAN.md — Playwright E2E tests for critical user journeys
+- [x] 07-02-PLAN.md — Playwright E2E tests for critical user journeys
 
 ---
 
