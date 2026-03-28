@@ -2,11 +2,11 @@
 
 ## Current Position
 - **Milestone** : 1 — MVP Debats AN
-- **Phase** : 4 — UI Debats Thread View (COMPLETE)
-- **Next** : Phase 5 — Profils Deputes
-- **Status** : 3/3 plans done
+- **Phase** : 5 — Profils Deputes (COMPLETE)
+- **Next** : Phase 6 (TBD) or MVP validation
+- **Status** : 2/2 plans done
 
-Progress: Phase 4 [███] 3/3 plans done
+Progress: Phase 5 [██] 2/2 plans done | Overall [█████████████░░] ~13/15 plans
 
 ## Decisions
 | ID | Decision | Context |
@@ -23,18 +23,23 @@ Progress: Phase 4 [███] 3/3 plans done
 | D-0303-02 | websearch_to_tsquery over to_tsquery | Handles unescaped user input safely, no manual pre-processing needed |
 | D-0401-01 | Group colors via inline JS (getGroupColor) not CSS variables | Dynamic data per group; CSS variables would be unused/inflexible |
 | D-0401-02 | whitespace-pre-wrap in InterventionCard (not v-html) | XSS-safe, handles multiline debate transcript text |
-| D-0403-01 | No virtual scrolling on debate thread page | Browser handles ~1000 simple nodes; deferred as premature optimization |
 | D-0402-01 | Date in computed with fr-FR + Europe/Paris timezone | Explicit locale and timezone in computed prevents SSR/client hydration mismatch |
 | D-0402-02 | useFetch watch: [page] re-fetches automatically | No manual refresh() call needed; avoids double-fetch bugs |
 | D-0403-01 | No virtual scrolling on debate thread page | Browser handles ~1000 simple nodes; deferred as premature optimization |
 | D-0403-02 | v-bind spread on InterventionCard | API response shape matches component props exactly — no manual binding needed |
+| D-0502-01 | deputyId is optional prop on InterventionCard | Existing v-bind spreads auto-pass it; debates API already returns deputyId |
+| D-0502-02 | Tag filter client-side on accumulated allInterventions | Simpler UX; resets activeTag to null on page increment |
+| D-0502-03 | component :is pattern for conditional NuxtLink avatar | Avoids duplicating full avatar markup in v-if/v-else blocks |
+| D-0502-04 | Deputy.fullName typed as string or null | Matches Drizzle/Nuxt SerializeObject<> shape; resolves pre-existing TS2345 |
 
 ## Session Continuity
 - **Last session**: 2026-03-28
-- **Stopped at**: Phase 4 complete
-- **Resume**: Plan Phase 5 (Profils Deputes)
+- **Stopped at**: Phase 5 complete (05-02 done)
+- **Resume**: Phase 6 planning (if applicable)
 
 ## History
+- 2026-03-28 : Completed 05-02 — Deputy profile page /deputies/[id] with tag filter, load more, debate context links + InterventionCard deputyId bidirectional nav (commits 2ce1d8d + f7492b4)
+- 2026-03-28 : Completed 05-01 — Deputies list page /deputies with search, group filter, infinite scroll + DeputyCard component
 - 2026-03-28 : Phase 4 complete — verification PASSED (11/11 must-haves). Design reskin "Marbre & Bronze" applied (commit 06c9e4f)
 - 2026-03-28 : Completed 04-03 — debate thread page /debates/[id] with route validation, useFetch, InterventionCard thread, SEO title (commit b93b901)
 - 2026-03-28 : Completed 04-02 — DebateCard component + home page with useFetch/useIntersectionObserver infinite scroll (commits 9fb6a35 + f3cde7a)
