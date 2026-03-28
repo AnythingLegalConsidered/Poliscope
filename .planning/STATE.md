@@ -3,10 +3,10 @@
 ## Current Position
 - **Milestone** : 2 — Polish & Lancement
 - **Phase** : 7 — Polish & Lancement (In progress)
-- **Plan** : 07-01 complete — 1/? plans done
+- **Plan** : 07-02 complete — 2/? plans done
 - **Status** : In progress
 
-Progress: Phase 7 [█░░] 1/? plans done | Overall [████████████████] ~16+ plans
+Progress: Phase 7 [██░] 2/? plans done | Overall [████████████████] ~17+ plans
 
 ## Decisions
 | ID | Decision | Context |
@@ -37,13 +37,16 @@ Progress: Phase 7 [█░░] 1/? plans done | Overall [████████
 | D-0601-04 | json_agg with COALESCE to '[]'::json in tags subquery | Ensures non-null tags array in SQL response for all interventions |
 | D-0701-01 | useSeoMeta with reactive getter functions for dynamic pages | SSR renders correctly when data loads asynchronously |
 | D-0701-02 | Footer-only links to /about and /legal (not in header nav) | Plan specified footer only — keeps header nav focused on core app pages |
+| D-0702-01 | @nuxt/test-utils/playwright with Nuxt rootDir integration | Tests run against real Nuxt dev server with full SSR/hydration cycle |
+| D-0702-02 | data-testid on root component elements (not wrappers) | Stable selectors independent of CSS class changes |
 
 ## Session Continuity
 - **Last session**: 2026-03-28
-- **Stopped at**: Phase 7 plan 01 complete — SEO, caching, sitemap, content pages
-- **Resume**: `.planning/phases/07-polish-lancement/07-02-PLAN.md` (next plan in phase 7)
+- **Stopped at**: Phase 7 plan 02 complete — Playwright E2E test suite (11 tests, 4 journeys)
+- **Resume**: `.planning/phases/07-polish-lancement/` (next plan in phase 7, if any)
 
 ## History
+- 2026-03-28 : Completed 07-02 — Playwright E2E suite: 11 tests across 4 spec files, data-testid on all card components (commits 6b51669 + fdd9da7)
 - 2026-03-28 : Completed 07-01 — Global SEO (@nuxtjs/sitemap, useSeoMeta, routeRules caching, robots.txt) + about/legal pages + footer nav (commits 5960a1e + 4553c38 + 1ae013f)
 - 2026-03-28 : Phase 6 complete — verification PASSED (10/10 must-haves)
 - 2026-03-28 : Completed 06-02 — Global header search bar in default.vue layout, NuxtLink fix + immediate fetch on URL load, 10/10 Playwright tests passed (commits 85a1d88 + 64a5e09)
