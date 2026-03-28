@@ -34,7 +34,7 @@ const initials = computed(() => {
 </script>
 
 <template>
-  <div class="flex gap-3 py-4 border-b border-stone-border/50">
+  <div data-testid="intervention-card" class="flex gap-3 py-4 border-b border-stone-border/50">
     <!-- Avatar column -->
     <component
       :is="deputyId ? resolveComponent('NuxtLink') : 'div'"

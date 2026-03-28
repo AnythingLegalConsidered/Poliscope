@@ -24,6 +24,7 @@ const imageError = ref(false)
 <template>
   <NuxtLink
     :to="`/deputies/${id}`"
+    data-testid="deputy-card"
     class="flex items-center gap-3 bg-parchment rounded-xl border border-stone-border p-4 hover:border-bronze/40 transition-colors duration-200"
   >
     <!-- Photo or initials fallback -->

@@ -53,7 +53,7 @@ const formattedDate = computed(() => {
 </script>
 
 <template>
-  <div class="bg-parchment border border-stone-border rounded-lg overflow-hidden">
+  <div data-testid="search-result-card" class="bg-parchment border border-stone-border rounded-lg overflow-hidden">
     <!-- Debate header -->
     <div class="px-4 pt-3 pb-2">
       <div class="flex items-start justify-between gap-3">

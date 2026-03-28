@@ -19,6 +19,7 @@ const formattedDate = computed(() => {
 <template>
   <NuxtLink
     :to="'/debates/' + id"
+    data-testid="debate-card"
     class="block bg-parchment rounded-xl border border-stone-border p-4 hover:border-bronze/40 transition-colors duration-200 cursor-pointer"
   >
     <h2 class="text-base font-semibold text-ink line-clamp-2 mb-2 font-heading">
