@@ -57,9 +57,9 @@ Plans:
 - **Plans:** 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Shared components (GroupBadge, InterventionCard, LoadingSpinner) + group colors
-- [ ] 04-02-PLAN.md — Home page with debates list + infinite scroll
-- [ ] 04-03-PLAN.md — Debate thread page (Twitter-style intervention thread)
+- [x] 04-01-PLAN.md — Shared components (GroupBadge, InterventionCard, LoadingSpinner) + group colors
+- [x] 04-02-PLAN.md — Home page with debates list + infinite scroll
+- [x] 04-03-PLAN.md — Debate thread page (Twitter-style intervention thread)
 
 ### Phase 5 — Profils Deputes
 **Objectif** : Pages profils avec historique des interventions.

@@ -2,12 +2,11 @@
 
 ## Current Position
 - **Milestone** : 1 — MVP Debats AN
-- **Phase** : 4 — UI Debats Thread View (In progress)
-- **Plan** : 04-03 Task 1 complete — debate thread page built; awaiting checkpoint:human-verify
-- **Next** : Human verification of full debates UI (/ and /debates/:id)
-- **Status** : 2/3 plans done in phase 4 (04-01 + 04-03 Task 1; 04-02 also needed for checkpoint)
+- **Phase** : 4 — UI Debats Thread View (COMPLETE)
+- **Next** : Phase 5 — Profils Deputes
+- **Status** : 3/3 plans done
 
-Progress: Phase 4 [█░█] 2/3 plans done (checkpoint pending)
+Progress: Phase 4 [███] 3/3 plans done
 
 ## Decisions
 | ID | Decision | Context |
@@ -32,11 +31,12 @@ Progress: Phase 4 [█░█] 2/3 plans done (checkpoint pending)
 
 ## Session Continuity
 - **Last session**: 2026-03-28
-- **Stopped at**: Phase 4, plan 03 Task 1 complete — debate thread page built; checkpoint:human-verify reached
-- **Resume**: After human approves checkpoint — phase 4 complete
+- **Stopped at**: Phase 4 complete
+- **Resume**: Plan Phase 5 (Profils Deputes)
 
 ## History
-- 2026-03-28 : Completed 04-03 Task 1 — debate thread page /debates/[id] with route validation, useFetch, InterventionCard thread, SEO title (commit b93b901); checkpoint pending
+- 2026-03-28 : Phase 4 complete — verification PASSED (11/11 must-haves). Design reskin "Marbre & Bronze" applied (commit 06c9e4f)
+- 2026-03-28 : Completed 04-03 — debate thread page /debates/[id] with route validation, useFetch, InterventionCard thread, SEO title (commit b93b901)
 - 2026-03-28 : Completed 04-02 — DebateCard component + home page with useFetch/useIntersectionObserver infinite scroll (commits 9fb6a35 + f3cde7a)
 - 2026-03-28 : Completed 04-01 — @vueuse/core + GroupBadge, InterventionCard, LoadingSpinner + 11-group color system (commits 2e896ad + 5418968)
 - 2026-03-27 : Completed 03-03 — GET /api/search FTS endpoint with French language, ts_rank, ts_headline highlights (commit 588bcf6)
