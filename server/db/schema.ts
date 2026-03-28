@@ -22,6 +22,7 @@ export const debates = pgTable('debates', {
   date: timestamp('date').notNull(),
   legislature: integer('legislature').notNull(),
   sessionType: text('session_type'),
+  presidingOfficer: text('presiding_officer'),
   sourceUrl: text('source_url'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })

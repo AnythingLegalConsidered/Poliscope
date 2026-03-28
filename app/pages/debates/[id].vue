@@ -50,6 +50,10 @@ const formattedDate = computed(() => {
           <span v-if="data.debate?.sessionType"> · {{ data.debate.sessionType }}</span>
         </div>
 
+        <p v-if="data.debate?.presidingOfficer" class="mt-1 text-sm text-ink-muted">
+          Présidence : {{ data.debate.presidingOfficer }}
+        </p>
+
         <p class="mt-1 text-sm text-ink-muted">
           {{ data.interventions?.length ?? 0 }} interventions
         </p>
