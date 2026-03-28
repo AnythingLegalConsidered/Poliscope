@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { useIntersectionObserver } from '@vueuse/core'
 
+useSeoMeta({
+  title: 'Députés',
+  description: "Liste des députés de l'Assemblée nationale",
+})
+
 // Known political groups for the 17th legislature filter
 const GROUPS = [
   { value: 'RN', label: 'RN — Rassemblement national' },

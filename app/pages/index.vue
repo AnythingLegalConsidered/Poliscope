@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { useIntersectionObserver } from '@vueuse/core'
 
+useSeoMeta({
+  title: 'Débats',
+  description: "Les derniers débats de l'Assemblée nationale",
+  ogType: 'website',
+})
+
 // Reactive page number — useFetch re-fetches automatically when it changes
 const page = ref(1)
 

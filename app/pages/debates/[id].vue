@@ -8,8 +8,12 @@ definePageMeta({
 const route = useRoute()
 const { data, status, error } = await useFetch(`/api/debates/${route.params.id}`)
 
-useHead({
-  title: computed(() => (data.value?.debate?.title ?? 'Debat') + ' — Poliscope'),
+useSeoMeta({
+  title: () => data.value?.debate?.title ?? 'Débat',
+  description: () => `Débat du ${data.value?.debate?.date ? new Date(data.value.debate.date).toLocaleDateString('fr-FR') : ''}`,
+  ogTitle: () => data.value?.debate?.title ?? 'Débat',
+  ogType: 'article',
+  twitterCard: 'summary',
 })
 
 const formattedDate = computed(() => {

@@ -1,13 +1,6 @@
 <script setup lang="ts">
 import { watchDebounced, useIntersectionObserver } from '@vueuse/core'
 
-useHead({
-  title: computed(() => {
-    const q = route.query.q as string | undefined
-    return q ? `Recherche : ${q} - Poliscope` : 'Recherche - Poliscope'
-  }),
-})
-
 const route = useRoute()
 const router = useRouter()
 
@@ -16,6 +9,11 @@ const inputValue = ref((route.query.q as string) ?? '')
 const q = ref((route.query.q as string) ?? '')
 const activeTag = ref((route.query.tag as string) ?? '')
 const deputyId = ref(route.query.deputyId ? Number(route.query.deputyId) : null)
+
+useSeoMeta({
+  title: () => q.value ? `Recherche : ${q.value}` : 'Recherche',
+  description: 'Rechercher dans les interventions parlementaires',
+})
 
 // Debounce raw input -> q (300ms)
 watchDebounced(inputValue, (val) => { q.value = val }, { debounce: 300 })

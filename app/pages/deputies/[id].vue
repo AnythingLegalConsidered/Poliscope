@@ -13,8 +13,12 @@ const { data, status, error } = await useFetch(`/api/deputies/${route.params.id}
   watch: [page],
 })
 
-useHead({
-  title: computed(() => (data.value?.deputy?.fullName ?? 'Député') + ' — Poliscope'),
+useSeoMeta({
+  title: () => data.value?.deputy?.fullName ?? 'Député',
+  description: () => `Activité parlementaire de ${data.value?.deputy?.fullName ?? 'ce député'}`,
+  ogTitle: () => data.value?.deputy?.fullName ?? 'Député',
+  ogType: 'profile',
+  twitterCard: 'summary',
 })
 
 // Accumulate all loaded interventions across pages
