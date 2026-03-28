@@ -162,11 +162,11 @@ Plans:
   3. Les pipelines acteurs et organes sont idempotents — re-lancer deux fois produit le meme resultat (pas de doublons, upsert correct)
   4. Les organes (commissions permanentes, groupes politiques) sont en base avec leurs membres et periodes de mandat
 
-**Plans** : TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 10-01-PLAN.md — Pipeline acteurs AN (Tricoteuses/data.an.fr) + senateurs (data.senat.fr) + cross-references
-- [ ] 10-02-PLAN.md — Pipeline organes (commissions + groupes politiques AN + Senat) + idempotence orchestrateur
+- [ ] 10-01-PLAN.md — Migration 0003 (cross_references unique) + AN deputies ZIP pipeline + Senat senators API pipeline + cross-references
+- [ ] 10-02-PLAN.md — AN + Senat organs ingestion + political_group resolution + run_all.py orchestrator update
 
 ---
 
