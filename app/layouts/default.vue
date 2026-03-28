@@ -25,6 +25,11 @@
     <main class="container mx-auto px-4 py-8">
       <slot />
     </main>
+    <footer class="border-t border-stone-border py-4 text-center text-sm text-ink-muted">
+      <NuxtLink to="/about" class="hover:text-bronze transition-colors duration-200">À propos</NuxtLink>
+      <span class="mx-3 opacity-40">·</span>
+      <NuxtLink to="/legal" class="hover:text-bronze transition-colors duration-200">Mentions légales</NuxtLink>
+    </footer>
   </div>
 </template>
 
