@@ -93,3 +93,8 @@ Plans:
 - Page "A propos" + mentions legales
 - Tests E2E sur les parcours principaux
 - **Livrable** : App prete pour un hebergement public
+- **Plans:** 2 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — SEO + performance caching + sitemap + content pages (about, legal)
+- [ ] 07-02-PLAN.md — Playwright E2E tests for critical user journeys
