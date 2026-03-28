@@ -5,11 +5,21 @@
         <NuxtLink to="/" class="text-xl font-bold text-ink font-heading tracking-wide hover:text-bronze transition-colors duration-200">
           Poliscope
         </NuxtLink>
-        <nav class="flex items-center gap-6 text-sm text-ink-muted">
-          <NuxtLink to="/" active-class="text-bronze" class="hover:text-bronze transition-colors duration-200">Débats</NuxtLink>
-          <NuxtLink to="/deputies" active-class="text-bronze" class="hover:text-bronze transition-colors duration-200">Députés</NuxtLink>
-          <NuxtLink to="/search" active-class="text-bronze" class="hover:text-bronze transition-colors duration-200">Recherche</NuxtLink>
-        </nav>
+        <div class="flex items-center gap-6">
+          <form @submit.prevent="submitSearch" class="hidden sm:block">
+            <input
+              v-model="headerSearch"
+              type="search"
+              placeholder="Rechercher..."
+              class="w-48 bg-parchment border border-stone-border rounded-lg px-3 py-1.5 text-sm text-ink placeholder-ink-muted focus:outline-none focus:border-bronze/40 transition-colors duration-200"
+            />
+          </form>
+          <nav class="flex items-center gap-6 text-sm text-ink-muted">
+            <NuxtLink to="/" active-class="text-bronze" class="hover:text-bronze transition-colors duration-200">Débats</NuxtLink>
+            <NuxtLink to="/deputies" active-class="text-bronze" class="hover:text-bronze transition-colors duration-200">Députés</NuxtLink>
+            <NuxtLink to="/search" active-class="text-bronze" class="hover:text-bronze transition-colors duration-200">Recherche</NuxtLink>
+          </nav>
+        </div>
       </div>
     </header>
     <main class="container mx-auto px-4 py-8">
@@ -17,3 +27,14 @@
     </main>
   </div>
 </template>
+
+<script setup lang="ts">
+const headerSearch = ref('')
+
+function submitSearch() {
+  if (!headerSearch.value.trim()) return
+  const query = headerSearch.value.trim()
+  headerSearch.value = ''
+  navigateTo({ path: '/search', query: { q: query } })
+}
+</script>
