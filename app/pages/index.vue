@@ -38,7 +38,7 @@ const hasMore = computed(() => {
 useIntersectionObserver(
   sentinel,
   ([entry]) => {
-    if (entry.isIntersecting && status.value !== 'pending' && hasMore.value) {
+    if (entry?.isIntersecting && status.value !== 'pending' && hasMore.value) {
       page.value++
     }
   },

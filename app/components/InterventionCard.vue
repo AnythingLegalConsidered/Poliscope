@@ -6,7 +6,7 @@ interface Tag {
 }
 
 interface Deputy {
-  fullName: string
+  fullName: string | null
   group: string | null
   photoUrl: string | null
 }
@@ -18,9 +18,10 @@ const props = defineProps<{
   orderInDebate: number
   deputy: Deputy | null
   tags: Tag[]
+  deputyId?: number | null
 }>()
 
-const displayName = computed(() => props.deputy?.fullName ?? props.speakerName)
+const displayName = computed(() => props.deputy?.fullName ?? props.speakerName ?? '')
 
 const initials = computed(() => {
   return displayName.value
@@ -35,7 +36,11 @@ const initials = computed(() => {
 <template>
   <div class="flex gap-3 py-4 border-b border-stone-border/50">
     <!-- Avatar column -->
-    <div class="flex-shrink-0">
+    <component
+      :is="deputyId ? resolveComponent('NuxtLink') : 'div'"
+      :to="deputyId ? `/deputies/${deputyId}` : undefined"
+      class="flex-shrink-0"
+    >
       <img
         v-if="deputy?.photoUrl"
         :src="deputy.photoUrl"
@@ -48,13 +53,20 @@ const initials = computed(() => {
       >
         {{ initials }}
       </div>
-    </div>
+    </component>
 
     <!-- Content column -->
     <div class="flex-1 min-w-0">
       <!-- Header line -->
       <div class="flex items-center gap-2 flex-wrap mb-1">
-        <span class="font-semibold text-sm text-ink">{{ displayName }}</span>
+        <NuxtLink
+          v-if="deputyId"
+          :to="`/deputies/${deputyId}`"
+          class="font-semibold text-sm text-ink hover:text-bronze transition-colors duration-200"
+        >
+          {{ displayName }}
+        </NuxtLink>
+        <span v-else class="font-semibold text-sm text-ink">{{ displayName }}</span>
         <GroupBadge v-if="deputy?.group" :group="deputy.group" />
         <span v-if="speakerRole" class="text-xs text-ink-muted">{{ speakerRole }}</span>
       </div>
