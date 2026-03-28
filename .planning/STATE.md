@@ -2,11 +2,11 @@
 
 ## Current Position
 - **Milestone** : 1 — MVP Debats AN
-- **Phase** : 6 — Recherche & Filtres (In progress)
-- **Plan** : 06-01 complete — 1/2 plans done
-- **Status** : In progress
+- **Phase** : 6 — Recherche & Filtres (Complete)
+- **Plan** : 06-02 complete — 2/2 plans done
+- **Status** : Phase complete — Milestone 1 ready for review
 
-Progress: Phase 6 [█░] 1/2 plans done | Overall [██████████████░] ~14/15 plans
+Progress: Phase 6 [██] 2/2 plans done | Overall [███████████████] ~15/15 plans
 
 ## Decisions
 | ID | Decision | Context |
@@ -38,10 +38,11 @@ Progress: Phase 6 [█░] 1/2 plans done | Overall [█████████
 
 ## Session Continuity
 - **Last session**: 2026-03-28
-- **Stopped at**: Phase 6 Plan 01 complete (06-01 done)
-- **Resume**: .planning/phases/06-recherche-filtres/06-02-PLAN.md
+- **Stopped at**: Phase 6 complete — both plans done (06-01 + 06-02)
+- **Resume**: Milestone 1 review or next milestone planning
 
 ## History
+- 2026-03-28 : Completed 06-02 — Global header search bar in default.vue layout, NuxtLink fix + immediate fetch on URL load, 10/10 Playwright tests passed (commits 85a1d88 + 64a5e09)
 - 2026-03-28 : Completed 06-01 — /search page with FTS highlights, tag filter, infinite scroll, URL-synced state + SearchResultCard + extended /api/search (tags[]) (commits a232986 + 154b5b7 + 4fb89f7)
 - 2026-03-28 : Phase 5 complete — verification PASSED (13/13 must-haves)
 - 2026-03-28 : Completed 05-02 — Deputy profile page /deputies/[id] with tag filter, load more, debate context links + InterventionCard deputyId bidirectional nav (commits 2ce1d8d + f7492b4)
