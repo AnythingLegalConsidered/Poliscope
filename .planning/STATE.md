@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
-- **Phase** : 9 — Schema BDD Universel
-- **Plan** : 3/3 — COMPLETE
-- **Status** : Phase 9 complete (gap closure done) — ready for Phase 10
-- **Last activity** : 2026-03-28 — Completed 09-03 gap closure (migrations applied to live DB, 12 tables, FTS verified)
+- **Phase** : 10 — Ingestion Acteurs & Organes
+- **Plan** : 1/2 — IN PROGRESS
+- **Status** : Plan 10-01 complete — 925 actors + 925 cross_references ingested
+- **Last activity** : 2026-03-28 — Completed 10-01 actors ingestion (577 AN + 348 Senat, idempotent pipelines)
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [█████░░░░░░░░░░░] 5/17 plans
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [██████░░░░░░░░░] 6/17 plans
 
 ## Accumulated Context
 
@@ -30,6 +30,14 @@ Progress: Milestone 1 [███████████████████
 | stored search_vector tsvector (pas functional index) | FTS cross-type scalable — functional index force row rechecks a >50K lignes |
 | Questions/Amendements/Dossiers -> v3 | Scope raisonnable pour v2 ; votes sont la priorite citoyenne #1 |
 | Votes ingeres en phase 12 (avant API/UI) | Data confidence avant exposition endpoints ; votes = attente principale |
+
+### Key Decisions (Phase 10 — Plan 01)
+
+| Decision | Rationale |
+|----------|-----------|
+| political_group pour AN stocke PO organeRef (pas le nom) | GP mandate contient un organeRef (ex: "PO834720") — resolu en nom lisible quand les organes sont ingeres en Plan 02 |
+| legislature=None pour senateurs | Le Senat n'a pas de numerotation de legislature discrete (contrairement a l'AN) |
+| GRANT ALL sur tables postgres-owned a l'utilisateur poliscope | Tables creees par postgres dans migration 0002 — poliscope user avait besoin de droits explicites pour INSERT |
 
 ### Key Decisions (Phase 9 — Plan 02)
 
@@ -75,11 +83,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-03-28
-- **Stopped at** : Phase 9 fully complete (3/3 plans, gaps closed, migrations applied) — Phase 10 ready
-- **Resume** : Plan Phase 10 — ingestion acteurs AN + organes
+- **Stopped at** : Phase 10 Plan 01 complete — 925 actors (577 AN + 348 Senat) ingested
+- **Resume** : Phase 10 Plan 02 — ingestion organes (AN organs/political groups from ZIP)
 
 ## History
 
+- 2026-03-28 : Completed 10-01 — 577 AN deputies + 348 senators ingested (open data ZIP + senat.fr API), migration 0003 unique constraint applied, GRANT permissions on postgres-owned tables
 - 2026-03-28 : Completed 09-03 gap closure — fix idx_interventions_fts name, apply migrations 0001+0002 to live DB (psql SSH), verified 618 actors + 2479 interventions + FTS indexes + API endpoints
 - 2026-03-28 : Completed 09-02 — 7 new tables (legislatures, organs, scrutins, votes, questions, amendments, cross_references), debates.chamber, additive migration 0002 (zero DROP TABLE)
 - 2026-03-28 : Completed 09-01 — rename deputies->actors (safe migration), stored tsvector FTS columns, all 6 API routes -> shared/schema
