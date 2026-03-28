@@ -37,11 +37,11 @@ CREATE INDEX "idx_actors_active" ON "actors" USING btree ("is_active");
 ALTER TABLE "interventions" ADD COLUMN "search_vector" tsvector
   GENERATED ALWAYS AS (to_tsvector('french', "content")) STORED;
 
--- Create GIN index on interventions search_vector (stored version)
-CREATE INDEX "idx_interventions_fts_stored" ON "interventions" USING gin ("search_vector");
-
--- Drop old functional GIN index (replaced by stored column index above)
+-- Drop old functional GIN index (replaced by stored column index below)
 DROP INDEX IF EXISTS "idx_interventions_fts";
+
+-- Create GIN index on interventions search_vector (stored version)
+CREATE INDEX "idx_interventions_fts" ON "interventions" USING gin ("search_vector");
 
 -- Add chamber column to interventions
 ALTER TABLE "interventions" ADD COLUMN "chamber" text DEFAULT 'AN';
