@@ -2,11 +2,11 @@
 
 ## Current Position
 - **Milestone** : 1 — MVP Debats AN
-- **Phase** : 5 — Profils Deputes (COMPLETE)
-- **Next** : Phase 6 — Recherche & Filtres
-- **Status** : 2/2 plans done
+- **Phase** : 6 — Recherche & Filtres (In progress)
+- **Plan** : 06-01 complete — 1/2 plans done
+- **Status** : In progress
 
-Progress: Phase 5 [██] 2/2 plans done | Overall [█████████████░░] ~13/15 plans
+Progress: Phase 6 [█░] 1/2 plans done | Overall [██████████████░] ~14/15 plans
 
 ## Decisions
 | ID | Decision | Context |
@@ -31,13 +31,18 @@ Progress: Phase 5 [██] 2/2 plans done | Overall [█████████
 | D-0502-02 | Tag filter client-side on accumulated allInterventions | Simpler UX; resets activeTag to null on page increment |
 | D-0502-03 | component :is pattern for conditional NuxtLink avatar | Avoids duplicating full avatar markup in v-if/v-else blocks |
 | D-0502-04 | Deputy.fullName typed as string or null | Matches Drizzle/Nuxt SerializeObject<> shape; resolves pre-existing TS2345 |
+| D-0601-01 | URL sync one-directional (local ref -> URL only) | No watch on route.query after init — avoids double-trigger infinite loop |
+| D-0601-02 | useFetch immediate:false + watch:false + manual refresh() | Prevents 400 on empty q; shouldFetch computed guards trigger |
+| D-0601-03 | Tag filter via click-on-result-pills (no pre-loaded tag list) | Zero new API endpoints; consistent with deputy profile tag filter UX |
+| D-0601-04 | json_agg with COALESCE to '[]'::json in tags subquery | Ensures non-null tags array in SQL response for all interventions |
 
 ## Session Continuity
 - **Last session**: 2026-03-28
-- **Stopped at**: Phase 5 complete (05-02 done)
-- **Resume**: Phase 6 planning (if applicable)
+- **Stopped at**: Phase 6 Plan 01 complete (06-01 done)
+- **Resume**: .planning/phases/06-recherche-filtres/06-02-PLAN.md
 
 ## History
+- 2026-03-28 : Completed 06-01 — /search page with FTS highlights, tag filter, infinite scroll, URL-synced state + SearchResultCard + extended /api/search (tags[]) (commits a232986 + 154b5b7 + 4fb89f7)
 - 2026-03-28 : Phase 5 complete — verification PASSED (13/13 must-haves)
 - 2026-03-28 : Completed 05-02 — Deputy profile page /deputies/[id] with tag filter, load more, debate context links + InterventionCard deputyId bidirectional nav (commits 2ce1d8d + f7492b4)
 - 2026-03-28 : Completed 05-01 — Deputies list page /deputies with search, group filter, infinite scroll + DeputyCard component (commits b8bcd24 + b5cae9b)
