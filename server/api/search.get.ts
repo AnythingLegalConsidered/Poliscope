@@ -96,7 +96,7 @@ export default defineEventHandler(async (event) => {
       total_count: string
     }>
 
-    const total = results.length > 0 ? Number(results[0].total_count) : 0
+    const total = Number(results.at(0)?.total_count ?? 0)
 
     const data = results.map(row => ({
       id: row.id,

@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
       .limit(limit)
       .offset(offset)
 
-    const total = rows.length > 0 ? Number(rows[0].totalCount) : 0
+    const total = Number(rows.at(0)?.totalCount ?? 0)
     const data = rows.map(({ totalCount, ...rest }) => rest)
 
     return paginatedResponse(data, total, page, limit)

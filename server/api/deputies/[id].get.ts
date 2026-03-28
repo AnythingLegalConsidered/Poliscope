@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
       .limit(limit)
       .offset(offset)
 
-    const totalInterventions = interventionRows.length > 0 ? Number(interventionRows[0].totalCount) : 0
+    const totalInterventions = Number(interventionRows.at(0)?.totalCount ?? 0)
 
     // Batch fetch tags for the returned interventions (avoid N+1)
     const interventionIds = interventionRows.map(i => i.id)
