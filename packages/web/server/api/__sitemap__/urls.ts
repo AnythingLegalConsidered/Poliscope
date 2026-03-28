@@ -1,10 +1,10 @@
 import { asc } from 'drizzle-orm'
-import { debates, deputies } from '../../db/schema'
+import { debates, actors } from 'shared/schema'
 
 export default defineSitemapEventHandler(async () => {
-  const [debateRows, deputyRows] = await Promise.all([
+  const [debateRows, actorRows] = await Promise.all([
     db.select({ id: debates.id, date: debates.date }).from(debates).orderBy(asc(debates.id)),
-    db.select({ id: deputies.id }).from(deputies).orderBy(asc(deputies.id)),
+    db.select({ id: actors.id }).from(actors).orderBy(asc(actors.id)),
   ])
 
   const debateUrls = debateRows.map(d => ({
@@ -12,7 +12,7 @@ export default defineSitemapEventHandler(async () => {
     lastmod: d.date ? new Date(d.date).toISOString().split('T')[0] : undefined,
   }))
 
-  const deputyUrls = deputyRows.map(d => ({
+  const deputyUrls = actorRows.map(d => ({
     loc: `/deputies/${d.id}`,
   }))
 

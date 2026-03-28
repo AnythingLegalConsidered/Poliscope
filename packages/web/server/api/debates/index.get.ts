@@ -1,5 +1,5 @@
 import { sql, desc } from 'drizzle-orm'
-import { debates } from '../../db/schema'
+import { debates } from 'shared/schema'
 
 export default defineEventHandler(async (event) => {
   const { page, limit, offset } = getPaginationParams(event)

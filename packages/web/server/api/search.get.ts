@@ -26,8 +26,8 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Build optional filter clauses
-    const deputyFilter = deputyId !== null
-      ? sql` AND i.deputy_id = ${deputyId}`
+    const actorFilter = deputyId !== null
+      ? sql` AND i.actor_id = ${deputyId}`
       : sql``
 
     const debateFilter = debateId !== null
@@ -77,9 +77,9 @@ export default defineEventHandler(async (event) => {
         ) AS tags
       FROM interventions i
       LEFT JOIN debates d ON i.debate_id = d.id
-      LEFT JOIN deputies dep ON i.deputy_id = dep.id
+      LEFT JOIN actors dep ON i.actor_id = dep.id
       WHERE to_tsvector('french', i.content) @@ websearch_to_tsquery('french', ${q})
-      ${deputyFilter}
+      ${actorFilter}
       ${debateFilter}
       ${tagFilter}
       ORDER BY rank DESC, i.id DESC

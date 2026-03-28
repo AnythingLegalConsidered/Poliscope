@@ -1,5 +1,5 @@
 import { eq, asc, inArray } from 'drizzle-orm'
-import { debates, interventions, deputies, interventionTags, tags } from '../../db/schema'
+import { debates, interventions, actors, interventionTags, tags } from 'shared/schema'
 
 export default defineEventHandler(async (event) => {
   const rawId = getRouterParam(event, 'id')
@@ -23,23 +23,23 @@ export default defineEventHandler(async (event) => {
 
     const debate = debateRows[0]
 
-    // Fetch interventions with deputy info (left join)
+    // Fetch interventions with actor info (left join)
     const interventionRows = await db
       .select({
         id: interventions.id,
         debateId: interventions.debateId,
-        deputyId: interventions.deputyId,
+        deputyId: interventions.actorId,
         speakerName: interventions.speakerName,
         speakerRole: interventions.speakerRole,
         content: interventions.content,
         orderInDebate: interventions.orderInDebate,
         createdAt: interventions.createdAt,
-        deputyFullName: deputies.fullName,
-        deputyGroup: deputies.group,
-        deputyPhotoUrl: deputies.photoUrl,
+        deputyFullName: actors.fullName,
+        deputyGroup: actors.group,
+        deputyPhotoUrl: actors.photoUrl,
       })
       .from(interventions)
-      .leftJoin(deputies, eq(interventions.deputyId, deputies.id))
+      .leftJoin(actors, eq(interventions.actorId, actors.id))
       .where(eq(interventions.debateId, id))
       .orderBy(asc(interventions.orderInDebate))
 

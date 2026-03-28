@@ -1,5 +1,5 @@
 import { eq, desc, inArray, sql } from 'drizzle-orm'
-import { deputies, interventions, debates, interventionTags, tags } from '../../db/schema'
+import { actors, interventions, debates, interventionTags, tags } from 'shared/schema'
 
 export default defineEventHandler(async (event) => {
   const rawId = getRouterParam(event, 'id')
@@ -12,25 +12,25 @@ export default defineEventHandler(async (event) => {
   const { page, limit, offset } = getPaginationParams(event)
 
   try {
-    // Fetch the deputy
-    const deputyRows = await db
+    // Fetch the actor (deputy)
+    const actorRows = await db
       .select()
-      .from(deputies)
-      .where(eq(deputies.id, id))
+      .from(actors)
+      .where(eq(actors.id, id))
       .limit(1)
 
-    if (!deputyRows.length) {
+    if (!actorRows.length) {
       throw createError({ statusCode: 404, message: 'Deputy not found' })
     }
 
-    const deputy = deputyRows[0]
+    const deputy = actorRows[0]
 
     // Fetch interventions with debate info (left join), paginated, ordered by createdAt DESC
     const interventionRows = await db
       .select({
         id: interventions.id,
         debateId: interventions.debateId,
-        deputyId: interventions.deputyId,
+        deputyId: interventions.actorId,
         speakerName: interventions.speakerName,
         speakerRole: interventions.speakerRole,
         content: interventions.content,
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
       })
       .from(interventions)
       .leftJoin(debates, eq(interventions.debateId, debates.id))
-      .where(eq(interventions.deputyId, id))
+      .where(eq(interventions.actorId, id))
       .orderBy(desc(interventions.createdAt))
       .limit(limit)
       .offset(offset)
@@ -104,7 +104,7 @@ export default defineEventHandler(async (event) => {
       .from(interventionTags)
       .innerJoin(tags, eq(interventionTags.tagId, tags.id))
       .innerJoin(interventions, eq(interventionTags.interventionId, interventions.id))
-      .where(eq(interventions.deputyId, id))
+      .where(eq(interventions.actorId, id))
       .groupBy(tags.name, tags.slug)
       .orderBy(desc(sql`count(*)`))
 

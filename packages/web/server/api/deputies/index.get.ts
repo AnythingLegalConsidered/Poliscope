@@ -1,5 +1,5 @@
 import { sql, asc, eq, ilike, and } from 'drizzle-orm'
-import { deputies } from '../../db/schema'
+import { actors } from 'shared/schema'
 import type { SQL } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
@@ -14,32 +14,32 @@ export default defineEventHandler(async (event) => {
   // Build WHERE conditions
   const conditions: SQL[] = []
   if (group) {
-    conditions.push(eq(deputies.group, group))
+    conditions.push(eq(actors.group, group))
   }
   if (search) {
-    conditions.push(ilike(deputies.fullName, `%${search}%`))
+    conditions.push(ilike(actors.fullName, `%${search}%`))
   }
 
   try {
     const rows = await db
       .select({
-        id: deputies.id,
-        officialId: deputies.officialId,
-        firstName: deputies.firstName,
-        lastName: deputies.lastName,
-        fullName: deputies.fullName,
-        group: deputies.group,
-        photoUrl: deputies.photoUrl,
-        constituency: deputies.constituency,
-        isActive: deputies.isActive,
-        createdAt: deputies.createdAt,
-        updatedAt: deputies.updatedAt,
+        id: actors.id,
+        officialId: actors.officialId,
+        firstName: actors.firstName,
+        lastName: actors.lastName,
+        fullName: actors.fullName,
+        group: actors.group,
+        photoUrl: actors.photoUrl,
+        constituency: actors.constituency,
+        isActive: actors.isActive,
+        createdAt: actors.createdAt,
+        updatedAt: actors.updatedAt,
         // Window function: count total rows matching the same WHERE clause
         totalCount: sql<number>`count(*) over()`,
       })
-      .from(deputies)
+      .from(actors)
       .where(conditions.length > 0 ? and(...conditions) : undefined)
-      .orderBy(asc(deputies.lastName), asc(deputies.firstName))
+      .orderBy(asc(actors.lastName), asc(actors.firstName))
       .limit(limit)
       .offset(offset)
 
