@@ -122,7 +122,7 @@ Plans:
   3. Un operateur peut se connecter a PostgreSQL 17 sur le LXC depuis sa machine de dev (psql -h [LXC_IP])
   4. Les scripts Python existants s'executent depuis packages/ingestion sans changer leurs imports
 
-**Plans** : TBD
+**Plans:** 2 plans
 
 Plans:
 - [ ] 08-01-PLAN.md — Restructuration monorepo pnpm (packages/shared, packages/ingestion, packages/web)
@@ -280,7 +280,7 @@ Plans:
 | 5. Profils Deputes | v1.0 | 2/2 | Complete | 2026-03-28 |
 | 6. Recherche & Filtres | v1.0 | 2/2 | Complete | 2026-03-28 |
 | 7. Polish & Lancement | v1.0 | 2/2 | Complete | 2026-03-28 |
-| 8. Monorepo & Infra LXC | v2.0 | 0/2 | Not started | - |
+| 8. Monorepo & Infra LXC | v2.0 | 0/2 | Planning | - |
 | 9. Schema BDD Universel | v2.0 | 0/2 | Not started | - |
 | 10. Ingestion Acteurs & Organes | v2.0 | 0/2 | Not started | - |
 | 11. Ingestion Debats CRI | v2.0 | 0/2 | Not started | - |
