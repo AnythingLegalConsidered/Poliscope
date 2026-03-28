@@ -6,7 +6,27 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  packages/ingestion: {}
+
+  packages/shared:
+    dependencies:
+      drizzle-orm:
+        specifier: ^0.45.1
+        version: 0.45.2(postgres@3.4.8)
+      postgres:
+        specifier: ^3.4.8
+        version: 3.4.8
+    devDependencies:
+      dotenv:
+        specifier: ^17.3.1
+        version: 17.3.1
+      drizzle-kit:
+        specifier: ^0.31.10
+        version: 0.31.10
+
+  packages/web:
     dependencies:
       '@nuxtjs/sitemap':
         specifier: ^8.0.9
@@ -26,6 +46,9 @@ importers:
       postgres:
         specifier: ^3.4.8
         version: 3.4.8
+      shared:
+        specifier: workspace:*
+        version: link:../shared
       tailwindcss:
         specifier: ^4.2.2
         version: 4.2.2
@@ -45,9 +68,6 @@ importers:
       dotenv:
         specifier: ^17.3.1
         version: 17.3.1
-      drizzle-kit:
-        specifier: ^0.31.10
-        version: 0.31.10
 
 packages:
 

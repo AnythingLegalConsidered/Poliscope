@@ -22,3 +22,11 @@ logs
 .env
 .env.*
 !.env.example
+
+# Python
+__pycache__/
+*.pyc
+packages/ingestion/.venv/
+
+# Test results
+test-results/

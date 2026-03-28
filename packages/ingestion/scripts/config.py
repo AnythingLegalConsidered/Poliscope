@@ -3,8 +3,8 @@
 import os
 from dotenv import load_dotenv
 
-# Load .env from project root (one level up from scripts/)
-_env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+# Load .env from repo root (three levels up from packages/ingestion/scripts/)
+_env_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', '.env')
 load_dotenv(_env_path)
 
 DATABASE_URL: str = os.environ["DATABASE_URL"]

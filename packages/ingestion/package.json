@@ -1,0 +1,10 @@
+{
+  "name": "ingestion",
+  "private": true,
+  "scripts": {
+    "ingest": "cd scripts && python run_all.py",
+    "ingest:limit": "cd scripts && python run_all.py --limit",
+    "venv:create": "python -m venv .venv",
+    "venv:install": ".venv/bin/pip install -r requirements.txt"
+  }
+}
