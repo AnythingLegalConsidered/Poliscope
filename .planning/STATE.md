@@ -39,7 +39,7 @@ Progress: Phase 5 [██] 2/2 plans done | Overall [█████████
 
 ## History
 - 2026-03-28 : Completed 05-02 — Deputy profile page /deputies/[id] with tag filter, load more, debate context links + InterventionCard deputyId bidirectional nav (commits 2ce1d8d + f7492b4)
-- 2026-03-28 : Completed 05-01 — Deputies list page /deputies with search, group filter, infinite scroll + DeputyCard component
+- 2026-03-28 : Completed 05-01 — Deputies list page /deputies with search, group filter, infinite scroll + DeputyCard component (commits b8bcd24 + b5cae9b)
 - 2026-03-28 : Phase 4 complete — verification PASSED (11/11 must-haves). Design reskin "Marbre & Bronze" applied (commit 06c9e4f)
 - 2026-03-28 : Completed 04-03 — debate thread page /debates/[id] with route validation, useFetch, InterventionCard thread, SEO title (commit b93b901)
 - 2026-03-28 : Completed 04-02 — DebateCard component + home page with useFetch/useIntersectionObserver infinite scroll (commits 9fb6a35 + f3cde7a)
