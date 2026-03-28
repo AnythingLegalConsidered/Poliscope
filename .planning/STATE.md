@@ -1,12 +1,12 @@
 # Poliscope — State
 
 ## Current Position
-- **Milestone** : 1 — MVP Debats AN
-- **Phase** : 6 — Recherche & Filtres (Complete)
-- **Plan** : 06-02 complete — 2/2 plans done
-- **Status** : Phase complete — Milestone 1 ready for review
+- **Milestone** : 2 — Polish & Lancement
+- **Phase** : 7 — Polish & Lancement (In progress)
+- **Plan** : 07-01 complete — 1/? plans done
+- **Status** : In progress
 
-Progress: Phase 6 [██] 2/2 plans done | Overall [███████████████] ~15/15 plans
+Progress: Phase 7 [█░░] 1/? plans done | Overall [████████████████] ~16+ plans
 
 ## Decisions
 | ID | Decision | Context |
@@ -35,13 +35,16 @@ Progress: Phase 6 [██] 2/2 plans done | Overall [█████████
 | D-0601-02 | useFetch immediate:false + watch:false + manual refresh() | Prevents 400 on empty q; shouldFetch computed guards trigger |
 | D-0601-03 | Tag filter via click-on-result-pills (no pre-loaded tag list) | Zero new API endpoints; consistent with deputy profile tag filter UX |
 | D-0601-04 | json_agg with COALESCE to '[]'::json in tags subquery | Ensures non-null tags array in SQL response for all interventions |
+| D-0701-01 | useSeoMeta with reactive getter functions for dynamic pages | SSR renders correctly when data loads asynchronously |
+| D-0701-02 | Footer-only links to /about and /legal (not in header nav) | Plan specified footer only — keeps header nav focused on core app pages |
 
 ## Session Continuity
 - **Last session**: 2026-03-28
-- **Stopped at**: Phase 6 complete — both plans done (06-01 + 06-02)
-- **Resume**: Milestone 1 review or next milestone planning
+- **Stopped at**: Phase 7 plan 01 complete — SEO, caching, sitemap, content pages
+- **Resume**: `.planning/phases/07-polish-lancement/07-02-PLAN.md` (next plan in phase 7)
 
 ## History
+- 2026-03-28 : Completed 07-01 — Global SEO (@nuxtjs/sitemap, useSeoMeta, routeRules caching, robots.txt) + about/legal pages + footer nav (commits 5960a1e + 4553c38 + 1ae013f)
 - 2026-03-28 : Phase 6 complete — verification PASSED (10/10 must-haves)
 - 2026-03-28 : Completed 06-02 — Global header search bar in default.vue layout, NuxtLink fix + immediate fetch on URL load, 10/10 Playwright tests passed (commits 85a1d88 + 64a5e09)
 - 2026-03-28 : Completed 06-01 — /search page with FTS highlights, tag filter, infinite scroll, URL-synced state + SearchResultCard + extended /api/search (tags[]) (commits a232986 + 154b5b7 + 4fb89f7)
