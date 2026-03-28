@@ -162,11 +162,12 @@ Plans:
   3. Les pipelines acteurs et organes sont idempotents — re-lancer deux fois produit le meme resultat (pas de doublons, upsert correct)
   4. Les organes (commissions permanentes, groupes politiques) sont en base avec leurs membres et periodes de mandat
 
-**Plans:** 2 plans
+**Plans:** 3 plans
 
 Plans:
-- [ ] 10-01-PLAN.md — Migration 0003 (cross_references unique) + AN deputies ZIP pipeline + Senat senators API pipeline + cross-references
-- [ ] 10-02-PLAN.md — AN + Senat organs ingestion + political_group resolution + run_all.py orchestrator update
+- [x] 10-01-PLAN.md — Migration 0003 (cross_references unique) + AN deputies ZIP pipeline + Senat senators API pipeline + cross-references
+- [x] 10-02-PLAN.md — AN + Senat organs ingestion + political_group resolution + run_all.py orchestrator update
+- [ ] 10-03-PLAN.md — Gap closure: actor_organs join table + AN memberships ingestion + Senat dates limitation documented
 
 ---
 
@@ -282,8 +283,8 @@ Plans:
 | 6. Recherche & Filtres | v1.0 | 2/2 | Complete | 2026-03-28 |
 | 7. Polish & Lancement | v1.0 | 2/2 | Complete | 2026-03-28 |
 | 8. Monorepo & Infra LXC | v2.0 | 2/2 | Complete | 2026-03-28 |
-| 9. Schema BDD Universel | v2.0 | 2/3 | Gap closure | - |
-| 10. Ingestion Acteurs & Organes | v2.0 | 0/2 | Not started | - |
+| 9. Schema BDD Universel | v2.0 | 3/3 | Complete | 2026-03-28 |
+| 10. Ingestion Acteurs & Organes | v2.0 | 2/3 | Gap closure | - |
 | 11. Ingestion Debats CRI | v2.0 | 0/2 | Not started | - |
 | 12. Ingestion Votes & Scrutins | v2.0 | 0/2 | Not started | - |
 | 13. API REST Universelle | v2.0 | 0/2 | Not started | - |
