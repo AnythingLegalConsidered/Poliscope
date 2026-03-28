@@ -22,6 +22,13 @@
       "when": 1774712035905,
       "tag": "0002_add-universal-schema",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1774720132000,
+      "tag": "0003_cross-references-unique",
+      "breakpoints": true
     }
   ]
 }
