@@ -8,6 +8,7 @@
         <nav class="flex items-center gap-6 text-sm text-ink-muted">
           <NuxtLink to="/" active-class="text-bronze" class="hover:text-bronze transition-colors duration-200">Débats</NuxtLink>
           <NuxtLink to="/deputies" active-class="text-bronze" class="hover:text-bronze transition-colors duration-200">Députés</NuxtLink>
+          <NuxtLink to="/search" active-class="text-bronze" class="hover:text-bronze transition-colors duration-200">Recherche</NuxtLink>
         </nav>
       </div>
     </header>
