@@ -67,6 +67,11 @@ Plans:
 - Liste des interventions filtrables
 - Navigation profil <-> debat
 - **Livrable** : On peut voir tout ce qu'un depute a dit
+- **Plans:** 2 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Deputies list page with search, group filter, infinite scroll
+- [ ] 05-02-PLAN.md — Deputy profile page with stats, tag filter, bidirectional navigation
 
 ### Phase 6 — Recherche & Filtres
 **Objectif** : Moteur de recherche puissant pour retrouver n'importe quelle citation.
