@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
-- **Phase** : 10 — Ingestion Acteurs & Organes
-- **Plan** : 1/2 — IN PROGRESS
-- **Status** : Plan 10-01 complete — 925 actors + 925 cross_references ingested
-- **Last activity** : 2026-03-28 — Completed 10-01 actors ingestion (577 AN + 348 Senat, idempotent pipelines)
+- **Phase** : 10 — Ingestion Acteurs & Organes — COMPLETE
+- **Plan** : 2/2 — DONE
+- **Status** : Phase 10 complete — 925 actors + 41 organs ingested, political_group resolved
+- **Last activity** : 2026-03-28 — Completed 10-02 organs ingestion (24 AN + 17 Senat, idempotent)
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [██████░░░░░░░░░] 6/17 plans
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [███████░░░░░░░░] 7/17 plans
 
 ## Accumulated Context
 
@@ -30,6 +30,14 @@ Progress: Milestone 1 [███████████████████
 | stored search_vector tsvector (pas functional index) | FTS cross-type scalable — functional index force row rechecks a >50K lignes |
 | Questions/Amendements/Dossiers -> v3 | Scope raisonnable pour v2 ; votes sont la priorite citoyenne #1 |
 | Votes ingeres en phase 12 (avant API/UI) | Data confidence avant exposition endpoints ; votes = attente principale |
+
+### Key Decisions (Phase 10 — Plan 02)
+
+| Decision | Rationale |
+|----------|-----------|
+| Filter AN organs to GP/COMPER/DELEG only | Skip meta-organs (ASSEMBLEE, BUREAU, OFFPAR) not useful for actor-organ queries |
+| SENAT_ prefix for Senat organ official_ids | Prevent collision with AN PO IDs; slug-based for groups ensures stable IDs |
+| political_group resolution via single SQL UPDATE | One UPDATE resolves all 577 PO refs — simpler than in-Python lookup |
 
 ### Key Decisions (Phase 10 — Plan 01)
 
@@ -83,11 +91,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-03-28
-- **Stopped at** : Phase 10 Plan 01 complete — 925 actors (577 AN + 348 Senat) ingested
-- **Resume** : Phase 10 Plan 02 — ingestion organes (AN organs/political groups from ZIP)
+- **Stopped at** : Phase 10 complete — 925 actors + 41 organs ingested, political groups resolved
+- **Resume** : Phase 11 — Ingestion Debats & Interventions (XML AN + Senat)
 
 ## History
 
+- 2026-03-28 : Completed 10-02 — 24 AN organs + 17 Senat organs ingested, 577 actors' political_group resolved from PO ref to name, run_all.py updated to 7-step pipeline
 - 2026-03-28 : Completed 10-01 — 577 AN deputies + 348 senators ingested (open data ZIP + senat.fr API), migration 0003 unique constraint applied, GRANT permissions on postgres-owned tables
 - 2026-03-28 : Completed 09-03 gap closure — fix idx_interventions_fts name, apply migrations 0001+0002 to live DB (psql SSH), verified 618 actors + 2479 interventions + FTS indexes + API endpoints
 - 2026-03-28 : Completed 09-02 — 7 new tables (legislatures, organs, scrutins, votes, questions, amendments, cross_references), debates.chamber, additive migration 0002 (zero DROP TABLE)
