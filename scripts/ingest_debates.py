@@ -39,6 +39,7 @@ DEBATE_COLUMNS = [
     "date",
     "legislature",
     "session_type",
+    "presiding_officer",
     "source_url",
 ]
 
@@ -242,7 +243,7 @@ def parse_cri_xml(xml_bytes: bytes) -> dict | None:
         # Remove the speaker name prefix from the text
         # The text usually starts with "M. Speaker Name. Content..."
         # We want just the content after the speaker name
-        content = _extract_speech_content(full_text, speaker_name_raw)
+        content = _clean_unicode(_extract_speech_content(full_text, speaker_name_raw))
 
         # Skip empty interventions (procedural notes, etc.)
         if not content or len(content) < 5:
@@ -295,6 +296,23 @@ def _extract_speech_content(full_text: str, speaker_name_raw: str) -> str:
     text = re.sub(r"^\([^)]*\)\s*", "", text)
 
     return text.strip()
+
+
+def _clean_unicode(text: str) -> str:
+    """Replace problematic Unicode chars with safe equivalents."""
+    replacements = {
+        '\u00a0': ' ',      # non-breaking space → space
+        '\u2019': "'",      # right single quote → apostrophe
+        '\u2018': "'",      # left single quote → apostrophe
+        '\u201c': '"',      # left double quote
+        '\u201d': '"',      # right double quote
+        '\u2013': '-',      # en dash
+        '\u2014': ' - ',    # em dash
+        '\ufffd': '',       # replacement character → remove
+    }
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+    return text
 
 
 def _parse_speaker(speaker_name_raw: str, para_element) -> tuple[str, str]:
@@ -429,6 +447,15 @@ def insert_interventions(conn, debate_id: int, interventions: list[dict]) -> int
 # Main ingestion logic
 # ---------------------------------------------------------------------------
 
+def extract_presiding_officer(raw_interventions: list[dict]) -> str | None:
+    """Return the name of the first speaker with a président/présidente role."""
+    for intervention in raw_interventions:
+        role = (intervention.get("speaker_role") or "").lower()
+        if "président" in role or "présidente" in role:
+            return intervention["speaker_name"]
+    return None
+
+
 def build_debate_record(metadata: dict, parution: str) -> dict:
     """Build a debate dict from CRI metadata."""
     date_str = metadata.get("date_seance")
@@ -457,6 +484,7 @@ def build_debate_record(metadata: dict, parution: str) -> dict:
         "date": date,
         "legislature": legislature,
         "session_type": session_type,
+        "presiding_officer": None,  # filled by caller
         "source_url": source_url,
     }
 
@@ -617,6 +645,7 @@ def ingest_debates(
             if dry_run:
                 # In dry-run, just log what would be done
                 debate_data = build_debate_record(metadata, taz_info["parution"])
+                debate_data["presiding_officer"] = extract_presiding_officer(raw_interventions)
                 records, matched, unmatched = build_intervention_records(
                     raw_interventions, by_official_id, by_name,
                 )
@@ -636,6 +665,7 @@ def ingest_debates(
 
             # Build debate record
             debate_data = build_debate_record(metadata, taz_info["parution"])
+            debate_data["presiding_officer"] = extract_presiding_officer(raw_interventions)
 
             # Build intervention records
             records, matched, unmatched = build_intervention_records(

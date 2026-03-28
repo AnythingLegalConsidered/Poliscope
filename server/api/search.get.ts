@@ -63,6 +63,7 @@ export default defineEventHandler(async (event) => {
         d.id AS "debateId",
         d.title AS "debateTitle",
         d.date AS "debateDate",
+        d.session_type AS "sessionType",
         dep.id AS "deputyId",
         dep.full_name AS "deputyName",
         dep.political_group AS "deputyGroup",
@@ -95,6 +96,7 @@ export default defineEventHandler(async (event) => {
       debateId: number
       debateTitle: string
       debateDate: string
+      sessionType: string | null
       deputyId: number | null
       deputyName: string | null
       deputyGroup: string | null
@@ -111,11 +113,12 @@ export default defineEventHandler(async (event) => {
       speakerRole: row.speakerRole,
       orderInDebate: row.orderInDebate,
       rank: Number(row.rank),
-      highlight: row.highlight,
+      highlight: row.highlight.replace(/\ufffd/g, ''),
       debate: {
         id: row.debateId,
         title: row.debateTitle,
         date: row.debateDate,
+        sessionType: row.sessionType,
       },
       deputy: row.deputyId ? {
         id: row.deputyId,

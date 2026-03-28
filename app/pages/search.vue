@@ -165,6 +165,7 @@ function handleFilterTag(slug: string) {
         :debate="result.debate"
         :deputy="result.deputy"
         :tags="result.tags ?? []"
+        :order-in-debate="result.orderInDebate"
         @filter-tag="handleFilterTag"
       />
     </div>
