@@ -1,9 +1,10 @@
 import { fileURLToPath } from 'node:url'
+import { config } from 'dotenv'
 import { defineConfig, devices } from '@playwright/test'
 import type { ConfigOptions } from '@nuxt/test-utils/playwright'
 
-// Ensure NUXT_DATABASE_URL is set for the test server
-process.env.NUXT_DATABASE_URL ??= 'postgresql://poliscope:poliscope_dev@LXC_IP:5432/poliscope'
+// Load .env from monorepo root
+config({ path: '../../.env' })
 
 export default defineConfig<ConfigOptions>({
   testDir: './e2e',

@@ -75,7 +75,8 @@ def load_deputy_cache(conn) -> tuple[dict, dict]:
     for db_id, official_id, full_name in rows:
         by_official_id[str(official_id)] = db_id
         if full_name:
-            by_name[normalize_name(full_name)] = db_id
+            name_str = full_name.decode("utf-8") if isinstance(full_name, (bytes, memoryview)) else str(full_name)
+            by_name[normalize_name(name_str)] = db_id
 
     logger.info("Deputy cache loaded: %d by official_id, %d by name", len(by_official_id), len(by_name))
     return by_official_id, by_name

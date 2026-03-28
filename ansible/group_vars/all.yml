@@ -4,8 +4,8 @@
 # =============================================================================
 lxc_vmid: 200
 lxc_hostname: poliscope-db
-lxc_ip: "<LXC_IP>"          # e.g. 192.168.1.200
-lxc_gw: "<GATEWAY_IP>"      # e.g. 192.168.1.1
+lxc_ip: "192.168.2.200"
+lxc_gw: "192.168.2.1"
 lxc_cidr: 24
 
 # =============================================================================
@@ -17,9 +17,9 @@ lxc_cidr: 24
 #   pve_api_token_secret: "<TOKEN_SECRET>"
 # =============================================================================
 pve_node: pve02
-pve_api_host: "<PVE02_IP>"   # e.g. 192.168.1.10
+pve_api_host: "192.168.2.4"
 pve_api_user: "root@pam"
-pve_api_password: "<PVE02_ROOT_PASSWORD>"
+# pve_api_password: "<SET_VIA_EXTRA_VARS>"  # pass with --extra-vars or vault
 # pve_api_user: "ansible@pve"
 # pve_api_token_id: "automation"
 # pve_api_token_secret: "<TOKEN_SECRET>"
@@ -30,8 +30,8 @@ pve_api_password: "<PVE02_ROOT_PASSWORD>"
 lxc_cores: 4
 lxc_memory: 4096
 lxc_disk: "local-lvm:100"
-lxc_template: "local:vztmpl/debian-12-standard_12.7-1_amd64.tar.zst"
-lxc_template_name: "debian-12-standard_12.7-1_amd64.tar.zst"
+lxc_template: "local:vztmpl/debian-12-standard_12.12-1_amd64.tar.zst"
+lxc_template_name: "debian-12-standard_12.12-1_amd64.tar.zst"
 lxc_bridge: vmbr0
 
 # =============================================================================
@@ -39,8 +39,8 @@ lxc_bridge: vmbr0
 # =============================================================================
 pg_db: poliscope
 pg_user: poliscope
-pg_password: "<CHANGE_ME>"   # Choose a strong password
-lan_subnet: "<LAN_SUBNET>/24" # e.g. 192.168.1.0/24
+pg_password: "{{ vault_pg_password | default('<SET_VIA_VAULT>') }}"
+lan_subnet: "192.168.2.0/24"
 
 # =============================================================================
 # SSH

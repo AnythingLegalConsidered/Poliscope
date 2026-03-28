@@ -32,7 +32,10 @@ def ensure_tags(conn) -> dict[str, int]:
     conn.commit()
 
     cur = conn.execute("SELECT slug, id FROM tags")
-    return {row[0]: row[1] for row in cur.fetchall()}
+    return {
+        (bytes(row[0]).decode("utf-8") if isinstance(row[0], (bytes, memoryview)) else str(row[0])): row[1]
+        for row in cur.fetchall()
+    }
 
 
 def fetch_interventions(conn, retag_all: bool):
@@ -77,7 +80,13 @@ def tag_interventions(retag_all: bool = False) -> None:
                 untagged += 1
                 continue
 
-            slugs = tag_content(content)
+            if isinstance(content, memoryview):
+                content_str = bytes(content).decode("utf-8")
+            elif isinstance(content, bytes):
+                content_str = content.decode("utf-8")
+            else:
+                content_str = str(content)
+            slugs = tag_content(content_str)
             if not slugs:
                 untagged += 1
                 continue
