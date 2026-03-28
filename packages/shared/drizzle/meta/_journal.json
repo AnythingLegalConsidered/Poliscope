@@ -15,6 +15,13 @@
       "when": 1774711358334,
       "tag": "0001_rename-deputies-to-actors",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1774712035905,
+      "tag": "0002_add-universal-schema",
+      "breakpoints": true
     }
   ]
 }
