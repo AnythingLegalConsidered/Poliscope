@@ -103,119 +103,188 @@ Plans:
 
 ## Milestone 2 : Base de Donnees Parlementaire Universelle
 
-**Objectif** : BDD PostgreSQL complete de toutes les donnees parlementaires francaises (XVIIe legislature), hebergee sur LXC dedie PVE02, exposee via API REST universelle.
-**Architecture** : Monorepo (packages/api + packages/web)
+**Objectif** : BDD PostgreSQL complete de toutes les donnees parlementaires francaises (XVIIe legislature), hebergee sur LXC dedie PVE02, exposee via API REST universelle et frontend adapte.
+**Architecture** : Monorepo pnpm (packages/shared + packages/ingestion + packages/web)
 **Infra** : LXC Debian 12 — 4 vCPU, 4 Go RAM, 100 Go disk
-**Scope donnees** : Niveau 3 complet (CRI, QAG, Questions, Amendements, Votes, Dossiers, Commissions)
+**Scope donnees** : CRI (AN + Senat), Scrutins/Votes, Acteurs bicameraux, Organes
+**V3 (deferred)** : Questions, Amendements, Dossiers legislatifs, CR Commissions
+
+---
 
 ### Phase 8 — Monorepo & Infra LXC
-**Objectif** : Restructurer le repo en monorepo et provisionner le LXC PVE02.
-- Restructurer en packages/api + packages/web
-- Migrer le code existant sans casser
-- Creer LXC Debian 12 sur PVE02 (4 vCPU, 4 Go, 100 Go)
-- Installer PostgreSQL 17 + config reseau
-- Valider connexion depuis le dev local
-- **Livrable** : Monorepo fonctionnel + LXC avec PostgreSQL accessible
+
+**Goal** : Le repo est restructure en monorepo pnpm fonctionnel et le LXC PVE02 est operationnel avec PostgreSQL 17 accessible depuis le dev local.
+**Depends on** : Phase 7 (Milestone 1 complete)
+**Requirements** : INFRA-01, INFRA-02, INFRA-03, INFRA-04
+**Success Criteria** (what must be TRUE) :
+  1. `pnpm dev` depuis la racine du monorepo lance le frontend Nuxt sans erreur de module resolution
+  2. `nuxt build` (pas seulement `nuxt dev`) reussit — les workspace packages sont resolus correctement par Vite
+  3. Un operateur peut se connecter a PostgreSQL 17 sur le LXC depuis sa machine de dev (psql -h [LXC_IP])
+  4. Les scripts Python existants s'executent depuis packages/ingestion sans changer leurs imports
+
+**Plans** : TBD
 
 Plans:
-- [ ] (a planifier)
+- [ ] 08-01-PLAN.md — Restructuration monorepo pnpm (packages/shared, packages/ingestion, packages/web)
+- [ ] 08-02-PLAN.md — Provisionnement LXC Debian 12 sur PVE02 + PostgreSQL 17 + acces reseau
+
+---
 
 ### Phase 9 — Schema BDD Universel
-**Objectif** : Designer et migrer vers un schema couvrant tous les types parlementaires.
-- Schema unifie : acteurs, organes, legislatures, seances, interventions, questions, amendements, scrutins, votes, dossiers_legislatifs, commissions_cr, tags
-- Migrations Drizzle (5 tables -> ~15 tables)
-- Migrer les 2 479 interventions existantes
-- Index FTS francais sur tous les champs texte
-- **Livrable** : Schema deploye sur LXC, donnees existantes migrees
+
+**Goal** : Le schema PostgreSQL couvre tous les types de donnees parlementaires cibles (acteurs, organes, seances, scrutins, votes) et les 2 479 interventions existantes sont migrees sans perte.
+**Depends on** : Phase 8 (monorepo + LXC operationnels)
+**Requirements** : SCHEMA-01, SCHEMA-02, SCHEMA-03, SCHEMA-04, SCHEMA-05, SCHEMA-06, SCHEMA-07, SCHEMA-08
+**Success Criteria** (what must be TRUE) :
+  1. La table `actors` contient les 618 deputes migres depuis `deputies` — aucune perte de donnees (count identique, FTS fonctionnel)
+  2. Les 2 479 interventions existantes sont accessibles via les endpoints Nuxt apres migration — zero regression visible en frontend
+  3. La table `cross_references` existe et peut mapper un ID PA vers un slug nosdeputes et un ID DILA numerique
+  4. `drizzle-kit generate` produit des migrations incrementales (pas de DROP TABLE sur les donnees existantes)
+  5. Les index FTS francais (`search_vector tsvector`) existent sur acteurs et interventions — `EXPLAIN ANALYZE` confirme un index scan
+
+**Plans** : TBD
 
 Plans:
-- [ ] (a planifier)
+- [ ] 09-01-PLAN.md — Migration schema acteurs/organes/legislatures (rename deputies -> actors, add tables)
+- [ ] 09-02-PLAN.md — Migration schema seances/scrutins/votes/cross-references + index FTS
+
+---
 
 ### Phase 10 — Ingestion Acteurs & Organes
-**Objectif** : Peupler la base avec tous les acteurs et organes parlementaires.
-- Source : Tricoteuses (@tricoteuses/assemblee) + data.senat.fr
-- Deputes XVIIe (AN) + Senateurs (Senat)
-- Ministres (gouvernement en exercice)
-- Organes : commissions permanentes, groupes politiques, delegations
-- Matching/dedup avec les 618 deputes existants
-- **Livrable** : ~1 000 acteurs + ~200 organes en base
+
+**Goal** : La base contient tous les acteurs parlementaires de la XVIIe legislature (deputes AN + senateurs) et leurs organes d'appartenance, avec une table cross-reference qui mappe les IDs entre toutes les sources.
+**Depends on** : Phase 9 (schema deploye)
+**Requirements** : INGEST-01, INGEST-02, INGEST-03, INGEST-09
+**Success Criteria** (what must be TRUE) :
+  1. La table `actors` contient ~577 deputes AN et ~348 senateurs XVIIe, chacun avec chambre, groupe politique, et photo
+  2. La table `cross_references` mappe chaque acteur vers son ID source (PA prefix pour AN, LA/PO pour Senat) — zero acteur orphelin dans `ingestion_warnings`
+  3. Les pipelines acteurs et organes sont idempotents — re-lancer deux fois produit le meme resultat (pas de doublons, upsert correct)
+  4. Les organes (commissions permanentes, groupes politiques) sont en base avec leurs membres et periodes de mandat
+
+**Plans** : TBD
 
 Plans:
-- [ ] (a planifier)
+- [ ] 10-01-PLAN.md — Pipeline acteurs AN (Tricoteuses/data.an.fr) + senateurs (data.senat.fr) + cross-references
+- [ ] 10-02-PLAN.md — Pipeline organes (commissions + groupes politiques AN + Senat) + idempotence orchestrateur
 
-### Phase 11 — Ingestion Debats (CRI)
-**Objectif** : Ingerer toutes les seances publiques AN + Senat de la XVIIe legislature.
-- Source AN : data.assemblee-nationale.fr (XML bulk) ou Tricoteuses
-- Source Senat : data.senat.fr (XML/SQL dump CRI)
-- Toutes les seances XVIIe (~200-300 AN + ~200 Senat)
-- Parsing XML, rattachement orateurs, normalisation
-- Tagging thematique etendu
-- **Livrable** : ~400 debats, ~200K interventions en base
+---
 
-Plans:
-- [ ] (a planifier)
+### Phase 11 — Ingestion Debats CRI (AN + Senat)
 
-### Phase 12 — Ingestion Questions
-**Objectif** : Ingerer les questions parlementaires et reponses du gouvernement.
-- QAG : Questions au Gouvernement (mardi/mercredi)
-- Questions ecrites + reponses du Gouvernement
-- QOSD : Questions orales sans debat
-- Sources : data.assemblee-nationale.fr + data.senat.fr
-- **Livrable** : ~20K questions en base
+**Goal** : Toutes les seances publiques de la XVIIe legislature sont en base pour l'AN et le Senat, avec tagging thematique applique aux nouvelles interventions.
+**Depends on** : Phase 10 (acteurs et cross-references en base — FK root)
+**Requirements** : INGEST-04, INGEST-05, INGEST-08
+**Success Criteria** (what must be TRUE) :
+  1. La liste des debats affiche des seances AN et Senat (filtre chambre fonctionnel) — ~200-300 seances AN, ~200 seances Senat
+  2. Un utilisateur peut ouvrir un debat du Senat et lire le thread d'interventions dans le meme format que les debats AN
+  3. Les nouvelles interventions (AN + Senat) ont des tags thematiques assigns — la recherche par tag retourne des resultats des deux chambres
+  4. Le pipeline CRI supporte le re-run sans doublons (idempotent) — les seances deja en base sont mises a jour, pas dupliquees
+
+**Plans** : TBD
 
 Plans:
-- [ ] (a planifier)
+- [ ] 11-01-PLAN.md — Refactoring pipeline CRI AN vers nouveau schema acteurs + ingestion complete XVIIe
+- [ ] 11-02-PLAN.md — Pipeline CRI Senat (Akoma Ntoso XML) + tagging etendu sur nouvelles interventions
 
-### Phase 13 — Ingestion Amendements & Votes
-**Objectif** : Ingerer les amendements et scrutins par parlementaire.
-- Amendements : auteur, texte, expose des motifs, sort (adopte/rejete/retire)
-- Scrutins : type, resultat, position de chaque parlementaire
-- Sources : data.assemblee-nationale.fr (XML/JSON)
-- **Livrable** : ~50K amendements, ~500 scrutins en base
+---
 
-Plans:
-- [ ] (a planifier)
+### Phase 12 — Ingestion Votes & Scrutins
 
-### Phase 14 — Ingestion Dossiers & Commissions
-**Objectif** : Ingerer les parcours legislatifs et CR commissions.
-- Dossiers legislatifs : titre, etapes de la navette, texte adopte
-- CR commissions : comptes rendus des commissions permanentes
-- Sources : data.assemblee-nationale.fr + data.senat.fr
-- **Livrable** : ~200 dossiers, ~300 CR en base
+**Goal** : Les scrutins publics de l'AN et du Senat sont en base avec la position de vote de chaque parlementaire, accessibles via API.
+**Depends on** : Phase 10 (acteurs), Phase 11 (sessions pour FK scrutin->seance)
+**Requirements** : INGEST-06, INGEST-07
+**Success Criteria** (what must be TRUE) :
+  1. L'API /api/votes retourne la liste des scrutins avec filtre par chambre (AN/Senat) — ~500 scrutins AN attendus
+  2. L'API /api/votes/:id retourne le detail d'un scrutin avec la position (pour/contre/abstention/absent) de chaque parlementaire
+  3. Un utilisateur peut voir sur le profil d'un parlementaire son historique de votes — les scrutins sont lies a l'acteur via actor_id
+  4. Les pipelines scrutins AN et Senat sont idempotents et tournent independamment
 
-Plans:
-- [ ] (a planifier)
-
-### Phase 15 — API REST Universelle
-**Objectif** : Refonte de l'API pour couvrir tous les types de donnees.
-- Refonte des endpoints existants + nouveaux
-- /api/debates, /api/questions, /api/amendments, /api/votes, /api/dossiers
-- Filtres avances (chambre, groupe, theme, date, texte)
-- FTS enrichi (recherche cross-types)
-- Documentation OpenAPI / Swagger
-- **Livrable** : API documentee couvrant toutes les donnees
+**Plans** : TBD
 
 Plans:
-- [ ] (a planifier)
+- [ ] 12-01-PLAN.md — Pipeline scrutins/votes AN (data.assemblee-nationale.fr Scrutins.json.zip)
+- [ ] 12-02-PLAN.md — Pipeline scrutins/votes Senat (Dosleg dump via staging container)
 
-### Phase 16 — Adaptation Frontend Poliscope
-**Objectif** : Adapter l'interface pour exploiter toutes les nouvelles donnees.
-- Nouvelles pages : Senat, votes/scrutins, amendements, dossiers
-- Navigation bicamerale (AN <-> Senat)
-- Recherche unifiee cross-types
-- Tableaux de bord par parlementaire enrichis
-- **Livrable** : Frontend complet exploitant la BDD universelle
+---
 
-Plans:
-- [ ] (a planifier)
+### Phase 13 — API REST Universelle + OpenAPI
 
-### Phase 17 — Deploiement & Ops
-**Objectif** : Deployer sur LXC et mettre en place l'operationnel.
-- Deploy API + BDD sur LXC PVE02
-- Strategie backup PostgreSQL (pg_dump cron)
-- Cron hebdo pour refresh donnees DILA/AN/Senat
-- Monitoring basique (health check, disk usage)
-- **Livrable** : App en production sur LXC, donnees auto-refreshed
+**Goal** : Tous les endpoints API sont stables, documentes, et couvrent les nouvelles donnees (votes, filtre chambre, recherche cross-type) avec une doc Swagger accessible.
+**Depends on** : Phase 12 (toutes les donnees en base)
+**Requirements** : API-01, API-02, API-03, API-04, API-05, API-06
+**Success Criteria** (what must be TRUE) :
+  1. Les endpoints debates et deputies existants continuent de fonctionner avec les nouvelles donnees — zero regression
+  2. GET /api/votes et GET /api/votes/:id retournent des donnees correctement formatees avec filtre chambre operationnel
+  3. Tous les endpoints existants acceptent un parametre `chambre` (AN/Senat) — les resultats sont filtrables par chambre
+  4. La recherche full-text retourne des resultats de type "debat" et "vote" dans la meme reponse (cross-type)
+  5. Swagger UI est accessible a /api/docs — chaque endpoint y est documente avec schemas de requete et reponse
+
+**Plans** : TBD
 
 Plans:
-- [ ] (a planifier)
+- [ ] 13-01-PLAN.md — Extension endpoints existants (chambre filter, deputies->actors alias) + endpoints /api/votes
+- [ ] 13-02-PLAN.md — FTS cross-type (stored search_vector + materialized view) + OpenAPI via @scalar/nuxt
+
+---
+
+### Phase 14 — Frontend Votes, Senat & Bicameral
+
+**Goal** : L'interface permet d'explorer les votes et les debats du Senat avec la meme UX que l'AN, et la navigation bicamerale est claire.
+**Depends on** : Phase 13 (API stable)
+**Requirements** : UI-01, UI-02, UI-03, UI-04, UI-05, UI-06
+**Success Criteria** (what must be TRUE) :
+  1. Un utilisateur peut consulter la liste des scrutins avec filtre par chambre et voir qui a vote quoi sur un scrutin donne
+  2. Les debats du Senat apparaissent dans la liste des debats — un filtre chambre (AN/Senat/Tous) est disponible
+  3. Un profil senateur est accessible avec le meme niveau d'information qu'un profil depute (interventions, votes, groupe)
+  4. La navigation entre AN et Senat est evidente — un toggle ou filtre global de chambre est present sur les pages liste
+  5. La recherche retourne des resultats de type "vote" avec un badge distinctif — un utilisateur peut filtrer par type de resultat
+
+**Plans** : TBD
+
+Plans:
+- [ ] 14-01-PLAN.md — Pages scrutins (liste + detail) + profils senateurs
+- [ ] 14-02-PLAN.md — Navigation bicamerale (filtre chambre global) + recherche cross-type avec type badges
+
+---
+
+### Phase 15 — Deploiement & Ops
+
+**Goal** : L'application tourne en production sur le LXC PVE02 avec backup automatique et refresh hebdomadaire des donnees.
+**Depends on** : Phase 14 (frontend stable), Phase 8 (LXC provisionné)
+**Requirements** : OPS-01, OPS-02, OPS-03, OPS-04
+**Success Criteria** (what must be TRUE) :
+  1. Poliscope est accessible publiquement depuis le LXC PVE02 — l'URL de production charge l'app
+  2. `pg_dump` tourne via systemd timer et produit un backup .sql.gz — le dernier backup a moins de 24h
+  3. Le refresh des donnees parlementaires se declenche automatiquement via systemd timer hebdomadaire — les nouvelles seances apparaissent sans intervention manuelle
+  4. Un endpoint /api/health retourne un status JSON avec l'etat de la DB et la date du dernier refresh
+
+**Plans** : TBD
+
+Plans:
+- [ ] 15-01-PLAN.md — Deploy app sur LXC (provision.sh, PostgreSQL config, Nuxt PM2/systemd)
+- [ ] 15-02-PLAN.md — Backup pg_dump + systemd timers (refresh hebdo) + health check endpoint
+
+---
+
+## Progress
+
+**Milestone 1 (Phases 1-7) :** Complete — 2026-03-28
+**Milestone 2 (Phases 8-15) :** In progress
+
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1. Setup & Infrastructure | v1.0 | 2/2 | Complete | 2026-03-27 |
+| 2. Ingestion AN | v1.0 | 3/3 | Complete | 2026-03-27 |
+| 3. API Backend | v1.0 | 3/3 | Complete | 2026-03-27 |
+| 4. UI Debats | v1.0 | 3/3 | Complete | 2026-03-28 |
+| 5. Profils Deputes | v1.0 | 2/2 | Complete | 2026-03-28 |
+| 6. Recherche & Filtres | v1.0 | 2/2 | Complete | 2026-03-28 |
+| 7. Polish & Lancement | v1.0 | 2/2 | Complete | 2026-03-28 |
+| 8. Monorepo & Infra LXC | v2.0 | 0/2 | Not started | - |
+| 9. Schema BDD Universel | v2.0 | 0/2 | Not started | - |
+| 10. Ingestion Acteurs & Organes | v2.0 | 0/2 | Not started | - |
+| 11. Ingestion Debats CRI | v2.0 | 0/2 | Not started | - |
+| 12. Ingestion Votes & Scrutins | v2.0 | 0/2 | Not started | - |
+| 13. API REST Universelle | v2.0 | 0/2 | Not started | - |
+| 14. Frontend Votes, Senat & Bicameral | v2.0 | 0/2 | Not started | - |
+| 15. Deploiement & Ops | v2.0 | 0/2 | Not started | - |

@@ -1,78 +1,65 @@
 # Poliscope — State
 
+## Project Reference
+
+See: .planning/PROJECT.md (updated 2026-03-28)
+
+**Core value:** Permettre a n'importe qui de chercher et lire ce qu'un parlementaire a dit sur n'importe quel sujet, en quelques clics.
+**Current focus:** Phase 8 — Monorepo & Infra LXC (Milestone 2 start)
+
 ## Current Position
-- **Milestone** : 1 — MVP Debats AN
-- **Phase** : 7 — Polish & Lancement (Complete)
-- **Plan** : 07-02 complete — 2/2 plans done
-- **Status** : Phase complete — Milestone 1 complete
 
-Progress: Phase 7 [██] 2/2 plans done | Overall [█████████████████] 17/17 plans
+- **Milestone** : 2 — Base de Donnees Parlementaire Universelle
+- **Phase** : 8 — Monorepo & Infra LXC
+- **Plan** : 0/2 — not started
+- **Status** : Ready to plan
+- **Last activity** : 2026-03-28 — Milestone 2 roadmap created (8 phases, 35 requirements)
 
-## Decisions
-| ID | Decision | Context |
-|----|----------|---------|
-| D-0201-01 | Python 3.12 installed via winget | Was missing from system, needed for scripts |
-| D-0201-02 | nosdeputes.fr = 16th legislature | All 618 deputies have mandat_fin, is_active=false correct |
-| D-0202-01 | Pivoted from nosdeputes.fr to DILA for debates | nosdeputes.fr /seances/json returns empty for 17th legislature; DILA has CRI XML archives |
-| D-0202-02 | DILA CRI XML format: .taz archives | Nested tar with CRI_*.xml, Orateur href for deputy matching |
-| D-0301-01 | Use relative imports in server/api (../../db/schema) | Nuxt 4 resolves ~ alias to app/ not project root — breaks server imports |
-| D-0301-02 | getPaginationParams takes H3Event directly | Cleaner API, avoids double getQuery() call in handler |
-| D-0302-01 | tagStats uses separate GROUP BY query (not in-memory post-process) | Covers all deputy interventions, not just current page |
-| D-0302-02 | Interventions in deputy detail ordered by createdAt DESC | Most recent first is natural for profile browsing |
-| D-0303-01 | Use db.execute(sql`...`) for FTS query | Drizzle query builder cannot express ts_rank/ts_headline/optional WHERE fragments cleanly |
-| D-0303-02 | websearch_to_tsquery over to_tsquery | Handles unescaped user input safely, no manual pre-processing needed |
-| D-0401-01 | Group colors via inline JS (getGroupColor) not CSS variables | Dynamic data per group; CSS variables would be unused/inflexible |
-| D-0401-02 | whitespace-pre-wrap in InterventionCard (not v-html) | XSS-safe, handles multiline debate transcript text |
-| D-0402-01 | Date in computed with fr-FR + Europe/Paris timezone | Explicit locale and timezone in computed prevents SSR/client hydration mismatch |
-| D-0402-02 | useFetch watch: [page] re-fetches automatically | No manual refresh() call needed; avoids double-fetch bugs |
-| D-0403-01 | No virtual scrolling on debate thread page | Browser handles ~1000 simple nodes; deferred as premature optimization |
-| D-0403-02 | v-bind spread on InterventionCard | API response shape matches component props exactly — no manual binding needed |
-| D-0502-01 | deputyId is optional prop on InterventionCard | Existing v-bind spreads auto-pass it; debates API already returns deputyId |
-| D-0502-02 | Tag filter client-side on accumulated allInterventions | Simpler UX; resets activeTag to null on page increment |
-| D-0502-03 | component :is pattern for conditional NuxtLink avatar | Avoids duplicating full avatar markup in v-if/v-else blocks |
-| D-0502-04 | Deputy.fullName typed as string or null | Matches Drizzle/Nuxt SerializeObject<> shape; resolves pre-existing TS2345 |
-| D-0601-01 | URL sync one-directional (local ref -> URL only) | No watch on route.query after init — avoids double-trigger infinite loop |
-| D-0601-02 | useFetch immediate:false + watch:false + manual refresh() | Prevents 400 on empty q; shouldFetch computed guards trigger |
-| D-0601-03 | Tag filter via click-on-result-pills (no pre-loaded tag list) | Zero new API endpoints; consistent with deputy profile tag filter UX |
-| D-0601-04 | json_agg with COALESCE to '[]'::json in tags subquery | Ensures non-null tags array in SQL response for all interventions |
-| D-0701-01 | useSeoMeta with reactive getter functions for dynamic pages | SSR renders correctly when data loads asynchronously |
-| D-0701-02 | Footer-only links to /about and /legal (not in header nav) | Plan specified footer only — keeps header nav focused on core app pages |
-| D-0702-01 | @nuxt/test-utils/playwright with Nuxt rootDir integration | Tests run against real Nuxt dev server with full SSR/hydration cycle |
-| D-0702-02 | data-testid on root component elements (not wrappers) | Stable selectors independent of CSS class changes |
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [░░░░░░░░░░░░░░░░] 0/16 plans
 
-## Milestone 2 — Base de Donnees Parlementaire Universelle (planifie)
-- **Phases** : 8-17 (10 phases)
-- **Status** : Planifie, en attente de completion Milestone 1
-- **Architecture** : Monorepo (packages/api + packages/web)
-- **Infra** : LXC Debian 12 sur PVE02 (4 vCPU, 4 Go RAM, 100 Go disk)
+## Accumulated Context
+
+### Key Decisions (Milestone 2)
+
+| Decision | Rationale |
+|----------|-----------|
+| Monorepo: packages/shared + packages/ingestion + packages/web | Types partages, scripts Python separes, Nuxt reste racine logique |
+| Garder server/ dans Nuxt (pas Hono standalone) | Couplage auto-imports H3 — zero benefice a extraire pour un seul client |
+| systemd timers (pas node-cron) | Ingestion Python independante du process Node; Persistent=true gere les runs manques |
+| Cross-reference table avant toute autre ingestion | Previent la corruption silencieuse de FK entre sources (PA vs DILA vs slug vs Senat) |
+| stored search_vector tsvector (pas functional index) | FTS cross-type scalable — functional index force row rechecks a >50K lignes |
+| Questions/Amendements/Dossiers -> v3 | Scope raisonnable pour v2 ; votes sont la priorite citoyenne #1 |
+| Votes ingeres en phase 12 (avant API/UI) | Data confidence avant exposition endpoints ; votes = attente principale |
+
+### Blockers / Risks
+
+- **Phase 10** : URL Tricoteuses a valider (migration Framagit -> git.en-root.org, retourne 403 en research)
+- **Phase 11** : Format XML Senat (Akoma Ntoso) non valide — echantillonner 2-3 CR recents avant implementation
+- **Phase 12** : Schema Dosleg dump PostgreSQL 8.4 non inspecte — tester compatibilite avec PG17 avant ingestion
+- **Phase 13** : Compatibilite @scalar/nuxt avec Nuxt 4 a confirmer (30 min check)
+- **Schema** : Rename `deputies -> actors` est HIGH RISK — toujours tester sur snapshot prod avant migration LXC
+
+### Pending Todos
+
+None.
 
 ## Session Continuity
-- **Last session**: 2026-03-28
-- **Stopped at**: Phase 7 complete — verification PASSED (14/14 must-haves)
-- **Resume**: Milestone 1 complete — next milestone planning
+
+- **Last session** : 2026-03-28
+- **Stopped at** : Milestone 2 roadmap created — Phase 8 ready to plan
+- **Resume** : `plan-phase 8` — Monorepo restructure + LXC provisionnement
 
 ## History
-- 2026-03-28 : Phase 7 complete — verification PASSED (14/14 must-haves)
-- 2026-03-28 : Completed 07-02 — Playwright E2E suite: 11 tests across 4 spec files, data-testid on all card components (commits 6b51669 + fdd9da7)
-- 2026-03-28 : Completed 07-01 — Global SEO (@nuxtjs/sitemap, useSeoMeta, routeRules caching, robots.txt) + about/legal pages + footer nav (commits 5960a1e + 4553c38 + 1ae013f)
+
+- 2026-03-28 : Milestone 2 roadmap cree — 8 phases (8-15), 35 requirements mappes, STATE.md mis a jour
+- 2026-03-28 : Milestone 1 complete — Phase 7 verification PASSED (14/14 must-haves)
+- 2026-03-28 : Completed 07-02 — Playwright E2E suite: 11 tests across 4 spec files
+- 2026-03-28 : Completed 07-01 — SEO + sitemap + routeRules caching + about/legal pages
 - 2026-03-28 : Phase 6 complete — verification PASSED (10/10 must-haves)
-- 2026-03-28 : Completed 06-02 — Global header search bar in default.vue layout, NuxtLink fix + immediate fetch on URL load, 10/10 Playwright tests passed (commits 85a1d88 + 64a5e09)
-- 2026-03-28 : Completed 06-01 — /search page with FTS highlights, tag filter, infinite scroll, URL-synced state + SearchResultCard + extended /api/search (tags[]) (commits a232986 + 154b5b7 + 4fb89f7)
+- 2026-03-28 : Completed 06-02 — Global header search bar + NuxtLink fix
+- 2026-03-28 : Completed 06-01 — /search page with FTS highlights + infinite scroll + URL sync
 - 2026-03-28 : Phase 5 complete — verification PASSED (13/13 must-haves)
-- 2026-03-28 : Completed 05-02 — Deputy profile page /deputies/[id] with tag filter, load more, debate context links + InterventionCard deputyId bidirectional nav (commits 2ce1d8d + f7492b4)
-- 2026-03-28 : Completed 05-01 — Deputies list page /deputies with search, group filter, infinite scroll + DeputyCard component (commits b8bcd24 + b5cae9b)
-- 2026-03-28 : Phase 4 complete — verification PASSED (11/11 must-haves). Design reskin "Marbre & Bronze" applied (commit 06c9e4f)
-- 2026-03-28 : Completed 04-03 — debate thread page /debates/[id] with route validation, useFetch, InterventionCard thread, SEO title (commit b93b901)
-- 2026-03-28 : Completed 04-02 — DebateCard component + home page with useFetch/useIntersectionObserver infinite scroll (commits 9fb6a35 + f3cde7a)
-- 2026-03-28 : Completed 04-01 — @vueuse/core + GroupBadge, InterventionCard, LoadingSpinner + 11-group color system (commits 2e896ad + 5418968)
-- 2026-03-27 : Completed 03-03 — GET /api/search FTS endpoint with French language, ts_rank, ts_headline highlights (commit 588bcf6)
-- 2026-03-27 : Completed 03-02 — GET /api/deputies + GET /api/deputies/:id with tag distribution (commits c176d96 + 478e375)
-- 2026-03-27 : Completed 03-01 — Pagination utility + GET /api/debates + GET /api/debates/:id (commits 5446b8d + c79932f)
-- 2026-03-27 : Completed 02-03 — Keyword tagging (12 tags, 787 assignments) + pipeline orchestrator (commits 6b8a383 + ea73f54)
-- 2026-03-27 : Completed 02-02 — Debate + intervention ingestion from DILA (5 debates, 2479 interventions, commit be82fa2)
-- 2026-03-27 : Completed 02-01 — Python env + deputy ingestion (618 deputies, commits fdcb43d + c82a200)
-- 2026-03-27 : Phase 2 planned (3 plans, 3 waves) — verified PASS (2 blockers fixed: interventions idempotence strategy, updated_at helper)
-- 2026-03-27 : Completed 01-02 — Docker Compose + Drizzle schema + health check API (commit 09a4aae)
-- 2026-03-27 : Completed 01-01 — Scaffold Nuxt 4 + Tailwind CSS v4 + project structure (commit 20c8795)
-- 2026-03-27 : Phase 1 planned (2 plans, 2 waves) — verified PASS
-- 2026-03-27 : Project initialized, planning created
+- 2026-03-28 : Phase 4 complete — verification PASSED (11/11 must-haves)
+- 2026-03-27 : Phase 3 complete — API REST 6 endpoints
+- 2026-03-27 : Phase 2 complete — 5 debats, 2 479 interventions, 618 deputes, 12 tags
+- 2026-03-27 : Phase 1 complete — Nuxt 4 + Docker Compose + Drizzle

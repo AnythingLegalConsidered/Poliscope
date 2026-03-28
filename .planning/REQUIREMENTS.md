@@ -123,26 +123,26 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INGEST-03 | Phase 10 | Pending |
 | INGEST-04 | Phase 11 | Pending |
 | INGEST-05 | Phase 11 | Pending |
-| INGEST-06 | Phase 13 | Pending |
-| INGEST-07 | Phase 13 | Pending |
+| INGEST-06 | Phase 12 | Pending |
+| INGEST-07 | Phase 12 | Pending |
 | INGEST-08 | Phase 11 | Pending |
 | INGEST-09 | Phase 10 | Pending |
-| API-01 | Phase 15 | Pending |
-| API-02 | Phase 15 | Pending |
-| API-03 | Phase 15 | Pending |
-| API-04 | Phase 15 | Pending |
-| API-05 | Phase 15 | Pending |
-| API-06 | Phase 15 | Pending |
-| UI-01 | Phase 16 | Pending |
-| UI-02 | Phase 16 | Pending |
-| UI-03 | Phase 16 | Pending |
-| UI-04 | Phase 16 | Pending |
-| UI-05 | Phase 16 | Pending |
-| UI-06 | Phase 16 | Pending |
-| OPS-01 | Phase 17 | Pending |
-| OPS-02 | Phase 17 | Pending |
-| OPS-03 | Phase 17 | Pending |
-| OPS-04 | Phase 17 | Pending |
+| API-01 | Phase 13 | Pending |
+| API-02 | Phase 13 | Pending |
+| API-03 | Phase 13 | Pending |
+| API-04 | Phase 13 | Pending |
+| API-05 | Phase 13 | Pending |
+| API-06 | Phase 13 | Pending |
+| UI-01 | Phase 14 | Pending |
+| UI-02 | Phase 14 | Pending |
+| UI-03 | Phase 14 | Pending |
+| UI-04 | Phase 14 | Pending |
+| UI-05 | Phase 14 | Pending |
+| UI-06 | Phase 14 | Pending |
+| OPS-01 | Phase 15 | Pending |
+| OPS-02 | Phase 15 | Pending |
+| OPS-03 | Phase 15 | Pending |
+| OPS-04 | Phase 15 | Pending |
 
 **Coverage:**
 - v2 requirements: 35 total
@@ -151,4 +151,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-28*
-*Last updated: 2026-03-28 after initial definition*
+*Last updated: 2026-03-28 — phase mapping corrected (API: 13, UI: 14, OPS: 15, Votes: 12)*
