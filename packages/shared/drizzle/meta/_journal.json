@@ -8,6 +8,13 @@
       "when": 1774688974728,
       "tag": "0000_luxuriant_guardian",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1774711358334,
+      "tag": "0001_rename-deputies-to-actors",
+      "breakpoints": true
     }
   ]
 }

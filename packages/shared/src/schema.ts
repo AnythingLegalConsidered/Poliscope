@@ -1,7 +1,12 @@
-import { pgTable, text, integer, timestamp, boolean, index, primaryKey } from 'drizzle-orm/pg-core'
-import { sql } from 'drizzle-orm'
+import { pgTable, text, integer, timestamp, boolean, index, primaryKey, customType } from 'drizzle-orm/pg-core'
+import { SQL, sql } from 'drizzle-orm'
 
-export const deputies = pgTable('deputies', {
+// Custom tsvector type for stored FTS columns
+const tsvector = customType<{ data: string }>({
+  dataType() { return 'tsvector' },
+})
+
+export const actors = pgTable('actors', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   officialId: text('official_id').notNull().unique(),
   firstName: text('first_name').notNull(),
@@ -11,9 +16,17 @@ export const deputies = pgTable('deputies', {
   photoUrl: text('photo_url'),
   constituency: text('constituency'),
   isActive: boolean('is_active').default(true),
+  actorType: text('actor_type').notNull().default('deputy'),
+  chamber: text('chamber'),
+  legislature: integer('legislature'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-})
+  searchVector: tsvector('search_vector').generatedAlwaysAs((): SQL => sql`to_tsvector('french', coalesce(${actors.fullName}, ''))`),
+}, (table) => [
+  index('idx_actors_fts').using('gin', table.searchVector as unknown as SQL),
+  index('idx_actors_type').on(table.actorType),
+  index('idx_actors_active').on(table.isActive),
+])
 
 export const debates = pgTable('debates', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
@@ -30,19 +43,18 @@ export const debates = pgTable('debates', {
 export const interventions = pgTable('interventions', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   debateId: integer('debate_id').notNull().references(() => debates.id),
-  deputyId: integer('deputy_id').references(() => deputies.id),
+  actorId: integer('actor_id').references(() => actors.id),
   speakerName: text('speaker_name').notNull(),
   speakerRole: text('speaker_role'),
   content: text('content').notNull(),
   orderInDebate: integer('order_in_debate').notNull(),
+  chamber: text('chamber').default('AN'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  searchVector: tsvector('search_vector').generatedAlwaysAs((): SQL => sql`to_tsvector('french', ${interventions.content})`),
 }, (table) => [
   index('idx_interventions_debate').on(table.debateId),
-  index('idx_interventions_deputy').on(table.deputyId),
-  index('idx_interventions_fts').using(
-    'gin',
-    sql`to_tsvector('french', ${table.content})`
-  ),
+  index('idx_interventions_actor').on(table.actorId),
+  index('idx_interventions_fts').using('gin', table.searchVector as unknown as SQL),
 ])
 
 export const tags = pgTable('tags', {
