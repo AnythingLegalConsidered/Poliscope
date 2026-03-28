@@ -38,3 +38,12 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Political group colors are handled via JS util (app/utils/groupColors.ts)
    using inline styles for dynamic color assignment per group acronym. */
+
+/* FTS search highlights — ts_headline produces <mark> tags */
+mark {
+  background-color: var(--color-bronze-light);
+  color: var(--color-ink);
+  border-radius: 2px;
+  padding: 0 2px;
+  font-style: normal;
+}
