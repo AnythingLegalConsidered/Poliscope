@@ -70,8 +70,8 @@ Plans:
 - **Plans:** 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Deputies list page with search, group filter, infinite scroll
-- [ ] 05-02-PLAN.md — Deputy profile page with stats, tag filter, bidirectional navigation
+- [x] 05-01-PLAN.md — Deputies list page with search, group filter, infinite scroll
+- [x] 05-02-PLAN.md — Deputy profile page with stats, tag filter, bidirectional navigation
 
 ### Phase 6 — Recherche & Filtres
 **Objectif** : Moteur de recherche puissant pour retrouver n'importe quelle citation.

@@ -3,7 +3,7 @@
 ## Current Position
 - **Milestone** : 1 — MVP Debats AN
 - **Phase** : 5 — Profils Deputes (COMPLETE)
-- **Next** : Phase 6 (TBD) or MVP validation
+- **Next** : Phase 6 — Recherche & Filtres
 - **Status** : 2/2 plans done
 
 Progress: Phase 5 [██] 2/2 plans done | Overall [█████████████░░] ~13/15 plans
@@ -38,6 +38,7 @@ Progress: Phase 5 [██] 2/2 plans done | Overall [█████████
 - **Resume**: Phase 6 planning (if applicable)
 
 ## History
+- 2026-03-28 : Phase 5 complete — verification PASSED (13/13 must-haves)
 - 2026-03-28 : Completed 05-02 — Deputy profile page /deputies/[id] with tag filter, load more, debate context links + InterventionCard deputyId bidirectional nav (commits 2ce1d8d + f7492b4)
 - 2026-03-28 : Completed 05-01 — Deputies list page /deputies with search, group filter, infinite scroll + DeputyCard component (commits b8bcd24 + b5cae9b)
 - 2026-03-28 : Phase 4 complete — verification PASSED (11/11 must-haves). Design reskin "Marbre & Bronze" applied (commit 06c9e4f)
