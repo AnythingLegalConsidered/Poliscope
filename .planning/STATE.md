@@ -11,9 +11,9 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
 - **Phase** : 8 — Monorepo & Infra LXC
-- **Plan** : 1/2 — 08-02 at checkpoint (human-action)
+- **Plan** : 1/2 — 08-01 DONE, 08-02 at checkpoint (human-action)
 - **Status** : In progress — PAUSED at 08-02 Task 2 (run Ansible playbook)
-- **Last activity** : 2026-03-28 — Completed 08-02 Task 1 (Ansible files created), checkpoint at Task 2
+- **Last activity** : 2026-03-28 — Completed 08-01 (monorepo restructure), 08-02 at Task 2 checkpoint
 
 Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [█░░░░░░░░░░░░░░░] 1/16 plans
 
@@ -35,6 +35,10 @@ Progress: Milestone 1 [███████████████████
 
 | Decision | Rationale |
 |----------|-----------|
+| shared exports TypeScript source directement (pas de build) | Vite resout .ts dans monorepo — pas besoin de transpiler shared |
+| shamefully-hoist=true dans .npmrc | Nuxt auto-imports scanne node_modules heuristiquement — hoisting requis |
+| Import shared: import * as schema from 'shared/schema' | Via exports field + workspace:* — pas d'import relatif cross-package |
+| Python config.py .env path: 3 niveaux (packages/ingestion/scripts/ -> root) | Structure monorepo impose 3 niveaux vs 1 avant |
 | community.proxmox.proxmox (not community.general.proxmox) | community.general.proxmox est deprecie — supprime en community.general 15.0.0 |
 | api_password auth par defaut, token en commentaire | Plus simple pour premier run ; token mieux documente pour suite |
 | scram-sha-256 dans pg_hba.conf | Default PG17 — ne pas downgrader en md5 |
@@ -61,6 +65,7 @@ None.
 
 ## History
 
+- 2026-03-28 : Completed 08-01 — pnpm monorepo: packages/shared + packages/web + packages/ingestion, pnpm build passes
 - 2026-03-28 : Completed 08-02 (partial) — Ansible playbook LXC + PG17 cree, checkpoint Task 2 (execution manuelle)
 - 2026-03-28 : Milestone 2 roadmap cree — 8 phases (8-15), 35 requirements mappes, STATE.md mis a jour
 - 2026-03-28 : Milestone 1 complete — Phase 7 verification PASSED (14/14 must-haves)
