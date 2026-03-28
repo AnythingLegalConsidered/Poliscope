@@ -67,7 +67,13 @@ export default defineEventHandler(async (event) => {
         dep.full_name AS "deputyName",
         dep.political_group AS "deputyGroup",
         dep.photo_url AS "deputyPhoto",
-        count(*) OVER() AS total_count
+        count(*) OVER() AS total_count,
+        (
+          SELECT COALESCE(json_agg(json_build_object('name', t.name, 'slug', t.slug)), '[]'::json)
+          FROM intervention_tags it2
+          JOIN tags t ON it2.tag_id = t.id
+          WHERE it2.intervention_id = i.id
+        ) AS tags
       FROM interventions i
       LEFT JOIN debates d ON i.debate_id = d.id
       LEFT JOIN deputies dep ON i.deputy_id = dep.id
@@ -94,6 +100,7 @@ export default defineEventHandler(async (event) => {
       deputyGroup: string | null
       deputyPhoto: string | null
       total_count: string
+      tags: Array<{ name: string, slug: string }> | string
     }>
 
     const total = Number(results.at(0)?.total_count ?? 0)
@@ -116,6 +123,7 @@ export default defineEventHandler(async (event) => {
         group: row.deputyGroup,
         photoUrl: row.deputyPhoto,
       } : null,
+      tags: typeof row.tags === 'string' ? JSON.parse(row.tags) : (row.tags ?? []),
     }))
 
     return paginatedResponse(data, total, page, limit)
