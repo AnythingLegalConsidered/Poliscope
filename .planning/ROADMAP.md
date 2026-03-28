@@ -83,8 +83,8 @@ Plans:
 - **Plans:** 2 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Search results page + SearchResultCard + FTS highlight styling
-- [ ] 06-02-PLAN.md — Global header search bar + full search UX verification
+- [x] 06-01-PLAN.md — Search results page + SearchResultCard + FTS highlight styling
+- [x] 06-02-PLAN.md — Global header search bar + full search UX verification
 
 ### Phase 7 — Polish & Lancement
 **Objectif** : Finitions avant mise en ligne.

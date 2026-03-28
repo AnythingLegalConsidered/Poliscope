@@ -42,6 +42,7 @@ Progress: Phase 6 [██] 2/2 plans done | Overall [█████████
 - **Resume**: Milestone 1 review or next milestone planning
 
 ## History
+- 2026-03-28 : Phase 6 complete — verification PASSED (10/10 must-haves)
 - 2026-03-28 : Completed 06-02 — Global header search bar in default.vue layout, NuxtLink fix + immediate fetch on URL load, 10/10 Playwright tests passed (commits 85a1d88 + 64a5e09)
 - 2026-03-28 : Completed 06-01 — /search page with FTS highlights, tag filter, infinite scroll, URL-synced state + SearchResultCard + extended /api/search (tags[]) (commits a232986 + 154b5b7 + 4fb89f7)
 - 2026-03-28 : Phase 5 complete — verification PASSED (13/13 must-haves)
