@@ -142,11 +142,11 @@ Plans:
   4. `drizzle-kit generate` produit des migrations incrementales (pas de DROP TABLE sur les donnees existantes)
   5. Les index FTS francais (`search_vector tsvector`) existent sur acteurs et interventions — `EXPLAIN ANALYZE` confirme un index scan
 
-**Plans** : TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — Migration schema acteurs/organes/legislatures (rename deputies -> actors, add tables)
-- [ ] 09-02-PLAN.md — Migration schema seances/scrutins/votes/cross-references + index FTS
+- [ ] 09-01-PLAN.md — Rename deputies -> actors (hand-written migration) + stored tsvector FTS + delete schema duplicate + update API routes
+- [ ] 09-02-PLAN.md — Add tables (organs, legislatures, scrutins, votes, questions, amendments, cross_references) + debates.chamber + additive migration
 
 ---
 
@@ -250,7 +250,7 @@ Plans:
 ### Phase 15 — Deploiement & Ops
 
 **Goal** : L'application tourne en production sur le LXC PVE02 avec backup automatique et refresh hebdomadaire des donnees.
-**Depends on** : Phase 14 (frontend stable), Phase 8 (LXC provisionné)
+**Depends on** : Phase 14 (frontend stable), Phase 8 (LXC provisionne)
 **Requirements** : OPS-01, OPS-02, OPS-03, OPS-04
 **Success Criteria** (what must be TRUE) :
   1. Poliscope est accessible publiquement depuis le LXC PVE02 — l'URL de production charge l'app
