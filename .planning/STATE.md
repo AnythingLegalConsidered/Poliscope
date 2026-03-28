@@ -40,10 +40,16 @@ Progress: Phase 7 [██░] 2/? plans done | Overall [████████
 | D-0702-01 | @nuxt/test-utils/playwright with Nuxt rootDir integration | Tests run against real Nuxt dev server with full SSR/hydration cycle |
 | D-0702-02 | data-testid on root component elements (not wrappers) | Stable selectors independent of CSS class changes |
 
+## Milestone 2 — Base de Donnees Parlementaire Universelle (planifie)
+- **Phases** : 8-17 (10 phases)
+- **Status** : Planifie, en attente de completion Milestone 1
+- **Architecture** : Monorepo (packages/api + packages/web)
+- **Infra** : LXC Debian 12 sur PVE02 (4 vCPU, 4 Go RAM, 100 Go disk)
+
 ## Session Continuity
 - **Last session**: 2026-03-28
-- **Stopped at**: Phase 7 plan 02 complete — Playwright E2E test suite (11 tests, 4 journeys)
-- **Resume**: `.planning/phases/07-polish-lancement/` (next plan in phase 7, if any)
+- **Stopped at**: Phase 7 plan 02 complete + Milestone 2 planifie (roadmap, PROJECT.md, MILESTONES.md, README)
+- **Resume**: Verifier phase 7 complete, puis Phase 8 (M2)
 
 ## History
 - 2026-03-28 : Completed 07-02 — Playwright E2E suite: 11 tests across 4 spec files, data-testid on all card components (commits 6b51669 + fdd9da7)
