@@ -61,7 +61,7 @@ watch([shouldFetch, page], ([sf]) => {
   else {
     allResults.value = []
   }
-})
+}, { immediate: true })
 
 // Accumulate results
 watch(data, (newData) => {

@@ -57,13 +57,9 @@ const formattedDate = computed(() => {
     <!-- Speaker info row -->
     <div class="flex items-start gap-3 mb-3">
       <!-- Avatar -->
-      <component
-        :is="deputy ? resolveComponent('NuxtLink') : 'div'"
-        :to="deputy ? `/deputies/${deputy.id}` : undefined"
-        class="flex-shrink-0"
-      >
+      <NuxtLink v-if="deputy" :to="`/deputies/${deputy.id}`" class="flex-shrink-0">
         <img
-          v-if="deputy?.photoUrl"
+          v-if="deputy.photoUrl"
           :src="deputy.photoUrl"
           :alt="displayName"
           class="w-10 h-10 rounded-full object-cover border border-stone-border"
@@ -74,7 +70,12 @@ const formattedDate = computed(() => {
         >
           {{ initials }}
         </div>
-      </component>
+      </NuxtLink>
+      <div v-else class="flex-shrink-0">
+        <div class="w-10 h-10 rounded-full bg-bronze flex items-center justify-center text-white text-sm font-bold">
+          {{ initials }}
+        </div>
+      </div>
 
       <!-- Speaker name + group + role -->
       <div class="flex-1 min-w-0">
