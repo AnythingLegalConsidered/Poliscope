@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
 - **Phase** : 9 — Schema BDD Universel
-- **Plan** : 0/2 — not started
-- **Status** : Ready to plan
-- **Last activity** : 2026-03-28 — Phase 8 complete (monorepo + LXC PG17)
+- **Plan** : 1/2 — in progress
+- **Status** : In progress
+- **Last activity** : 2026-03-28 — Completed 09-01 (rename deputies->actors, tsvector FTS, shared schema)
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [██░░░░░░░░░░░░░░] 2/16 plans
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [███░░░░░░░░░░░░░] 3/16 plans
 
 ## Accumulated Context
 
@@ -30,6 +30,14 @@ Progress: Milestone 1 [███████████████████
 | stored search_vector tsvector (pas functional index) | FTS cross-type scalable — functional index force row rechecks a >50K lignes |
 | Questions/Amendements/Dossiers -> v3 | Scope raisonnable pour v2 ; votes sont la priorite citoyenne #1 |
 | Votes ingeres en phase 12 (avant API/UI) | Data confidence avant exposition endpoints ; votes = attente principale |
+
+### Key Decisions (Phase 9 — Plan 01)
+
+| Decision | Rationale |
+|----------|-----------|
+| drizzle-kit --custom + snapshot manual update | --custom crée SQL vide + snapshot copie; mise a jour manuelle evite DROP/CREATE lors du prochain generate |
+| Snapshot GENERATED ALWAYS AS avec noms qualifies (actors.full_name) | drizzle-kit génère les expressions avec table.column — doit matcher exactement pour eviter le delta |
+| API response fields (deputyId, deputyName) inchanges | Backward compat frontend — seuls les refs Drizzle internes changent; API contract stable jusqu'en Phase 13 |
 
 ### Key Decisions (Phase 8)
 
@@ -59,11 +67,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-03-28
-- **Stopped at** : Phase 8 complete — Phase 9 ready to plan
-- **Resume** : `plan-phase 9` — Schema BDD Universel
+- **Stopped at** : Phase 9, Plan 01 complete — Plan 02 ready
+- **Resume** : Execute 09-02-PLAN.md — New tables (organs, scrutins, votes, cross_references)
 
 ## History
 
+- 2026-03-28 : Completed 09-01 — rename deputies->actors (safe migration), stored tsvector FTS columns, all 6 API routes -> shared/schema
 - 2026-03-28 : Phase 8 complete — verification PASSED (7/7 must-haves). LXC 200 poliscope-db provisioned (PG17.9), monorepo pnpm, E2E 11/11
 
 - 2026-03-28 : Completed 08-01 — pnpm monorepo: packages/shared + packages/web + packages/ingestion, pnpm build passes
