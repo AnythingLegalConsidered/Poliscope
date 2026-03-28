@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
 - **Phase** : 9 — Schema BDD Universel
-- **Plan** : 1/2 — in progress
-- **Status** : In progress
-- **Last activity** : 2026-03-28 — Completed 09-01 (rename deputies->actors, tsvector FTS, shared schema)
+- **Plan** : 2/2 — COMPLETE
+- **Status** : Phase complete — ready for Phase 10
+- **Last activity** : 2026-03-28 — Completed 09-02 (7 new tables: organs, legislatures, scrutins, votes, questions, amendments, cross_references)
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [███░░░░░░░░░░░░░] 3/16 plans
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [████░░░░░░░░░░░░] 4/16 plans
 
 ## Accumulated Context
 
@@ -30,6 +30,14 @@ Progress: Milestone 1 [███████████████████
 | stored search_vector tsvector (pas functional index) | FTS cross-type scalable — functional index force row rechecks a >50K lignes |
 | Questions/Amendements/Dossiers -> v3 | Scope raisonnable pour v2 ; votes sont la priorite citoyenne #1 |
 | Votes ingeres en phase 12 (avant API/UI) | Data confidence avant exposition endpoints ; votes = attente principale |
+
+### Key Decisions (Phase 9 — Plan 02)
+
+| Decision | Rationale |
+|----------|-----------|
+| crossReferences: sourceType + sourceId (not per-source columns) | Ajout d'une nouvelle source = nouvelle ligne, pas de schema change |
+| organs.parentOrganId sans FK constraint | Self-ref FK cause des problemes d'insert circulaire — resolu au niveau applicatif |
+| questions et amendments: schema-only (pas d'ingestion) | Scope v2 raisonnable — votes sont la priorite #1, QAG/amendements -> v3 |
 
 ### Key Decisions (Phase 9 — Plan 01)
 
@@ -67,11 +75,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-03-28
-- **Stopped at** : Phase 9, Plan 01 complete — Plan 02 ready
-- **Resume** : Execute 09-02-PLAN.md — New tables (organs, scrutins, votes, cross_references)
+- **Stopped at** : Phase 9 complete (2/2 plans) — Phase 10 ready
+- **Resume** : Execute 10-ingestion-an — Phase 10 ingestion AN (tricoteuses, CRI XML parsing)
 
 ## History
 
+- 2026-03-28 : Completed 09-02 — 7 new tables (legislatures, organs, scrutins, votes, questions, amendments, cross_references), debates.chamber, additive migration 0002 (zero DROP TABLE)
 - 2026-03-28 : Completed 09-01 — rename deputies->actors (safe migration), stored tsvector FTS columns, all 6 API routes -> shared/schema
 - 2026-03-28 : Phase 8 complete — verification PASSED (7/7 must-haves). LXC 200 poliscope-db provisioned (PG17.9), monorepo pnpm, E2E 11/11
 
