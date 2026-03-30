@@ -1,8 +1,17 @@
-import { sql, desc } from 'drizzle-orm'
+import { sql, desc, eq, and } from 'drizzle-orm'
+import type { SQL } from 'drizzle-orm'
 import { debates } from 'shared/schema'
 
 export default defineEventHandler(async (event) => {
   const { page, limit, offset } = getPaginationParams(event)
+  const query = getQuery(event)
+  const chamber = query.chamber as string | undefined
+
+  // Build WHERE conditions
+  const conditions: SQL[] = []
+  if (chamber === 'AN' || chamber === 'Senat') {
+    conditions.push(eq(debates.chamber, chamber))
+  }
 
   try {
     const rows = await db
@@ -13,12 +22,14 @@ export default defineEventHandler(async (event) => {
         date: debates.date,
         legislature: debates.legislature,
         sessionType: debates.sessionType,
+        chamber: debates.chamber,
         sourceUrl: debates.sourceUrl,
         createdAt: debates.createdAt,
         // Window function: count total rows in same query
         totalCount: sql<number>`count(*) over()`,
       })
       .from(debates)
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
       .orderBy(desc(debates.date))
       .limit(limit)
       .offset(offset)
