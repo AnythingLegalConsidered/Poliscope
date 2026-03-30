@@ -11,11 +11,11 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
 - **Phase** : 11 — Ingestion Debats CRI — In progress
-- **Plan** : 1/3 — DONE
-- **Status** : Plan 11-01 complete — ingest_debates.py refactored to actors table + PA prefix + chamber columns
-- **Last activity** : 2026-03-30 — Completed 11-01 (AN CRI pipeline actors migration)
+- **Plan** : 2/3 — IN PROGRESS
+- **Status** : Plan 11-02 complete — ingest_debates_senat.py + 9-step orchestrator
+- **Last activity** : 2026-03-30 — Completed 11-02 (Senat CRI pipeline)
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [█████████░░░░░░] 9/17 plans
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [██████████░░░░░] 10/17 plans
 
 ## Accumulated Context
 
@@ -30,6 +30,15 @@ Progress: Milestone 1 [███████████████████
 | stored search_vector tsvector (pas functional index) | FTS cross-type scalable — functional index force row rechecks a >50K lignes |
 | Questions/Amendements/Dossiers -> v3 | Scope raisonnable pour v2 ; votes sont la priorite citoyenne #1 |
 | Votes ingeres en phase 12 (avant API/UI) | Data confidence avant exposition endpoints ; votes = attente principale |
+
+### Key Decisions (Phase 11 — Plan 02)
+
+| Decision | Rationale |
+|----------|-----------|
+| httpx.stream() + NamedTemporaryFile for cri.zip | 510 MB ZIP — httpx.get().content would OOM on 4GB LXC; streaming to disk avoids full in-memory buffer |
+| Name-only senator matching (no href) | Senat CRI XML has no href/ID on Orateur — cross_references not viable; normalize_name() lookup only |
+| XVIIE_START = 2022-06-22 | Matches AN XVIIe legislature start for consistent scope across both chambers |
+| legislature=17 hardcoded for Senat debates | Senat has no discrete legislature numbering; 17 aligns with concurrent AN XVIIe legislature |
 
 ### Key Decisions (Phase 11 — Plan 01)
 
@@ -106,11 +115,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-03-30
-- **Stopped at** : Phase 11 plan 01 — ingest_debates.py actors migration complete
-- **Resume** : Phase 11 plan 02 — Senat CRI pipeline (ingest_debates_senat.py)
+- **Stopped at** : Phase 11 plan 02 — Senat CRI pipeline + 9-step orchestrator complete
+- **Resume** : Phase 11 plan 03 — if applicable, or phase 12
 
 ## History
 
+- 2026-03-30 : Completed 11-02 — ingest_debates_senat.py (Senat CRI from cri.zip, streaming download, name-only senator matching), run_all.py 9-step pipeline
 - 2026-03-30 : Completed 11-01 — ingest_debates.py refactored: actors table (chamber='AN'), PA prefix fix for official_id matching, chamber column on debates+interventions
 - 2026-03-30 : Completed 10-03 — actor_organs table (migration 0004), 1311 AN memberships from AMO10 mandats, run_all.py 8-step pipeline, Senat limitation documented
 - 2026-03-28 : Completed 10-02 — 24 AN organs + 17 Senat organs ingested, 577 actors' political_group resolved from PO ref to name, run_all.py updated to 7-step pipeline
