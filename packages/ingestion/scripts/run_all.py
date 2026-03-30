@@ -6,6 +6,7 @@ Usage:
     python run_all.py --skip-actors --skip-organs  # Debates + tags only
     python run_all.py --skip-deputies --skip-debates --retag-all  # Re-tag only
     python run_all.py --skip-debates --skip-tags --skip-deputies  # Actors + organs only
+    python run_all.py --senat-zip-path /tmp/cri.zip  # Use pre-downloaded cri.zip
 
 Pipeline order (dependency-safe):
     Step 1: ingest_actors_an.py      (AN deputies from ZIP — must run before organs)
@@ -14,8 +15,9 @@ Pipeline order (dependency-safe):
     Step 4: ingest_organs_senat.py   (Senat organs)
     Step 5: ingest_memberships_an.py (AN actor-organ memberships from AMO10 mandats)
     Step 6: ingest_deputies.py       (legacy nosdeputes.fr — backward compat)
-    Step 7: ingest_debates.py        (debates + interventions)
-    Step 8: tag_interventions.py     (FTS tags on interventions)
+    Step 7: ingest_debates.py        (AN CRI debates + interventions)
+    Step 8: ingest_debates_senat.py  (Senat CRI debates + interventions from cri.zip)
+    Step 9: tag_interventions.py     (FTS tags on interventions)
 """
 
 import argparse
@@ -83,8 +85,10 @@ def main():
     parser.add_argument("--skip-organs", action="store_true", help="Skip organ ingestion (AN + Senat)")
     parser.add_argument("--skip-memberships", action="store_true", help="Skip actor-organ membership ingestion (AN)")
     parser.add_argument("--skip-deputies", action="store_true", help="Skip legacy nosdeputes.fr deputy ingestion")
-    parser.add_argument("--skip-debates", action="store_true", help="Skip debate ingestion")
+    parser.add_argument("--skip-debates", action="store_true", help="Skip AN debate ingestion")
+    parser.add_argument("--skip-senat-debates", action="store_true", help="Skip Senat debate ingestion")
     parser.add_argument("--skip-tags", action="store_true", help="Skip tagging")
+    parser.add_argument("--senat-zip-path", type=str, default=None, help="Path to pre-downloaded cri.zip (skips download)")
     parser.add_argument("--retag-all", action="store_true", help="Clear and retag all interventions")
     args = parser.parse_args()
 
@@ -99,8 +103,9 @@ def main():
         ("Step 4: ingest_organs_senat.py", not args.skip_organs),
         ("Step 5: ingest_memberships_an.py", not args.skip_memberships),
         ("Step 6: ingest_deputies.py (legacy)", not args.skip_deputies),
-        ("Step 7: ingest_debates.py", not args.skip_debates),
-        ("Step 8: tag_interventions.py", not args.skip_tags),
+        ("Step 7: ingest_debates.py (AN CRI)", not args.skip_debates),
+        ("Step 8: ingest_debates_senat.py (Senat CRI)", not args.skip_senat_debates),
+        ("Step 9: tag_interventions.py", not args.skip_tags),
     ]
     for step_name, will_run in steps:
         status = "RUN" if will_run else "SKIP"
@@ -152,7 +157,7 @@ def main():
     else:
         logger.info("SKIPPED: ingest_deputies.py (legacy)")
 
-    # Step 7: Debates
+    # Step 7: AN debates
     if not args.skip_debates:
         debate_args = []
         if args.limit is not None:
@@ -164,9 +169,21 @@ def main():
         if not run_script("ingest_debates.py", debate_args):
             errors += 1
     else:
-        logger.info("SKIPPED: ingest_debates.py")
+        logger.info("SKIPPED: ingest_debates.py (AN CRI)")
 
-    # Step 8: Tags
+    # Step 8: Senat debates
+    if not args.skip_senat_debates:
+        senat_args = []
+        if args.limit is not None:
+            senat_args += ["--limit", str(args.limit)]
+        if args.senat_zip_path:
+            senat_args += ["--senat-zip-path", args.senat_zip_path]
+        if not run_script("ingest_debates_senat.py", senat_args):
+            errors += 1
+    else:
+        logger.info("SKIPPED: ingest_debates_senat.py (Senat CRI)")
+
+    # Step 9: Tags
     if not args.skip_tags:
         tag_args = []
         if args.retag_all:
