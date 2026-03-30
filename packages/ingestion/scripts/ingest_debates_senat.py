@@ -1,11 +1,23 @@
 """Ingest Senat debates and interventions from data.senat.fr CRI bulk ZIP.
 
 Source: https://data.senat.fr/data/debats/cri.zip
-Format: ZIP archive containing per-session XML files (PublicationDSenat format, NOT Akoma Ntoso).
+Format: ZIP archive containing per-session XML files (cri:cri namespace,
+        http://senat.fr/schemas/thb/cri). Filename format: cri/dYYYYMMDD.xml.
 
 The ZIP is ~510 MB and is streamed to a temp file to avoid OOM on the 4GB LXC.
 Only sessions from the XVIIe legislature (>= 2022-06-22) are ingested.
-Senator matching is name-only (no href/ID on Orateur in Senat XML).
+Senator matching uses the mat= attribute (official_id in actors table) first,
+falling back to name normalization for speakers not in the DB (ministers, etc.).
+
+Bug fixes vs original implementation:
+  - Filename regex updated from SEN_YYYYMMDD_NNN.xml to dYYYYMMDD.xml
+  - XML parser updated: lxml XMLParser(recover=True) handles malformed HTML/XML
+    mixed documents (tag mismatches in older Senat CRI files)
+  - XML elements: cri:intervenant with nom/civ/qua/mat attrs instead of
+    PublicationDSenat Para/Orateur/Nom elements
+  - Date sourced from filename (not XML metadata)
+  - official_id derived from mat attribute for direct DB matching
+  - UnboundLocalError in finally block fixed: conn initialized before try block
 """
 
 import argparse
@@ -13,7 +25,6 @@ import logging
 import os
 import re
 import tempfile
-import unicodedata
 import zipfile
 from datetime import datetime
 
@@ -23,7 +34,7 @@ from tqdm import tqdm
 
 from config import DATABASE_URL  # noqa: F401 — triggers .env load
 from db import get_connection, upsert_query
-from ingest_debates import _clean_unicode, _extract_speech_content, normalize_name
+from ingest_debates import _clean_unicode, normalize_name
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +44,7 @@ logger = logging.getLogger(__name__)
 
 DILA_SENAT_ZIP = "https://data.senat.fr/data/debats/cri.zip"
 XVIIE_START = datetime(2022, 6, 22)
+CRI_NS = "http://senat.fr/schemas/thb/cri"
 
 DEBATE_COLUMNS = [
     "official_id",
@@ -55,8 +67,8 @@ INTERVENTION_COLUMNS = [
     "chamber",
 ]
 
-# Filename pattern: SEN_YYYYMMDD_NNN.xml
-_FILENAME_RE = re.compile(r"SEN_(\d{4})(\d{2})(\d{2})_(\d+)\.xml")
+# Filename pattern: cri/dYYYYMMDD.xml
+_FILENAME_RE = re.compile(r"d(\d{4})(\d{2})(\d{2})\.xml")
 
 
 # ---------------------------------------------------------------------------
@@ -73,7 +85,6 @@ def download_cri_zip_to_temp() -> str:
     try:
         with httpx.stream("GET", DILA_SENAT_ZIP, timeout=600, follow_redirects=True) as r:
             r.raise_for_status()
-            total = int(r.headers.get("content-length", 0))
             downloaded = 0
             for chunk in r.iter_bytes(chunk_size=65536):
                 tmp.write(chunk)
@@ -97,7 +108,7 @@ def download_cri_zip_to_temp() -> str:
 def iter_xviie_sessions(zip_path: str, start_date: datetime):
     """Yield (filename, xml_bytes) for sessions on or after start_date.
 
-    Filters by filename date pattern SEN_YYYYMMDD_NNN.xml.
+    Filters by filename date pattern dYYYYMMDD.xml.
     Skips entries that do not match the expected filename pattern.
     """
     with zipfile.ZipFile(zip_path) as zf:
@@ -120,127 +131,80 @@ def iter_xviie_sessions(zip_path: str, start_date: datetime):
             except Exception as e:
                 logger.warning("Could not read %s from zip: %s", name, e)
                 continue
-            yield name, xml_bytes
-
-
-# ---------------------------------------------------------------------------
-# Helper: text extraction
-# ---------------------------------------------------------------------------
-
-def _text(element, tag: str) -> str | None:
-    """Return stripped text of a child element, or None."""
-    child = element.find(tag)
-    if child is not None and child.text:
-        return child.text.strip()
-    return None
-
-
-def _strip_tz(date_str: str) -> str:
-    """Strip timezone offset from date string like '2024-01-15+01:00' or '2024-01-15-01:00'.
-
-    The Senat XML includes a timezone suffix after the date; strptime cannot parse it.
-    We strip everything after the date portion (YYYY-MM-DD).
-    """
-    return re.sub(r"[+-]\d{2}:\d{2}$", "", date_str).strip()
+            yield name, session_date, xml_bytes
 
 
 # ---------------------------------------------------------------------------
 # XML parsing
 # ---------------------------------------------------------------------------
 
-def parse_senat_cri_xml(xml_bytes: bytes) -> dict | None:
-    """Parse a PublicationDSenat XML file.
+def parse_senat_cri_xml(xml_bytes: bytes, session_date: datetime, filename: str) -> dict | None:
+    """Parse a Senat CRI XML file (cri:cri namespace format).
 
     Returns {metadata: {...}, interventions: [...]} or None on failure.
+
+    Uses XMLParser(recover=True) to handle tag-mismatch errors common in
+    older Senat CRI files (mixed HTML/XML with unclosed div tags).
     """
     try:
-        root = etree.fromstring(xml_bytes)
-    except etree.XMLSyntaxError as e:
-        logger.error("XML parse error: %s", e)
+        parser = etree.XMLParser(recover=True, encoding="iso-8859-1")
+        root = etree.fromstring(xml_bytes, parser=parser)
+    except Exception as e:
+        logger.error("XML parse error for %s: %s", filename, e)
         return None
 
-    # Metadata at root level
-    meta = root.find("Metadonnees")
-    if meta is None:
-        logger.warning("No Metadonnees element in PublicationDSenat")
-        return None
+    # Date from filename (XML metadata is unreliable / absent in older files)
+    date_clean = session_date.strftime("%Y-%m-%d")
 
-    # Date: "2024-01-15+01:00" — strip timezone offset
-    date_str_raw = _text(meta, "dateSeance")
-    if not date_str_raw:
-        logger.warning("No dateSeance in Metadonnees")
-        return None
+    # official_id: SEN-YYYY-MM-DD (one file per date in this format)
+    official_id = f"SEN-{date_clean}"
 
-    date_clean = _strip_tz(date_str_raw)
-    try:
-        session_date = datetime.strptime(date_clean, "%Y-%m-%d")
-    except ValueError as e:
-        logger.warning("Could not parse date '%s': %s", date_clean, e)
-        return None
-
-    num_parution = _text(meta, "numParution") or "1"
-    num_seance = _text(meta, "numSeance")
-
-    # Session type from session/sessionOrd
-    session_el = meta.find("session")
-    session_type = None
-    if session_el is not None:
-        session_type = _text(session_el, "sessionOrd")
-
-    # official_id: SEN-YYYY-MM-DD-NNN (zero-padded to 3 digits)
-    try:
-        num_int = int(num_parution)
-    except (ValueError, TypeError):
-        num_int = 1
-    official_id = f"SEN-{date_clean}-{num_int:03d}"
-
-    # Navigate to content
-    contenu = root.find(".//ContenuDSenat/CompteRendu/Contenu")
-
-    # Presiding officer from PresidentSeance text
+    # Presiding officer: first intervenant with qua="président de séance"
     presiding_officer = None
-    if contenu is not None:
-        pres_el = contenu.find("PresidentSeance")
-        if pres_el is not None and pres_el.text:
-            presiding_officer = pres_el.text.strip().rstrip(".,;: ")
+    intervs_all = root.findall(f".//{{{CRI_NS}}}intervenant")
+    for iv in intervs_all:
+        qua = iv.get("qua", "")
+        if "président de séance" in qua.lower() or "president de seance" in qua.lower():
+            nom = iv.get("nom", "").strip()
+            if nom:
+                presiding_officer = nom
+                break
 
-    # Title: use presiding officer context or fallback
-    title = f"Seance du {date_clean}"
+    title = f"Séance du {date_clean}"
 
-    # Interventions: iterate all Para elements with Orateur/Nom child
+    # Interventions: all cri:intervenant elements with nom and mat attributes
     interventions = []
-    search_root = contenu if contenu is not None else root
-    for para in search_root.iter("Para"):
-        orateur = para.find("Orateur")
-        if orateur is None:
-            continue
-        nom_el = orateur.find("Nom")
-        if nom_el is None or not nom_el.text:
-            continue
+    seen_interv_ids = set()  # deduplicate by intervenant id
 
-        speaker_name_raw = nom_el.text.strip()
-        # Strip trailing punctuation that Senat XML adds to names
-        speaker_name = speaker_name_raw.rstrip(".,;: ")
-        if not speaker_name:
+    for iv in intervs_all:
+        iv_id = iv.get("id", "")
+        if iv_id and iv_id in seen_interv_ids:
+            continue
+        if iv_id:
+            seen_interv_ids.add(iv_id)
+
+        nom = iv.get("nom", "").strip()
+        if not nom:
             continue
 
-        # Role from Orateur/Qualite (not QualiteMouvement as in AN)
-        qualite_el = orateur.find("Qualite")
-        speaker_role = ""
-        if qualite_el is not None and qualite_el.text:
-            speaker_role = qualite_el.text.strip().rstrip(".,;: ")
+        mat = iv.get("mat", "").strip()  # senator matricule = official_id in actors
+        civ = iv.get("civ", "").strip()
+        qua = iv.get("qua", "").strip()
 
-        # Full text content of the Para element
-        full_text = etree.tostring(para, method="text", encoding="unicode").strip()
+        # Build display name with civility
+        speaker_name = f"{civ} {nom}".strip() if civ else nom
 
-        # Extract speech content (remove speaker name prefix)
-        content = _clean_unicode(_extract_speech_content(full_text, speaker_name_raw))
+        # Full text content of the intervenant element
+        full_text = etree.tostring(iv, method="text", encoding="unicode").strip()
+        content = _clean_unicode(full_text) if full_text else ""
         if not content or len(content) < 5:
             continue
 
         interventions.append({
             "speaker_name": speaker_name,
-            "speaker_role": speaker_role,
+            "speaker_name_raw": nom,  # used for fallback name matching
+            "speaker_role": qua,
+            "mat": mat,
             "content": content,
         })
 
@@ -248,9 +212,7 @@ def parse_senat_cri_xml(xml_bytes: bytes) -> dict | None:
         "official_id": official_id,
         "date": session_date,
         "date_clean": date_clean,
-        "num_parution": num_parution,
-        "num_seance": num_seance,
-        "session_type": session_type or "hemicycle",
+        "session_type": "hemicycle",
         "title": title,
         "presiding_officer": presiding_officer,
     }
@@ -262,46 +224,66 @@ def parse_senat_cri_xml(xml_bytes: bytes) -> dict | None:
 # Senator cache + matching
 # ---------------------------------------------------------------------------
 
-def load_senator_cache(conn) -> dict[str, int]:
-    """Load Senat actors from DB into a normalized-name lookup dict.
+def load_senator_cache(conn) -> tuple[dict[str, int], dict[str, int]]:
+    """Load Senat actors from DB into two lookup dicts.
 
-    Returns {normalized_full_name: db_id} for all actors WHERE chamber = 'Senat'.
+    Returns:
+        by_mat: {official_id: db_id}  — primary matching via mat attribute
+        by_name: {normalized_full_name: db_id}  — fallback name matching
     """
     cur = conn.execute(
         "SELECT id, official_id, full_name FROM actors WHERE chamber = 'Senat'"
     )
     rows = cur.fetchall()
 
+    by_mat: dict[str, int] = {}
     by_name: dict[str, int] = {}
-    for db_id, _official_id, full_name in rows:
-        if full_name:
-            name_str = (
-                full_name.decode("utf-8")
-                if isinstance(full_name, (bytes, memoryview))
-                else str(full_name)
-            )
+    for db_id, official_id, full_name in rows:
+        # Decode bytes if needed (psycopg3 binary protocol)
+        oid_str = (
+            official_id.decode("utf-8") if isinstance(official_id, (bytes, memoryview))
+            else str(official_id)
+        ) if official_id else ""
+        name_str = (
+            full_name.decode("utf-8") if isinstance(full_name, (bytes, memoryview))
+            else str(full_name)
+        ) if full_name else ""
+
+        if oid_str:
+            by_mat[oid_str] = db_id
+        if name_str:
             by_name[normalize_name(name_str)] = db_id
 
-    logger.info("Senator cache loaded: %d actors by name", len(by_name))
-    return by_name
+    logger.info(
+        "Senator cache loaded: %d by mat, %d by name",
+        len(by_mat), len(by_name),
+    )
+    return by_mat, by_name
 
 
 def match_senator(
-    speaker_name: str,
+    mat: str,
+    speaker_name_raw: str,
+    by_mat: dict[str, int],
     by_name: dict[str, int],
     unmatched_log: list[str] | None = None,
 ) -> int | None:
-    """Match a speaker name to a senator in the DB (name-only matching).
+    """Match a speaker to a senator in the DB.
 
-    Strips civility prefixes (M., Mme, etc.) before normalizing.
-    Logs unmatched names if unmatched_log list is provided.
+    Priority:
+    1. mat attribute (official_id direct lookup) — most reliable
+    2. Normalized full name fallback — for ministers/non-senator speakers
     """
-    # Strip civility prefix
-    clean = re.sub(r"^(M\.\s*|Mme\.?\s*|M\s+)", "", speaker_name).strip()
+    # Primary: mat-based lookup
+    if mat and mat in by_mat:
+        return by_mat[mat]
+
+    # Fallback: name normalization
+    clean = re.sub(r"^(M\.\s*|Mme\.?\s*|M\s+)", "", speaker_name_raw).strip()
     normalized = normalize_name(clean)
     result = by_name.get(normalized)
     if result is None and unmatched_log is not None:
-        unmatched_log.append(speaker_name)
+        unmatched_log.append(speaker_name_raw)
     return result
 
 
@@ -359,6 +341,7 @@ def insert_interventions(conn, debate_id: int, interventions: list[dict]) -> int
 
 def build_intervention_records(
     raw_interventions: list[dict],
+    by_mat: dict[str, int],
     by_name: dict[str, int],
     unmatched_log: list[str] | None = None,
 ) -> tuple[list[dict], int, int]:
@@ -371,7 +354,13 @@ def build_intervention_records(
     unmatched = 0
 
     for idx, raw in enumerate(raw_interventions, start=1):
-        actor_id = match_senator(raw["speaker_name"], by_name, unmatched_log)
+        actor_id = match_senator(
+            mat=raw.get("mat", ""),
+            speaker_name_raw=raw.get("speaker_name_raw", raw["speaker_name"]),
+            by_mat=by_mat,
+            by_name=by_name,
+            unmatched_log=unmatched_log,
+        )
 
         if actor_id is not None:
             matched += 1
@@ -430,6 +419,8 @@ def ingest_debates_senat(
 
     unmatched_names: list[str] = []
     temp_path_to_cleanup: str | None = None
+    # Initialize conn before try block to avoid UnboundLocalError in finally
+    conn = None
 
     try:
         # Download or use local zip
@@ -454,23 +445,23 @@ def ingest_debates_senat(
             return stats
 
         # Connect to DB (or prepare dry-run mode)
-        conn = None
+        by_mat: dict[str, int] = {}
         by_name: dict[str, int] = {}
         if not dry_run:
             conn = get_connection()
-            by_name = load_senator_cache(conn)
+            by_mat, by_name = load_senator_cache(conn)
         else:
             logger.info("DRY-RUN mode — no DB writes")
             try:
                 conn_tmp = get_connection()
-                by_name = load_senator_cache(conn_tmp)
+                by_mat, by_name = load_senator_cache(conn_tmp)
                 conn_tmp.close()
             except Exception:
                 logger.info("Could not load senator cache in dry-run (DB not available)")
 
-        for filename, xml_bytes in tqdm(sessions, desc="Ingesting Senat debates", unit="session"):
+        for filename, session_date, xml_bytes in tqdm(sessions, desc="Ingesting Senat debates", unit="session"):
             try:
-                parsed = parse_senat_cri_xml(xml_bytes)
+                parsed = parse_senat_cri_xml(xml_bytes, session_date, filename)
                 if parsed is None:
                     stats["errors"] += 1
                     logger.warning("Failed to parse %s", filename)
@@ -494,6 +485,7 @@ def ingest_debates_senat(
                 # Build intervention records
                 records, matched, unmatched = build_intervention_records(
                     raw_interventions,
+                    by_mat,
                     by_name,
                     unmatched_log=unmatched_names if log_unmatched else None,
                 )
