@@ -99,6 +99,19 @@ export const organs = pgTable('organs', {
   index('idx_organs_chamber').on(t.chamber),
 ])
 
+export const actorOrgans = pgTable('actor_organs', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  actorId: integer('actor_id').notNull().references(() => actors.id, { onDelete: 'cascade' }),
+  organId: integer('organ_id').notNull().references(() => organs.id, { onDelete: 'cascade' }),
+  role: text('role'),                                   // 'membre' | 'president' | 'vice-president' etc.
+  startDate: timestamp('start_date'),                   // mandat dateDebut from AMO10
+  endDate: timestamp('end_date'),                       // mandat dateFin from AMO10 (nullable = still active)
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (t) => [
+  index('idx_actor_organs_actor').on(t.actorId),
+  index('idx_actor_organs_organ').on(t.organId),
+])
+
 export const scrutins = pgTable('scrutins', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
   officialId: text('official_id').notNull().unique(),  // e.g. 'VTANR5L17V4785'
