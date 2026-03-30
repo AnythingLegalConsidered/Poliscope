@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
-- **Phase** : 11 — Ingestion Debats CRI — COMPLETE
-- **Plan** : 3/3 — DONE
-- **Status** : Plan 11-03 complete — chamber filter API + UI selector + DebateCard badge
-- **Last activity** : 2026-03-30 — Completed 11-03 (chamber filter UI)
+- **Phase** : 11 — Ingestion Debats CRI
+- **Plan** : 4/4 — Task 1 DONE, awaiting checkpoint:human-verify (Task 2)
+- **Status** : 413 Senat debates + 292,286 interventions in DB (81.8% match) — awaiting UI verification
+- **Last activity** : 2026-03-30 — Completed 11-04 Task 1 (Senat pipeline execution + tagging)
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [███████████░░░░] 11/17 plans
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [████████████░░░] 12/17 plans (partial)
 
 ## Accumulated Context
 
@@ -115,11 +115,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-03-30
-- **Stopped at** : Phase 11 plan 03 — chamber filter UI complete — Phase 11 DONE
-- **Resume** : Phase 12 — Ingestion Votes
+- **Stopped at** : Phase 11 plan 04 — Task 2 checkpoint:human-verify (Senat debates navigable in UI?)
+- **Resume** : 11-04 Task 2 — human confirms Senat debates UI, then phase 11 DONE → Phase 12
 
 ## History
 
+- 2026-03-30 : Completed 11-04 Task 1 — Senat CRI pipeline executed: 413 debates, 292286 interventions, 81.8% match rate, 218535 tagged; fixed 5 bugs in ingest_debates_senat.py (filename regex, XML parser, element structure, mat matching, UnboundLocalError)
 - 2026-03-30 : Completed 11-03 — chamber filter on /api/debates (?chamber=AN|Senat), 3-tab selector UI, DebateCard badge, dynamic page title, pagination reset on filter change
 - 2026-03-30 : Completed 11-02 — ingest_debates_senat.py (Senat CRI from cri.zip, streaming download, name-only senator matching), run_all.py 9-step pipeline
 - 2026-03-30 : Completed 11-01 — ingest_debates.py refactored: actors table (chamber='AN'), PA prefix fix for official_id matching, chamber column on debates+interventions
