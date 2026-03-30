@@ -182,11 +182,13 @@ Plans:
   3. Les nouvelles interventions (AN + Senat) ont des tags thematiques assigns — la recherche par tag retourne des resultats des deux chambres
   4. Le pipeline CRI supporte le re-run sans doublons (idempotent) — les seances deja en base sont mises a jour, pas dupliquees
 
-**Plans:** 2 plans
+**Plans:** 4 plans
 
 Plans:
-- [ ] 11-01-PLAN.md — Refactoring pipeline CRI AN (deputy to actor migration + chamber column + PA prefix fix)
-- [ ] 11-02-PLAN.md — Pipeline CRI Senat (PublicationDSenat XML from cri.zip) + run_all.py orchestrator update
+- [x] 11-01-PLAN.md — Refactoring pipeline CRI AN (deputy to actor migration + chamber column + PA prefix fix)
+- [x] 11-02-PLAN.md — Pipeline CRI Senat (PublicationDSenat XML from cri.zip) + run_all.py orchestrator update
+- [ ] 11-03-PLAN.md — Gap closure: chamber filter API + UI (selecteur chambre, badge chambre sur DebateCard)
+- [ ] 11-04-PLAN.md — Gap closure: execute Senat CRI pipeline + tagging + human verification
 
 ---
 
@@ -285,7 +287,7 @@ Plans:
 | 8. Monorepo & Infra LXC | v2.0 | 2/2 | Complete | 2026-03-28 |
 | 9. Schema BDD Universel | v2.0 | 3/3 | Complete | 2026-03-28 |
 | 10. Ingestion Acteurs & Organes | v2.0 | 3/3 | Complete | 2026-03-30 |
-| 11. Ingestion Debats CRI | v2.0 | 0/2 | Not started | - |
+| 11. Ingestion Debats CRI | v2.0 | 2/4 | In progress | - |
 | 12. Ingestion Votes & Scrutins | v2.0 | 0/2 | Not started | - |
 | 13. API REST Universelle | v2.0 | 0/2 | Not started | - |
 | 14. Frontend Votes, Senat & Bicameral | v2.0 | 0/2 | Not started | - |
