@@ -5,6 +5,7 @@ const props = defineProps<{
   date: string // ISO timestamp from API
   sessionType: string | null
   legislature: number
+  chamber: string | null
 }>()
 
 // Computed formatted date — explicit locale + timezone to avoid SSR/client hydration mismatch
@@ -31,10 +32,26 @@ const formattedDate = computed(() => {
     </p>
 
     <div class="flex items-center justify-between mt-auto">
-      <span v-if="sessionType" class="text-xs text-ink-muted bg-marble-dark px-2 py-0.5 rounded-full uppercase tracking-wider">
-        {{ sessionType }}
-      </span>
-      <span v-else class="flex-1" />
+      <div class="flex items-center gap-2">
+        <!-- Chamber badge -->
+        <span
+          v-if="chamber === 'AN'"
+          class="text-xs bg-bronze/10 text-bronze px-2 py-0.5 rounded-full font-medium"
+        >
+          AN
+        </span>
+        <span
+          v-else-if="chamber === 'Senat'"
+          class="text-xs bg-ink/10 text-ink px-2 py-0.5 rounded-full font-medium"
+        >
+          Sénat
+        </span>
+
+        <!-- Session type badge -->
+        <span v-if="sessionType" class="text-xs text-ink-muted bg-marble-dark px-2 py-0.5 rounded-full uppercase tracking-wider">
+          {{ sessionType }}
+        </span>
+      </div>
 
       <span class="text-xs text-ink-muted/60">
         {{ legislature }}e législature

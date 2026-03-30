@@ -1,9 +1,19 @@
 <script setup lang="ts">
 import { useIntersectionObserver } from '@vueuse/core'
 
+// Reactive chamber filter — undefined means all chambers
+const chamber = ref<string | undefined>(undefined)
+
+// Dynamic page title based on active filter
+const pageTitle = computed(() => {
+  if (chamber.value === 'AN') return "Débats de l'Assemblée nationale"
+  if (chamber.value === 'Senat') return 'Débats du Sénat'
+  return 'Débats parlementaires'
+})
+
 useSeoMeta({
   title: 'Débats',
-  description: "Les derniers débats de l'Assemblée nationale",
+  description: 'Les derniers débats parlementaires',
   ogType: 'website',
 })
 
@@ -17,9 +27,9 @@ const allDebates = ref<any[]>([])
 const sentinel = useTemplateRef('sentinel')
 
 const { data, status } = await useFetch('/api/debates', {
-  query: { page, limit: 20 },
+  query: { page, limit: 20, chamber },
   lazy: true,
-  watch: [page],
+  watch: [page, chamber],
 })
 
 // Append new page results to allDebates
@@ -50,13 +60,46 @@ useIntersectionObserver(
   },
   { rootMargin: '200px' },
 )
+
+// Tab button classes
+const activeClass = 'bg-bronze text-white rounded-full px-4 py-1.5 text-sm font-medium'
+const inactiveClass = 'bg-marble-dark text-ink-muted rounded-full px-4 py-1.5 text-sm font-medium hover:bg-marble-dark/80'
+
+// Select a chamber filter — reset pagination so infinite scroll restarts from page 1
+function selectChamber(newVal: string | undefined) {
+  page.value = 1
+  allDebates.value = []
+  chamber.value = newVal
+}
 </script>
 
 <template>
   <div class="max-w-7xl mx-auto">
-    <h1 class="text-2xl font-bold text-ink mb-6 font-heading">
-      Débats de l'Assemblée nationale
+    <h1 class="text-2xl font-bold text-ink mb-4 font-heading">
+      {{ pageTitle }}
     </h1>
+
+    <!-- Chamber filter tabs -->
+    <div class="flex gap-2 mb-6">
+      <button
+        :class="[!chamber ? activeClass : inactiveClass]"
+        @click="selectChamber(undefined)"
+      >
+        Tous
+      </button>
+      <button
+        :class="[chamber === 'AN' ? activeClass : inactiveClass]"
+        @click="selectChamber('AN')"
+      >
+        Assemblée nationale
+      </button>
+      <button
+        :class="[chamber === 'Senat' ? activeClass : inactiveClass]"
+        @click="selectChamber('Senat')"
+      >
+        Sénat
+      </button>
+    </div>
 
     <!-- Debates grid -->
     <div
@@ -67,6 +110,7 @@ useIntersectionObserver(
         v-for="debate in allDebates"
         :key="debate.id"
         v-bind="debate"
+        :chamber="debate.chamber"
       />
     </div>
 
