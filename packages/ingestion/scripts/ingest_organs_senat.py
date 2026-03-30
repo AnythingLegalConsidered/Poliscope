@@ -2,6 +2,13 @@
 
 Source: senat.fr API senateurs.json — extract unique organs from all senators' organismes[] arrays
 and political groups from each senator's groupe field.
+
+Known limitation: senateurs.json API does not provide start_date/end_date for organs.
+Senat organ dates remain NULL in the organs table.
+Senat membership ingestion (actor_organs) is also deferred — senateurs.json organismes[] provides
+code/type/libelle but NO start/end dates for memberships. A complete Senat membership ingestion
+would require scraping individual senator pages or a different API endpoint (e.g., API Senat v1
+mandats endpoint). This is out of scope for Phase 10.
 """
 
 import logging

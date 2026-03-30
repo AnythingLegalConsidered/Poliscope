@@ -12,9 +12,10 @@ Pipeline order (dependency-safe):
     Step 2: ingest_actors_senat.py   (Senators from API — must run before organs)
     Step 3: ingest_organs_an.py      (AN organs + resolve political_group)
     Step 4: ingest_organs_senat.py   (Senat organs)
-    Step 5: ingest_deputies.py       (legacy nosdeputes.fr — backward compat)
-    Step 6: ingest_debates.py        (debates + interventions)
-    Step 7: tag_interventions.py     (FTS tags on interventions)
+    Step 5: ingest_memberships_an.py (AN actor-organ memberships from AMO10 mandats)
+    Step 6: ingest_deputies.py       (legacy nosdeputes.fr — backward compat)
+    Step 7: ingest_debates.py        (debates + interventions)
+    Step 8: tag_interventions.py     (FTS tags on interventions)
 """
 
 import argparse
@@ -60,7 +61,7 @@ def print_summary(total_time: float, errors: int) -> None:
     logger.info("=" * 60)
     try:
         with get_connection() as conn:
-            for table in ["actors", "debates", "interventions", "tags", "intervention_tags", "organs", "cross_references"]:
+            for table in ["actors", "debates", "interventions", "tags", "intervention_tags", "organs", "actor_organs", "cross_references"]:
                 try:
                     cur = conn.execute(f"SELECT count(*) FROM {table}")
                     logger.info("  %-25s %d", table, cur.fetchone()[0])
@@ -80,6 +81,7 @@ def main():
     parser.add_argument("--end-date", type=str, default=None, help="End date (YYYY-MM-DD)")
     parser.add_argument("--skip-actors", action="store_true", help="Skip actor ingestion (AN + Senat)")
     parser.add_argument("--skip-organs", action="store_true", help="Skip organ ingestion (AN + Senat)")
+    parser.add_argument("--skip-memberships", action="store_true", help="Skip actor-organ membership ingestion (AN)")
     parser.add_argument("--skip-deputies", action="store_true", help="Skip legacy nosdeputes.fr deputy ingestion")
     parser.add_argument("--skip-debates", action="store_true", help="Skip debate ingestion")
     parser.add_argument("--skip-tags", action="store_true", help="Skip tagging")
@@ -95,9 +97,10 @@ def main():
         ("Step 2: ingest_actors_senat.py", not args.skip_actors),
         ("Step 3: ingest_organs_an.py", not args.skip_organs),
         ("Step 4: ingest_organs_senat.py", not args.skip_organs),
-        ("Step 5: ingest_deputies.py (legacy)", not args.skip_deputies),
-        ("Step 6: ingest_debates.py", not args.skip_debates),
-        ("Step 7: tag_interventions.py", not args.skip_tags),
+        ("Step 5: ingest_memberships_an.py", not args.skip_memberships),
+        ("Step 6: ingest_deputies.py (legacy)", not args.skip_deputies),
+        ("Step 7: ingest_debates.py", not args.skip_debates),
+        ("Step 8: tag_interventions.py", not args.skip_tags),
     ]
     for step_name, will_run in steps:
         status = "RUN" if will_run else "SKIP"
@@ -135,14 +138,21 @@ def main():
     else:
         logger.info("SKIPPED: ingest_organs_senat.py")
 
-    # Step 5: Legacy deputies (nosdeputes.fr — kept for backward compat)
+    # Step 5: AN memberships (must run after actors + organs to resolve FKs)
+    if not args.skip_memberships:
+        if not run_script("ingest_memberships_an.py"):
+            errors += 1
+    else:
+        logger.info("SKIPPED: ingest_memberships_an.py")
+
+    # Step 6: Legacy deputies (nosdeputes.fr — kept for backward compat)
     if not args.skip_deputies:
         if not run_script("ingest_deputies.py"):
             errors += 1
     else:
         logger.info("SKIPPED: ingest_deputies.py (legacy)")
 
-    # Step 6: Debates
+    # Step 7: Debates
     if not args.skip_debates:
         debate_args = []
         if args.limit is not None:
@@ -156,7 +166,7 @@ def main():
     else:
         logger.info("SKIPPED: ingest_debates.py")
 
-    # Step 7: Tags
+    # Step 8: Tags
     if not args.skip_tags:
         tag_args = []
         if args.retag_all:
