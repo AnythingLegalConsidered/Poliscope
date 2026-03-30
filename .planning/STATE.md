@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
-- **Phase** : 11 — Ingestion Debats CRI — In progress
-- **Plan** : 2/3 — IN PROGRESS
-- **Status** : Plan 11-02 complete — ingest_debates_senat.py + 9-step orchestrator
-- **Last activity** : 2026-03-30 — Completed 11-02 (Senat CRI pipeline)
+- **Phase** : 11 — Ingestion Debats CRI — COMPLETE
+- **Plan** : 3/3 — DONE
+- **Status** : Plan 11-03 complete — chamber filter API + UI selector + DebateCard badge
+- **Last activity** : 2026-03-30 — Completed 11-03 (chamber filter UI)
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [██████████░░░░░] 10/17 plans
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [███████████░░░░] 11/17 plans
 
 ## Accumulated Context
 
@@ -115,11 +115,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-03-30
-- **Stopped at** : Phase 11 plan 02 — Senat CRI pipeline + 9-step orchestrator complete
-- **Resume** : Phase 11 plan 03 — if applicable, or phase 12
+- **Stopped at** : Phase 11 plan 03 — chamber filter UI complete — Phase 11 DONE
+- **Resume** : Phase 12 — Ingestion Votes
 
 ## History
 
+- 2026-03-30 : Completed 11-03 — chamber filter on /api/debates (?chamber=AN|Senat), 3-tab selector UI, DebateCard badge, dynamic page title, pagination reset on filter change
 - 2026-03-30 : Completed 11-02 — ingest_debates_senat.py (Senat CRI from cri.zip, streaming download, name-only senator matching), run_all.py 9-step pipeline
 - 2026-03-30 : Completed 11-01 — ingest_debates.py refactored: actors table (chamber='AN'), PA prefix fix for official_id matching, chamber column on debates+interventions
 - 2026-03-30 : Completed 10-03 — actor_organs table (migration 0004), 1311 AN memberships from AMO10 mandats, run_all.py 8-step pipeline, Senat limitation documented
