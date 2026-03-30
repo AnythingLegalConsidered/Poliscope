@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
-- **Phase** : 10 — Ingestion Acteurs & Organes — COMPLETE
-- **Plan** : 2/2 — DONE
-- **Status** : Phase 10 complete — 925 actors + 41 organs ingested, political_group resolved
-- **Last activity** : 2026-03-28 — Completed 10-02 organs ingestion (24 AN + 17 Senat, idempotent)
+- **Phase** : 10 — Ingestion Acteurs & Organes — COMPLETE (gap closure done)
+- **Plan** : 3/3 — DONE
+- **Status** : Phase 10 fully complete — 925 actors + 41 organs + 1311 actor_organs memberships
+- **Last activity** : 2026-03-30 — Completed 10-03 gap closure (actor_organs table + AN memberships)
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [███████░░░░░░░░] 7/17 plans
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [████████░░░░░░░] 8/17 plans
 
 ## Accumulated Context
 
@@ -30,6 +30,14 @@ Progress: Milestone 1 [███████████████████
 | stored search_vector tsvector (pas functional index) | FTS cross-type scalable — functional index force row rechecks a >50K lignes |
 | Questions/Amendements/Dossiers -> v3 | Scope raisonnable pour v2 ; votes sont la priorite citoyenne #1 |
 | Votes ingeres en phase 12 (avant API/UI) | Data confidence avant exposition endpoints ; votes = attente principale |
+
+### Key Decisions (Phase 10 — Plan 03)
+
+| Decision | Rationale |
+|----------|-----------|
+| actor_organs UNIQUE on (actor_id, organ_id) | Deduplicates multiple mandats per pair — 1422 source rows -> 1311 via ON CONFLICT DO UPDATE |
+| psycopg3 binary protocol: decode bytes on FK lookup | psycopg3 v3.3.2 returns text as bytes in binary mode — _decode() helper, no global conn change |
+| Senat memberships deferred | senateurs.json has no membership dates — incomplete data worse than none; documented as known limitation |
 
 ### Key Decisions (Phase 10 — Plan 02)
 
@@ -90,12 +98,13 @@ None.
 
 ## Session Continuity
 
-- **Last session** : 2026-03-28
-- **Stopped at** : Phase 10 complete — 925 actors + 41 organs ingested, political groups resolved
+- **Last session** : 2026-03-30
+- **Stopped at** : Phase 10 gap closure complete — 1311 actor_organs rows, 8-step pipeline
 - **Resume** : Phase 11 — Ingestion Debats & Interventions (XML AN + Senat)
 
 ## History
 
+- 2026-03-30 : Completed 10-03 — actor_organs table (migration 0004), 1311 AN memberships from AMO10 mandats, run_all.py 8-step pipeline, Senat limitation documented
 - 2026-03-28 : Completed 10-02 — 24 AN organs + 17 Senat organs ingested, 577 actors' political_group resolved from PO ref to name, run_all.py updated to 7-step pipeline
 - 2026-03-28 : Completed 10-01 — 577 AN deputies + 348 senators ingested (open data ZIP + senat.fr API), migration 0003 unique constraint applied, GRANT permissions on postgres-owned tables
 - 2026-03-28 : Completed 09-03 gap closure — fix idx_interventions_fts name, apply migrations 0001+0002 to live DB (psql SSH), verified 618 actors + 2479 interventions + FTS indexes + API endpoints
