@@ -10,12 +10,12 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
-- **Phase** : 10 — Ingestion Acteurs & Organes — COMPLETE (gap closure done)
-- **Plan** : 3/3 — DONE
-- **Status** : Phase 10 fully complete — 925 actors + 41 organs + 1311 actor_organs memberships
-- **Last activity** : 2026-03-30 — Completed 10-03 gap closure (actor_organs table + AN memberships)
+- **Phase** : 11 — Ingestion Debats CRI — In progress
+- **Plan** : 1/3 — DONE
+- **Status** : Plan 11-01 complete — ingest_debates.py refactored to actors table + PA prefix + chamber columns
+- **Last activity** : 2026-03-30 — Completed 11-01 (AN CRI pipeline actors migration)
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [████████░░░░░░░] 8/17 plans
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [█████████░░░░░░] 9/17 plans
 
 ## Accumulated Context
 
@@ -30,6 +30,13 @@ Progress: Milestone 1 [███████████████████
 | stored search_vector tsvector (pas functional index) | FTS cross-type scalable — functional index force row rechecks a >50K lignes |
 | Questions/Amendements/Dossiers -> v3 | Scope raisonnable pour v2 ; votes sont la priorite citoyenne #1 |
 | Votes ingeres en phase 12 (avant API/UI) | Data confidence avant exposition endpoints ; votes = attente principale |
+
+### Key Decisions (Phase 11 — Plan 01)
+
+| Decision | Rationale |
+|----------|-----------|
+| PA prefix prepend in match_actor() at match time | DILA hrefs give raw numeric IDs (795746); actors.official_id stores PA-prefixed IDs (PA795746) — prepend on lookup, not stored separately |
+| chamber='AN' hardcoded in build_debate_record() and build_intervention_records() | Not derived from XML metadata — avoids ambiguity in multi-chamber queries |
 
 ### Key Decisions (Phase 10 — Plan 03)
 
@@ -99,11 +106,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-03-30
-- **Stopped at** : Phase 10 gap closure complete — 1311 actor_organs rows, 8-step pipeline
-- **Resume** : Phase 11 — Ingestion Debats & Interventions (XML AN + Senat)
+- **Stopped at** : Phase 11 plan 01 — ingest_debates.py actors migration complete
+- **Resume** : Phase 11 plan 02 — Senat CRI pipeline (ingest_debates_senat.py)
 
 ## History
 
+- 2026-03-30 : Completed 11-01 — ingest_debates.py refactored: actors table (chamber='AN'), PA prefix fix for official_id matching, chamber column on debates+interventions
 - 2026-03-30 : Completed 10-03 — actor_organs table (migration 0004), 1311 AN memberships from AMO10 mandats, run_all.py 8-step pipeline, Senat limitation documented
 - 2026-03-28 : Completed 10-02 — 24 AN organs + 17 Senat organs ingested, 577 actors' political_group resolved from PO ref to name, run_all.py updated to 7-step pipeline
 - 2026-03-28 : Completed 10-01 — 577 AN deputies + 348 senators ingested (open data ZIP + senat.fr API), migration 0003 unique constraint applied, GRANT permissions on postgres-owned tables
