@@ -182,11 +182,11 @@ Plans:
   3. Les nouvelles interventions (AN + Senat) ont des tags thematiques assigns — la recherche par tag retourne des resultats des deux chambres
   4. Le pipeline CRI supporte le re-run sans doublons (idempotent) — les seances deja en base sont mises a jour, pas dupliquees
 
-**Plans** : TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 11-01-PLAN.md — Refactoring pipeline CRI AN vers nouveau schema acteurs + ingestion complete XVIIe
-- [ ] 11-02-PLAN.md — Pipeline CRI Senat (Akoma Ntoso XML) + tagging etendu sur nouvelles interventions
+- [ ] 11-01-PLAN.md — Refactoring pipeline CRI AN (deputy to actor migration + chamber column + PA prefix fix)
+- [ ] 11-02-PLAN.md — Pipeline CRI Senat (PublicationDSenat XML from cri.zip) + run_all.py orchestrator update
 
 ---
 
