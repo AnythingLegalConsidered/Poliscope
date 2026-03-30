@@ -3,8 +3,10 @@
 Source: https://echanges.dila.gouv.fr/OPENDATA/Debats/AN/
 Format: .taz archives containing CRI (Compte Rendu Integral) XML files.
 
-Fallback from nosdeputes.fr /seances/json which returns empty data for the
-17th legislature as of 2026-03.
+Uses the actors table (chamber='AN') for speaker matching. The official_id
+stored in actors has a 'PA' prefix (e.g. 'PA795746') while DILA hrefs expose
+the raw numeric ID (e.g. '795746') — this is handled by prepending 'PA' before
+lookup.
 """
 
 import argparse
@@ -41,32 +43,34 @@ DEBATE_COLUMNS = [
     "session_type",
     "presiding_officer",
     "source_url",
+    "chamber",
 ]
 
 INTERVENTION_COLUMNS = [
     "debate_id",
-    "deputy_id",
+    "actor_id",
     "speaker_name",
     "speaker_role",
     "content",
     "order_in_debate",
+    "chamber",
 ]
 
 
 # ---------------------------------------------------------------------------
-# Deputy cache
+# Actor cache
 # ---------------------------------------------------------------------------
 
-def load_deputy_cache(conn) -> tuple[dict, dict]:
-    """Load deputies from DB into lookup dicts.
+def load_actor_cache(conn) -> tuple[dict, dict]:
+    """Load AN actors from DB into lookup dicts.
 
     Returns
     -------
     (by_official_id, by_name)
-        by_official_id: {official_id: db_id}
+        by_official_id: {official_id: db_id}  — keys have 'PA' prefix, e.g. 'PA795746'
         by_name: {normalized_full_name: db_id}
     """
-    cur = conn.execute("SELECT id, official_id, full_name FROM deputies")
+    cur = conn.execute("SELECT id, official_id, full_name FROM actors WHERE chamber = 'AN'")
     rows = cur.fetchall()
 
     by_official_id: dict[str, int] = {}
@@ -78,7 +82,7 @@ def load_deputy_cache(conn) -> tuple[dict, dict]:
             name_str = full_name.decode("utf-8") if isinstance(full_name, (bytes, memoryview)) else str(full_name)
             by_name[normalize_name(name_str)] = db_id
 
-    logger.info("Deputy cache loaded: %d by official_id, %d by name", len(by_official_id), len(by_name))
+    logger.info("Actor cache loaded: %d by official_id, %d by name", len(by_official_id), len(by_name))
     return by_official_id, by_name
 
 
@@ -353,7 +357,7 @@ def _parse_speaker(speaker_name_raw: str, para_element) -> tuple[str, str]:
 
 
 # ---------------------------------------------------------------------------
-# Deputy matching
+# Actor matching
 # ---------------------------------------------------------------------------
 
 def extract_an_id_from_href(href: str) -> str | None:
@@ -367,22 +371,25 @@ def extract_an_id_from_href(href: str) -> str | None:
     return match.group(1) if match else None
 
 
-def match_deputy(
+def match_actor(
     speaker_name: str,
     href: str,
     by_official_id: dict[str, int],
     by_name: dict[str, int],
 ) -> int | None:
-    """Try to match a speaker to a deputy in the DB.
+    """Try to match a speaker to an actor in the DB.
 
     Strategy:
-    1. Extract AN ID from href -> match by official_id
+    1. Extract AN ID from href -> prepend 'PA' prefix -> match by official_id
+       (actors.official_id stores 'PA795746' but DILA href gives '795746')
     2. Fallback: normalize speaker name -> match by name
     """
-    # Strategy 1: Match by AN fiche ID
+    # Strategy 1: Match by AN fiche ID with PA prefix
     an_id = extract_an_id_from_href(href)
-    if an_id and an_id in by_official_id:
-        return by_official_id[an_id]
+    if an_id:
+        pa_id = "PA" + an_id
+        if pa_id in by_official_id:
+            return by_official_id[pa_id]
 
     # Strategy 2: Match by normalized name
     # Clean the speaker name: remove "M.", "Mme", "Mme.", etc.
@@ -487,6 +494,7 @@ def build_debate_record(metadata: dict, parution: str) -> dict:
         "session_type": session_type,
         "presiding_officer": None,  # filled by caller
         "source_url": source_url,
+        "chamber": "AN",
     }
 
 
@@ -497,31 +505,32 @@ def build_intervention_records(
 ) -> tuple[list[dict], int, int]:
     """Build intervention dicts from parsed CRI data.
 
-    Returns (records, matched_count, unmatched_count).
+    Returns (records, actor_matches, actor_unmatched).
     """
     records = []
     matched = 0
     unmatched = 0
 
     for idx, raw in enumerate(raw_interventions, start=1):
-        deputy_id = match_deputy(
+        actor_id = match_actor(
             raw["speaker_name"],
             raw.get("href", ""),
             by_official_id,
             by_name,
         )
 
-        if deputy_id:
+        if actor_id:
             matched += 1
         else:
             unmatched += 1
 
         records.append({
-            "deputy_id": deputy_id,
+            "actor_id": actor_id,
             "speaker_name": raw["speaker_name"],
             "speaker_role": raw.get("speaker_role", ""),
             "content": raw["content"],
             "order_in_debate": idx,
+            "chamber": "AN",
         })
 
     return records, matched, unmatched
@@ -549,7 +558,7 @@ def ingest_debates(
 
     Returns
     -------
-    dict with stats: debates_processed, interventions_inserted, errors, deputy_matches, deputy_unmatched
+    dict with stats: debates_processed, interventions_inserted, errors, actor_matches, actor_unmatched
     """
     if years is None:
         years = [2024, 2025, 2026]
@@ -558,8 +567,8 @@ def ingest_debates(
         "debates_processed": 0,
         "interventions_inserted": 0,
         "errors": 0,
-        "deputy_matches": 0,
-        "deputy_unmatched": 0,
+        "actor_matches": 0,
+        "actor_unmatched": 0,
         "skipped_date": 0,
     }
 
@@ -580,19 +589,19 @@ def ingest_debates(
         logger.warning("No .taz files found")
         return stats
 
-    # Load deputy cache (skip in dry-run if no DB needed, but we still need it for matching)
+    # Load actor cache (skip in dry-run if no DB needed, but we still need it for matching)
     if not dry_run:
         conn = get_connection()
-        by_official_id, by_name = load_deputy_cache(conn)
+        by_official_id, by_name = load_actor_cache(conn)
     else:
         by_official_id, by_name = {}, {}
         # Try to load cache even in dry-run for matching info
         try:
             conn_tmp = get_connection()
-            by_official_id, by_name = load_deputy_cache(conn_tmp)
+            by_official_id, by_name = load_actor_cache(conn_tmp)
             conn_tmp.close()
         except Exception:
-            logger.info("Could not load deputy cache in dry-run mode (DB not available)")
+            logger.info("Could not load actor cache in dry-run mode (DB not available)")
 
     # Debug: log structure of first file
     first_logged = False
@@ -660,8 +669,8 @@ def ingest_debates(
                 )
                 stats["debates_processed"] += 1
                 stats["interventions_inserted"] += len(records)
-                stats["deputy_matches"] += matched
-                stats["deputy_unmatched"] += unmatched
+                stats["actor_matches"] += matched
+                stats["actor_unmatched"] += unmatched
                 continue
 
             # Build debate record
@@ -680,8 +689,8 @@ def ingest_debates(
 
             stats["debates_processed"] += 1
             stats["interventions_inserted"] += inserted
-            stats["deputy_matches"] += matched
-            stats["deputy_unmatched"] += unmatched
+            stats["actor_matches"] += matched
+            stats["actor_unmatched"] += unmatched
 
         except Exception as e:
             logger.error("Error processing %s: %s", taz_info["filename"], e, exc_info=True)
@@ -747,8 +756,8 @@ def main():
     logger.info("INGESTION COMPLETE")
     logger.info("  Debates processed:       %d", stats["debates_processed"])
     logger.info("  Interventions inserted:   %d", stats["interventions_inserted"])
-    logger.info("  Deputy matches:           %d", stats["deputy_matches"])
-    logger.info("  Deputy unmatched:         %d", stats["deputy_unmatched"])
+    logger.info("  Actor matches:            %d", stats["actor_matches"])
+    logger.info("  Actor unmatched:          %d", stats["actor_unmatched"])
     logger.info("  Errors:                   %d", stats["errors"])
     logger.info("  Skipped (date filter):    %d", stats["skipped_date"])
     logger.info("=" * 60)
