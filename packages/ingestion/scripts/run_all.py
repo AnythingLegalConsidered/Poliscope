@@ -7,19 +7,20 @@ Usage:
     python run_all.py --skip-deputies --skip-debates --retag-all  # Re-tag only
     python run_all.py --skip-debates --skip-tags --skip-deputies  # Actors + organs only
     python run_all.py --senat-zip-path /tmp/cri.zip  # Use pre-downloaded cri.zip
-    python run_all.py --skip-scrutins              # Skip scrutin/vote ingestion
+    python run_all.py --skip-scrutins              # Skip scrutin/vote ingestion (AN + Senat)
 
 Pipeline order (dependency-safe):
-    Step 1:  ingest_actors_an.py      (AN deputies from ZIP — must run before organs)
-    Step 2:  ingest_actors_senat.py   (Senators from API — must run before organs)
-    Step 3:  ingest_organs_an.py      (AN organs + resolve political_group)
-    Step 4:  ingest_organs_senat.py   (Senat organs)
-    Step 5:  ingest_memberships_an.py (AN actor-organ memberships from AMO10 mandats)
-    Step 6:  ingest_deputies.py       (legacy nosdeputes.fr — backward compat)
-    Step 7:  ingest_debates.py        (AN CRI debates + interventions)
-    Step 8:  ingest_debates_senat.py  (Senat CRI debates + interventions from cri.zip)
-    Step 9:  ingest_scrutins_an.py    (AN public votes — scrutins + individual votes)
-    Step 10: tag_interventions.py     (FTS tags on interventions)
+    Step 1:  ingest_actors_an.py       (AN deputies from ZIP — must run before organs)
+    Step 2:  ingest_actors_senat.py    (Senators from API — must run before organs)
+    Step 3:  ingest_organs_an.py       (AN organs + resolve political_group)
+    Step 4:  ingest_organs_senat.py    (Senat organs)
+    Step 5:  ingest_memberships_an.py  (AN actor-organ memberships from AMO10 mandats)
+    Step 6:  ingest_deputies.py        (legacy nosdeputes.fr — backward compat)
+    Step 7:  ingest_debates.py         (AN CRI debates + interventions)
+    Step 8:  ingest_debates_senat.py   (Senat CRI debates + interventions from cri.zip)
+    Step 9:  ingest_scrutins_an.py     (AN public votes — scrutins + individual votes)
+    Step 10: ingest_scrutins_senat.py  (Senat public votes — Dosleg PostgreSQL dump)
+    Step 11: tag_interventions.py      (FTS tags on interventions)
 """
 
 import argparse
@@ -109,7 +110,8 @@ def main():
         ("Step 7:  ingest_debates.py (AN CRI)", not args.skip_debates),
         ("Step 8:  ingest_debates_senat.py (Senat CRI)", not args.skip_senat_debates),
         ("Step 9:  ingest_scrutins_an.py (AN votes)", not args.skip_scrutins),
-        ("Step 10: tag_interventions.py", not args.skip_tags),
+        ("Step 10: ingest_scrutins_senat.py (Senat votes)", not args.skip_scrutins),
+        ("Step 11: tag_interventions.py", not args.skip_tags),
     ]
     for step_name, will_run in steps:
         status = "RUN" if will_run else "SKIP"
@@ -194,7 +196,14 @@ def main():
     else:
         logger.info("SKIPPED: ingest_scrutins_an.py (AN scrutins)")
 
-    # Step 10: Tags
+    # Step 10: Senat scrutins/votes (must run after Senat actors to resolve official_id)
+    if not args.skip_scrutins:
+        if not run_script("ingest_scrutins_senat.py"):
+            errors += 1
+    else:
+        logger.info("SKIPPED: ingest_scrutins_senat.py (Senat scrutins)")
+
+    # Step 11: Tags
     if not args.skip_tags:
         tag_args = []
         if args.retag_all:
