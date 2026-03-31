@@ -223,11 +223,11 @@ Plans:
   4. La recherche full-text retourne des resultats de type "debat" et "vote" dans la meme reponse (cross-type)
   5. Swagger UI est accessible a /api/docs — chaque endpoint y est documente avec schemas de requete et reponse
 
-**Plans** : TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 13-01-PLAN.md — Extension endpoints existants (chambre filter, deputies->actors alias) + endpoints /api/votes
-- [ ] 13-02-PLAN.md — FTS cross-type (stored search_vector + materialized view) + OpenAPI via @scalar/nuxt
+- [ ] 13-01-PLAN.md — Endpoints /api/votes (list + detail) + chambre filter deputies + voteStats profil
+- [ ] 13-02-PLAN.md — FTS cross-type (UNION interventions + scrutins) + OpenAPI defineRouteMeta + @scalar/nuxt
 
 ---
 
