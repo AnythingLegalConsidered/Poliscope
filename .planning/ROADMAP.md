@@ -206,8 +206,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 12-01-PLAN.md — Pipeline scrutins/votes AN (Scrutins.json.zip → scrutins + votes tables + run_all.py Step 10)
-- [ ] 12-02-PLAN.md — Pipeline scrutins/votes Senat (Dosleg PG dump → schema discovery + ingestion + run_all.py Step 11)
+- [x] 12-01-PLAN.md — Pipeline scrutins/votes AN (Scrutins.json.zip → scrutins + votes tables + run_all.py Step 9)
+- [x] 12-02-PLAN.md — Pipeline scrutins/votes Senat (Dosleg COPY parsing → scrutins + votes tables + run_all.py Step 10)
 
 ---
 
@@ -288,7 +288,7 @@ Plans:
 | 9. Schema BDD Universel | v2.0 | 3/3 | Complete | 2026-03-28 |
 | 10. Ingestion Acteurs & Organes | v2.0 | 3/3 | Complete | 2026-03-30 |
 | 11. Ingestion Debats CRI | v2.0 | 4/4 | Complete | 2026-03-30 |
-| 12. Ingestion Votes & Scrutins | v2.0 | 0/2 | Not started | - |
+| 12. Ingestion Votes & Scrutins | v2.0 | 2/2 | Complete | 2026-03-31 |
 | 13. API REST Universelle | v2.0 | 0/2 | Not started | - |
 | 14. Frontend Votes, Senat & Bicameral | v2.0 | 0/2 | Not started | - |
 | 15. Deploiement & Ops | v2.0 | 0/2 | Not started | - |

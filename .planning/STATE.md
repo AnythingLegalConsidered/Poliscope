@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Permettre a n'importe qui de chercher et lire ce qu'un parlementaire a dit sur n'importe quel sujet, en quelques clics.
-**Current focus:** Phase 9 — Schema BDD Universel
+**Current focus:** Phase 13 — API REST Universelle + OpenAPI
 
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
-- **Phase** : 12 — Ingestion Votes Scrutins — In progress
-- **Plan** : 2/3 — 12-02 DONE
-- **Status** : 12-02 complete — 1154 Senat scrutins + 361853 votes in DB; both chambers done (7062 total scrutins, 1308512 votes); next: 12-03 (if any) or Phase 13 API
-- **Last activity** : 2026-03-31 — Completed 12-02 (Senat scrutins/votes via Dosleg)
+- **Phase** : 12 — Ingestion Votes & Scrutins — COMPLETE
+- **Plan** : 2/2 — ALL DONE
+- **Status** : Phase 12 complete — 7062 scrutins (5908 AN + 1154 Senat) + 1308512 votes in DB, verification PASSED 4/4, next: Phase 13 (API REST)
+- **Last activity** : 2026-03-31 — Phase 12 verification PASSED (4/4 must-haves)
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [██████████████░] 15/17 plans (partial)
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [███████████████░] 15/17 plans (partial)
 
 ## Accumulated Context
 
@@ -49,6 +49,16 @@ Progress: Milestone 1 [███████████████████
 | stored search_vector tsvector (pas functional index) | FTS cross-type scalable — functional index force row rechecks a >50K lignes |
 | Questions/Amendements/Dossiers -> v3 | Scope raisonnable pour v2 ; votes sont la priorite citoyenne #1 |
 | Votes ingeres en phase 12 (avant API/UI) | Data confidence avant exposition endpoints ; votes = attente principale |
+
+### Key Decisions (Phase 12)
+
+| Decision | Rationale |
+|----------|-----------|
+| Dosleg text parsing (COPY blocks) instead of pg_restore | PG 8.4 dump incompatible with PG 17 restore — text parsing of COPY blocks is reliable and avoids throwaway DB |
+| SENAT_ prefix on scrutin official_id | Prevents collision with AN scrutin UIDs; consistent with SENAT_ prefix on organs from Phase 10 |
+| DELETE+INSERT votes per scrutin (not upsert) | Votes have no natural unique key — delete all votes for a scrutin then reinsert is cleaner and idempotent |
+| hex-escaped cross_references source_id fixed via SQL UPDATE | psycopg3 binary protocol stored escaped hex instead of text — 577 PA entries corrected in-place |
+| syntheseVote.decompte.pour (not syntheseVote.pour.nbrVoix) | Research docs showed wrong path — actual AN JSON uses decompte sub-object for vote counts |
 
 ### Key Decisions (Phase 11 — Plan 02)
 
@@ -123,7 +133,7 @@ Progress: Milestone 1 [███████████████████
 
 - **Phase 10** : URL Tricoteuses a valider (migration Framagit -> git.en-root.org, retourne 403 en research)
 - **Phase 11** : Format XML Senat (Akoma Ntoso) non valide — echantillonner 2-3 CR recents avant implementation
-- **Phase 12** : Schema Dosleg dump PostgreSQL 8.4 non inspecte — tester compatibilite avec PG17 avant ingestion
+- **Phase 12** : ~~Schema Dosleg dump PostgreSQL 8.4~~ DONE — Dosleg parsed as text (COPY blocks), no PG restore needed; 1154 scrutins + 361853 votes ingested
 - **Phase 13** : Compatibilite @scalar/nuxt avec Nuxt 4 a confirmer (30 min check)
 - **Schema** : ~~Rename `deputies -> actors`~~ DONE — migration appliquee avec succes (618 actors, zero perte)
 
@@ -134,11 +144,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-03-31
-- **Stopped at** : Phase 12 — 12-02 Senat scrutins/votes complete
-- **Resume** : Phase 12 — 12-03 (check if plan exists) or Phase 13 (API votes endpoints)
+- **Stopped at** : Phase 12 complete — verification PASSED 4/4
+- **Resume** : Phase 13 — API REST Universelle + OpenAPI (votes endpoints, chambre filter, FTS cross-type, Swagger)
 
 ## History
 
+- 2026-03-31 : Phase 12 complete — verification PASSED (4/4 must-haves). 7062 scrutins + 1308512 votes bicameraux en base
 - 2026-03-31 : Completed 12-02 — Senat scrutins pipeline: 1154 scrutins, 361853 votes, 90.2% match rate via actors.official_id; Dosleg SQL dump text parsing, no PG restore needed
 - 2026-03-31 : Completed 12-01 — AN scrutins pipeline: 5908 scrutins, 946659 votes, 574/577 actors linked; fixed psycopg3 bytes decode + hex-escaped cross_references source_id + wrong syntheseVote field path
 - 2026-03-30 : Phase 11 complete — 11-04 Task 2 human-verify approved via E2E 9/9: chamber filter tabs, Senat debates navigable, cross-chamber search confirmed
