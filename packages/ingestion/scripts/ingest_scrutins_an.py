@@ -63,6 +63,16 @@ _UPSERT_SCRUTIN = upsert_query("scrutins", SCRUTIN_COLUMNS, "official_id")
 # ---------------------------------------------------------------------------
 
 
+def _decode_text(v) -> str:
+    """Decode psycopg3 binary-protocol text column to Python str.
+
+    psycopg3 in binary mode can return text columns as bytes. Always coerce to str.
+    """
+    if isinstance(v, (bytes, memoryview)):
+        return bytes(v).decode("utf-8")
+    return str(v)
+
+
 def load_actor_cache_an(conn) -> dict[str, int]:
     """Return {source_id: actor_id} from cross_references WHERE source_type = 'PA'.
 
@@ -72,7 +82,8 @@ def load_actor_cache_an(conn) -> dict[str, int]:
     cur = conn.execute(
         "SELECT source_id, actor_id FROM cross_references WHERE source_type = 'PA'"
     )
-    cache = {row[0]: row[1] for row in cur.fetchall()}
+    # _decode_text handles psycopg3 binary protocol returning text columns as bytes
+    cache = {_decode_text(row[0]): row[1] for row in cur.fetchall()}
     logger.info("Loaded %d PA actor references from cross_references", len(cache))
     return cache
 
@@ -110,17 +121,19 @@ def build_scrutin_record(scrutin: dict) -> dict:
         logger.warning("Could not parse dateScrutin '%s' for scrutin %s", date_str, scrutin.get("uid"))
         parsed_date = None
 
-    # Vote counts come as strings in the JSON
+    # Vote counts: actual JSON uses syntheseVote.decompte.{pour,contre,abstentions}
+    # (not syntheseVote.pour.nbrVoix as some documentation suggests)
+    decompte = synthese.get("decompte", {})
     try:
-        votes_for = int(synthese.get("pour", {}).get("nbrVoix", 0))
+        votes_for = int(decompte.get("pour", 0))
     except (ValueError, TypeError):
         votes_for = 0
     try:
-        votes_against = int(synthese.get("contre", {}).get("nbrVoix", 0))
+        votes_against = int(decompte.get("contre", 0))
     except (ValueError, TypeError):
         votes_against = 0
     try:
-        votes_abstain = int(synthese.get("abstentions", {}).get("nbrVoix", 0))
+        votes_abstain = int(decompte.get("abstentions", 0))
     except (ValueError, TypeError):
         votes_abstain = 0
 

@@ -7,17 +7,19 @@ Usage:
     python run_all.py --skip-deputies --skip-debates --retag-all  # Re-tag only
     python run_all.py --skip-debates --skip-tags --skip-deputies  # Actors + organs only
     python run_all.py --senat-zip-path /tmp/cri.zip  # Use pre-downloaded cri.zip
+    python run_all.py --skip-scrutins              # Skip scrutin/vote ingestion
 
 Pipeline order (dependency-safe):
-    Step 1: ingest_actors_an.py      (AN deputies from ZIP — must run before organs)
-    Step 2: ingest_actors_senat.py   (Senators from API — must run before organs)
-    Step 3: ingest_organs_an.py      (AN organs + resolve political_group)
-    Step 4: ingest_organs_senat.py   (Senat organs)
-    Step 5: ingest_memberships_an.py (AN actor-organ memberships from AMO10 mandats)
-    Step 6: ingest_deputies.py       (legacy nosdeputes.fr — backward compat)
-    Step 7: ingest_debates.py        (AN CRI debates + interventions)
-    Step 8: ingest_debates_senat.py  (Senat CRI debates + interventions from cri.zip)
-    Step 9: tag_interventions.py     (FTS tags on interventions)
+    Step 1:  ingest_actors_an.py      (AN deputies from ZIP — must run before organs)
+    Step 2:  ingest_actors_senat.py   (Senators from API — must run before organs)
+    Step 3:  ingest_organs_an.py      (AN organs + resolve political_group)
+    Step 4:  ingest_organs_senat.py   (Senat organs)
+    Step 5:  ingest_memberships_an.py (AN actor-organ memberships from AMO10 mandats)
+    Step 6:  ingest_deputies.py       (legacy nosdeputes.fr — backward compat)
+    Step 7:  ingest_debates.py        (AN CRI debates + interventions)
+    Step 8:  ingest_debates_senat.py  (Senat CRI debates + interventions from cri.zip)
+    Step 9:  ingest_scrutins_an.py    (AN public votes — scrutins + individual votes)
+    Step 10: tag_interventions.py     (FTS tags on interventions)
 """
 
 import argparse
@@ -63,7 +65,7 @@ def print_summary(total_time: float, errors: int) -> None:
     logger.info("=" * 60)
     try:
         with get_connection() as conn:
-            for table in ["actors", "debates", "interventions", "tags", "intervention_tags", "organs", "actor_organs", "cross_references"]:
+            for table in ["actors", "debates", "interventions", "tags", "intervention_tags", "organs", "actor_organs", "cross_references", "scrutins", "votes"]:
                 try:
                     cur = conn.execute(f"SELECT count(*) FROM {table}")
                     logger.info("  %-25s %d", table, cur.fetchone()[0])
@@ -87,6 +89,7 @@ def main():
     parser.add_argument("--skip-deputies", action="store_true", help="Skip legacy nosdeputes.fr deputy ingestion")
     parser.add_argument("--skip-debates", action="store_true", help="Skip AN debate ingestion")
     parser.add_argument("--skip-senat-debates", action="store_true", help="Skip Senat debate ingestion")
+    parser.add_argument("--skip-scrutins", action="store_true", help="Skip scrutin/vote ingestion (AN + Senat)")
     parser.add_argument("--skip-tags", action="store_true", help="Skip tagging")
     parser.add_argument("--senat-zip-path", type=str, default=None, help="Path to pre-downloaded cri.zip (skips download)")
     parser.add_argument("--retag-all", action="store_true", help="Clear and retag all interventions")
@@ -97,15 +100,16 @@ def main():
     logger.info("PIPELINE PLAN")
     logger.info("=" * 60)
     steps = [
-        ("Step 1: ingest_actors_an.py", not args.skip_actors),
-        ("Step 2: ingest_actors_senat.py", not args.skip_actors),
-        ("Step 3: ingest_organs_an.py", not args.skip_organs),
-        ("Step 4: ingest_organs_senat.py", not args.skip_organs),
-        ("Step 5: ingest_memberships_an.py", not args.skip_memberships),
-        ("Step 6: ingest_deputies.py (legacy)", not args.skip_deputies),
-        ("Step 7: ingest_debates.py (AN CRI)", not args.skip_debates),
-        ("Step 8: ingest_debates_senat.py (Senat CRI)", not args.skip_senat_debates),
-        ("Step 9: tag_interventions.py", not args.skip_tags),
+        ("Step 1:  ingest_actors_an.py", not args.skip_actors),
+        ("Step 2:  ingest_actors_senat.py", not args.skip_actors),
+        ("Step 3:  ingest_organs_an.py", not args.skip_organs),
+        ("Step 4:  ingest_organs_senat.py", not args.skip_organs),
+        ("Step 5:  ingest_memberships_an.py", not args.skip_memberships),
+        ("Step 6:  ingest_deputies.py (legacy)", not args.skip_deputies),
+        ("Step 7:  ingest_debates.py (AN CRI)", not args.skip_debates),
+        ("Step 8:  ingest_debates_senat.py (Senat CRI)", not args.skip_senat_debates),
+        ("Step 9:  ingest_scrutins_an.py (AN votes)", not args.skip_scrutins),
+        ("Step 10: tag_interventions.py", not args.skip_tags),
     ]
     for step_name, will_run in steps:
         status = "RUN" if will_run else "SKIP"
@@ -183,7 +187,14 @@ def main():
     else:
         logger.info("SKIPPED: ingest_debates_senat.py (Senat CRI)")
 
-    # Step 9: Tags
+    # Step 9: AN scrutins/votes (must run after actors to resolve PA cross_references)
+    if not args.skip_scrutins:
+        if not run_script("ingest_scrutins_an.py"):
+            errors += 1
+    else:
+        logger.info("SKIPPED: ingest_scrutins_an.py (AN scrutins)")
+
+    # Step 10: Tags
     if not args.skip_tags:
         tag_args = []
         if args.retag_all:
