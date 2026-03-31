@@ -10,14 +10,23 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
-- **Phase** : 11 — Ingestion Debats CRI — COMPLETE
-- **Plan** : 4/4 — ALL DONE
-- **Status** : Phase 11 complete — 413 Senat debates + 292,286 interventions in DB, UI verified (E2E 9/9), next: Phase 12 (votes)
-- **Last activity** : 2026-03-30 — Completed 11-04 Task 2 (human-verify approved via E2E 9/9)
+- **Phase** : 12 — Ingestion Votes Scrutins — In progress
+- **Plan** : 1/3 — 12-01 DONE
+- **Status** : 12-01 complete — 5908 AN scrutins + 946659 votes in DB, pipeline idempotent; next: 12-02 (Senat Dosleg)
+- **Last activity** : 2026-03-31 — Completed 12-01 (AN scrutins/votes pipeline)
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [████████████░░░] 13/17 plans (partial)
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [█████████████░░] 14/17 plans (partial)
 
 ## Accumulated Context
+
+### Key Decisions (Phase 12 — Plan 01)
+
+| Decision | Rationale |
+|----------|-----------|
+| syntheseVote.decompte.{pour,contre,abstentions} for AN vote counts | Actual JSON format — research doc incorrectly described syntheseVote.pour.nbrVoix; decompte is the real structure |
+| _decode_text() helper in load_actor_cache_an() | psycopg3 binary protocol returns text columns as bytes — must decode; cross_references source_id also had hex-escaped values from Phase 10 original ingestion |
+| delegation_actor_id = None for v1 | parDelegation detected (string "true"/"false") but delegation_actor_id tracking deferred — FK requires a second actor lookup not worth implementing now |
+| session_id = None | Linking AN scrutins to debate sessions via seanceRef requires lookup not trivial and not needed for Phase 12 |
 
 ### Key Decisions (Milestone 2)
 
@@ -114,12 +123,13 @@ None.
 
 ## Session Continuity
 
-- **Last session** : 2026-03-30
-- **Stopped at** : Phase 11 complete — all 4 plans done
-- **Resume** : Phase 12 — votes ingestion (Dosleg PostgreSQL 8.4 dump → PG17 compatibility to check first)
+- **Last session** : 2026-03-31
+- **Stopped at** : Phase 12 — 12-01 AN scrutins/votes complete
+- **Resume** : Phase 12 — 12-02 Senat votes (Dosleg PostgreSQL 8.4 dump schema discovery first)
 
 ## History
 
+- 2026-03-31 : Completed 12-01 — AN scrutins pipeline: 5908 scrutins, 946659 votes, 574/577 actors linked; fixed psycopg3 bytes decode + hex-escaped cross_references source_id + wrong syntheseVote field path
 - 2026-03-30 : Phase 11 complete — 11-04 Task 2 human-verify approved via E2E 9/9: chamber filter tabs, Senat debates navigable, cross-chamber search confirmed
 - 2026-03-30 : Completed 11-04 Task 1 — Senat CRI pipeline executed: 413 debates, 292286 interventions, 81.8% match rate, 218535 tagged; fixed 5 bugs in ingest_debates_senat.py (filename regex, XML parser, element structure, mat matching, UnboundLocalError)
 - 2026-03-30 : Completed 11-03 — chamber filter on /api/debates (?chamber=AN|Senat), 3-tab selector UI, DebateCard badge, dynamic page title, pagination reset on filter change
