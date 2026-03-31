@@ -203,11 +203,11 @@ Plans:
   3. Un utilisateur peut voir sur le profil d'un parlementaire son historique de votes — les scrutins sont lies a l'acteur via actor_id
   4. Les pipelines scrutins AN et Senat sont idempotents et tournent independamment
 
-**Plans** : TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 12-01-PLAN.md — Pipeline scrutins/votes AN (data.assemblee-nationale.fr Scrutins.json.zip)
-- [ ] 12-02-PLAN.md — Pipeline scrutins/votes Senat (Dosleg dump via staging container)
+- [ ] 12-01-PLAN.md — Pipeline scrutins/votes AN (Scrutins.json.zip → scrutins + votes tables + run_all.py Step 10)
+- [ ] 12-02-PLAN.md — Pipeline scrutins/votes Senat (Dosleg PG dump → schema discovery + ingestion + run_all.py Step 11)
 
 ---
 
