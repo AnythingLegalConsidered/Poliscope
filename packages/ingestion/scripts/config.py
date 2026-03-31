@@ -18,3 +18,6 @@ AN_PHOTO_BASE: str = "https://www2.assemblee-nationale.fr/static/tribun/17/photo
 
 # Senat API
 SENAT_API_BASE: str = "https://www.senat.fr/api-senat"
+
+# AN scrutins (votes)
+AN_SCRUTINS_ZIP: str = "https://data.assemblee-nationale.fr/static/openData/repository/17/loi/scrutins/Scrutins.json.zip"
