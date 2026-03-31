@@ -21,3 +21,6 @@ SENAT_API_BASE: str = "https://www.senat.fr/api-senat"
 
 # AN scrutins (votes)
 AN_SCRUTINS_ZIP: str = "https://data.assemblee-nationale.fr/static/openData/repository/17/loi/scrutins/Scrutins.json.zip"
+
+# Senat Dosleg (votes + scrutins from PostgreSQL dump)
+SENAT_DOSLEG_ZIP: str = "https://data.senat.fr/data/dosleg/dosleg.zip"
