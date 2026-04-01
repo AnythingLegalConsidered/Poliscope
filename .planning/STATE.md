@@ -5,19 +5,27 @@
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Permettre a n'importe qui de chercher et lire ce qu'un parlementaire a dit sur n'importe quel sujet, en quelques clics.
-**Current focus:** Phase 14 — Frontend Votes, Plan 01 complete
+**Current focus:** Phase 14 — COMPLETE
 
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
-- **Phase** : 14 — Frontend Votes Sénat & Bicaméral — In progress
-- **Plan** : 1/2 — Plan 01 DONE
-- **Status** : 14-01 complete — /votes list + /votes/[id] detail pages + 3 components (ScrutinCard, ScrutinResultBar, VotePositionBadge), tsc PASSED
-- **Last activity** : 2026-04-01 — Completed 14-01 — votes frontend pages and components
+- **Phase** : 14 — Frontend Votes Sénat & Bicaméral — COMPLETE
+- **Plan** : 2/2 — Plans 01 + 02 DONE
+- **Status** : Phase 14 complete — /votes list + detail, bicameral nav, chamber filter /deputies, senator badge on profiles, search cross-type badges Vote, tsc PASSED
+- **Last activity** : 2026-04-01 — Completed 14-02 — bicameral nav + search cross-type
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [████████████████████░] 20/21 plans
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [█████████████████████] 21/21 plans
 
 ## Accumulated Context
+
+### Key Decisions (Phase 14 — Plan 02)
+
+| Decision | Rationale |
+|----------|-----------|
+| v-if/v-else on `type` prop in SearchResultCard (not two components) | Single import in search.vue, shared component boundary, simpler props union |
+| scrutinId = result.id for scrutin variant | /api/search normalizes id to scrutin.id for type=scrutin rows — no separate context_id field |
+| typeFilter pills shown only when results exist OR filter active | Avoids confusing empty state when query is blank |
 
 ### Key Decisions (Phase 13 — Plan 02)
 
@@ -163,11 +171,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-04-01
-- **Stopped at** : Phase 14 Plan 01 complete — /votes + /votes/[id] pages + 3 components, tsc PASSED
-- **Resume** : Phase 14 Plan 02 — senator profiles + chamber filter refinements (14-02-PLAN.md)
+- **Stopped at** : Phase 14 Plan 02 complete — bicameral nav, chamber filter /deputies, senator badge, SearchResultCard scrutin variant, search typeFilter
+- **Resume** : Phase 15 (if defined) or release preparation
 
 ## History
 
+- 2026-04-01 : Completed 14-02 — bicameral nav (Votes + Parlementaires), chamber filter pills on /deputies, senator badge on /deputies/[id], SearchResultCard scrutin variant (badge Vote + ScrutinResultBar + /votes/:id link), typeFilter pills on /search; 2 tasks, 5 files
 - 2026-04-01 : Completed 14-01 — /votes list page (chamber+result filters, infinite scroll) + /votes/[id] detail page (position filter, paginated votes) + 3 components (ScrutinCard, ScrutinResultBar, VotePositionBadge)
 - 2026-04-01 : Phase 13 complete — verification PASSED 5/5. Votes API, cross-type FTS, Scalar UI /api/docs, chamber param normalized across all endpoints
 - 2026-04-01 : Completed 13-02 — search UNION ALL (interventions+scrutins), @scalar/nuxt, defineRouteMeta on all endpoints, /api/docs; 2 tasks, 10 files
