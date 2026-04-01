@@ -1,4 +1,24 @@
-import { sql } from 'drizzle-orm'
+import { sql, inArray } from 'drizzle-orm'
+import { interventionTags, tags } from 'shared/schema'
+import { eq } from 'drizzle-orm'
+
+defineRouteMeta({
+  openAPI: {
+    tags: ['search'],
+    summary: 'Recherche full-text cross-type',
+    description: 'Recherche dans les interventions et les scrutins. Retourne des resultats melanges avec type discriminant.',
+    parameters: [
+      { in: 'query', name: 'q', required: true, schema: { type: 'string' }, description: 'Terme de recherche' },
+      { in: 'query', name: 'type', schema: { type: 'string', enum: ['intervention', 'scrutin'] }, description: 'Filtrer par type de resultat' },
+      { in: 'query', name: 'chamber', schema: { type: 'string', enum: ['AN', 'Senat'] }, description: 'Filtrer par chambre' },
+      { in: 'query', name: 'deputyId', schema: { type: 'integer' }, description: 'Filtrer par acteur (interventions uniquement)' },
+      { in: 'query', name: 'debateId', schema: { type: 'integer' }, description: 'Filtrer par debat (interventions uniquement)' },
+      { in: 'query', name: 'tag', schema: { type: 'string' }, description: 'Filtrer par tag (interventions uniquement)' },
+      { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
+      { in: 'query', name: 'limit', schema: { type: 'integer', default: 20, maximum: 100 } },
+    ],
+  },
+})
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
@@ -11,6 +31,8 @@ export default defineEventHandler(async (event) => {
   const deputyIdRaw = query.deputyId as string | undefined
   const debateIdRaw = query.debateId as string | undefined
   const tag = (query.tag as string | undefined)?.trim() || null
+  const typeFilter = query.type as string | undefined
+  const chamber = (query.chamber as string | undefined)?.trim() || null
 
   const deputyId = deputyIdRaw ? Number(deputyIdRaw) : null
   const debateId = debateIdRaw ? Number(debateIdRaw) : null
@@ -25,7 +47,7 @@ export default defineEventHandler(async (event) => {
   const { page, limit, offset } = getPaginationParams(event)
 
   try {
-    // Build optional filter clauses
+    // Build optional filter clauses for interventions branch
     const actorFilter = deputyId !== null
       ? sql` AND i.actor_id = ${deputyId}`
       : sql``
@@ -44,90 +66,206 @@ export default defineEventHandler(async (event) => {
         )`
       : sql``
 
-    const rows = await db.execute(sql`
+    // Chamber filter for each branch (applied per-branch since SQL fragments differ)
+    const interventionChamberFilter = (chamber === 'AN' || chamber === 'Senat')
+      ? sql` AND d.chamber = ${chamber}`
+      : sql``
+
+    const scrutinChamberFilter = (chamber === 'AN' || chamber === 'Senat')
+      ? sql` AND s.chamber = ${chamber}`
+      : sql``
+
+    // Determine which branches to include based on ?type filter
+    const includeInterventions = !typeFilter || typeFilter === 'intervention'
+    const includeScrutins = !typeFilter || typeFilter === 'scrutin'
+
+    // Build the UNION ALL query — wrapping in subquery to allow window function on combined result
+    // Strategy: build each branch as a fragment, combine only the needed branches
+    const interventionBranch = sql`
       SELECT
+        'intervention' AS type,
         i.id,
-        i.speaker_name AS "speakerName",
-        i.speaker_role AS "speakerRole",
-        i.order_in_debate AS "orderInDebate",
-        ts_rank(
-          to_tsvector('french', i.content),
-          websearch_to_tsquery('french', ${q})
-        ) AS rank,
+        ts_rank(i.search_vector, websearch_to_tsquery('french', ${q})) AS rank,
         ts_headline(
           'french',
           i.content,
           websearch_to_tsquery('french', ${q}),
           'StartSel=<mark>, StopSel=</mark>, MaxWords=35, MinWords=15, MaxFragments=2, FragmentDelimiter= ... '
         ) AS highlight,
-        d.id AS "debateId",
-        d.title AS "debateTitle",
-        d.date AS "debateDate",
-        d.session_type AS "sessionType",
-        dep.id AS "deputyId",
-        dep.full_name AS "deputyName",
-        dep.political_group AS "deputyGroup",
-        dep.photo_url AS "deputyPhoto",
-        count(*) OVER() AS total_count,
-        (
-          SELECT COALESCE(json_agg(json_build_object('name', t.name, 'slug', t.slug)), '[]'::json)
-          FROM intervention_tags it2
-          JOIN tags t ON it2.tag_id = t.id
-          WHERE it2.intervention_id = i.id
-        ) AS tags
+        i.speaker_name AS speaker_name,
+        d.id AS context_id,
+        d.title AS context_title,
+        d.date AS context_date,
+        dep.id AS actor_id,
+        dep.full_name AS actor_name,
+        dep.political_group AS actor_group,
+        dep.photo_url AS actor_photo,
+        NULL::text AS result,
+        NULL::integer AS votes_for,
+        NULL::integer AS votes_against,
+        NULL::integer AS votes_abstain,
+        d.chamber AS chamber,
+        i.speaker_role AS speaker_role,
+        i.order_in_debate AS order_in_debate,
+        d.session_type AS session_type
       FROM interventions i
       LEFT JOIN debates d ON i.debate_id = d.id
       LEFT JOIN actors dep ON i.actor_id = dep.id
-      WHERE to_tsvector('french', i.content) @@ websearch_to_tsquery('french', ${q})
+      WHERE i.search_vector @@ websearch_to_tsquery('french', ${q})
       ${actorFilter}
       ${debateFilter}
       ${tagFilter}
-      ORDER BY rank DESC, i.id DESC
+      ${interventionChamberFilter}
+    `
+
+    const scrutinBranch = sql`
+      SELECT
+        'scrutin' AS type,
+        s.id,
+        ts_rank(to_tsvector('french', s.title), websearch_to_tsquery('french', ${q})) AS rank,
+        ts_headline(
+          'french',
+          s.title,
+          websearch_to_tsquery('french', ${q}),
+          'StartSel=<mark>, StopSel=</mark>, MaxWords=35, MinWords=15, MaxFragments=1'
+        ) AS highlight,
+        NULL AS speaker_name,
+        s.id AS context_id,
+        s.title AS context_title,
+        s.date AS context_date,
+        NULL::integer AS actor_id,
+        NULL AS actor_name,
+        NULL AS actor_group,
+        NULL AS actor_photo,
+        s.result AS result,
+        s.votes_for AS votes_for,
+        s.votes_against AS votes_against,
+        s.votes_abstain AS votes_abstain,
+        s.chamber AS chamber,
+        NULL AS speaker_role,
+        NULL::integer AS order_in_debate,
+        NULL AS session_type
+      FROM scrutins s
+      WHERE to_tsvector('french', s.title) @@ websearch_to_tsquery('french', ${q})
+      ${scrutinChamberFilter}
+    `
+
+    // Assemble union based on which types are requested
+    let unionSql: ReturnType<typeof sql>
+    if (includeInterventions && includeScrutins) {
+      unionSql = sql`${interventionBranch} UNION ALL ${scrutinBranch}`
+    }
+    else if (includeInterventions) {
+      unionSql = interventionBranch
+    }
+    else {
+      unionSql = scrutinBranch
+    }
+
+    const rows = await db.execute(sql`
+      SELECT *, count(*) OVER() AS total_count
+      FROM (${unionSql}) sub
+      ORDER BY rank DESC, id DESC
       LIMIT ${limit} OFFSET ${offset}
     `)
 
-    const results = rows as unknown as Array<{
+    type RawRow = {
+      type: 'intervention' | 'scrutin'
       id: number
-      speakerName: string
-      speakerRole: string | null
-      orderInDebate: number
-      rank: number
+      rank: string
       highlight: string
-      debateId: number
-      debateTitle: string
-      debateDate: string
-      sessionType: string | null
-      deputyId: number | null
-      deputyName: string | null
-      deputyGroup: string | null
-      deputyPhoto: string | null
+      speaker_name: string | null
+      context_id: number
+      context_title: string
+      context_date: string
+      actor_id: number | null
+      actor_name: string | null
+      actor_group: string | null
+      actor_photo: string | null
+      result: string | null
+      votes_for: number | null
+      votes_against: number | null
+      votes_abstain: number | null
+      chamber: string | null
+      speaker_role: string | null
+      order_in_debate: number | null
+      session_type: string | null
       total_count: string
-      tags: Array<{ name: string, slug: string }> | string
-    }>
+    }
 
+    const results = rows as unknown as RawRow[]
     const total = Number(results.at(0)?.total_count ?? 0)
 
-    const data = results.map(row => ({
-      id: row.id,
-      speakerName: row.speakerName,
-      speakerRole: row.speakerRole,
-      orderInDebate: row.orderInDebate,
-      rank: Number(row.rank),
-      highlight: row.highlight.replace(/\ufffd/g, ''),
-      debate: {
-        id: row.debateId,
-        title: row.debateTitle,
-        date: row.debateDate,
-        sessionType: row.sessionType,
-      },
-      deputy: row.deputyId ? {
-        id: row.deputyId,
-        fullName: row.deputyName,
-        group: row.deputyGroup,
-        photoUrl: row.deputyPhoto,
-      } : null,
-      tags: typeof row.tags === 'string' ? JSON.parse(row.tags) : (row.tags ?? []),
-    }))
+    // Batch-fetch tags for intervention results only (avoid N+1)
+    const interventionIds = results
+      .filter(r => r.type === 'intervention')
+      .map(r => r.id)
+
+    const tagMap = new Map<number, Array<{ name: string; slug: string }>>()
+    if (interventionIds.length > 0) {
+      const tagRows = await db
+        .select({
+          interventionId: interventionTags.interventionId,
+          name: tags.name,
+          slug: tags.slug,
+        })
+        .from(interventionTags)
+        .innerJoin(tags, eq(interventionTags.tagId, tags.id))
+        .where(inArray(interventionTags.interventionId, interventionIds))
+
+      for (const row of tagRows) {
+        if (!tagMap.has(row.interventionId)) {
+          tagMap.set(row.interventionId, [])
+        }
+        tagMap.get(row.interventionId)!.push({ name: row.name, slug: row.slug })
+      }
+    }
+
+    // Map rows to clean response format
+    const data = results.map((row) => {
+      if (row.type === 'intervention') {
+        return {
+          type: 'intervention' as const,
+          id: row.id,
+          rank: Number(row.rank),
+          highlight: row.highlight.replace(/\ufffd/g, ''),
+          speakerName: row.speaker_name,
+          speakerRole: row.speaker_role,
+          orderInDebate: row.order_in_debate,
+          debate: {
+            id: row.context_id,
+            title: row.context_title,
+            date: row.context_date,
+            sessionType: row.session_type,
+          },
+          deputy: row.actor_id
+            ? {
+                id: row.actor_id,
+                fullName: row.actor_name,
+                group: row.actor_group,
+                photoUrl: row.actor_photo,
+              }
+            : null,
+          tags: tagMap.get(row.id) ?? [],
+          chamber: row.chamber,
+        }
+      }
+      else {
+        return {
+          type: 'scrutin' as const,
+          id: row.id,
+          rank: Number(row.rank),
+          highlight: row.highlight.replace(/\ufffd/g, ''),
+          title: row.context_title,
+          date: row.context_date,
+          result: row.result,
+          votesFor: row.votes_for,
+          votesAgainst: row.votes_against,
+          votesAbstain: row.votes_abstain,
+          chamber: row.chamber,
+        }
+      }
+    })
 
     return paginatedResponse(data, total, page, limit)
   }
