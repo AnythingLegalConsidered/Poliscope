@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Permettre a n'importe qui de chercher et lire ce qu'un parlementaire a dit sur n'importe quel sujet, en quelques clics.
-**Current focus:** Phase 14 — Frontend Votes (Phase 13 complete)
+**Current focus:** Phase 14 — Frontend Votes, Plan 01 complete
 
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
-- **Phase** : 13 — API REST Universelle + OpenAPI — COMPLETE
-- **Plan** : 2/2 — Plans 01 + 02 DONE
-- **Status** : Phase 13 complete — votes API, cross-type FTS, Scalar UI at /api/docs, OpenAPI on all 8 endpoints, verification PASSED 5/5
-- **Last activity** : 2026-04-01 — Phase 13 verification PASSED (5/5 must-haves after chamber param fix)
+- **Phase** : 14 — Frontend Votes Sénat & Bicaméral — In progress
+- **Plan** : 1/2 — Plan 01 DONE
+- **Status** : 14-01 complete — /votes list + /votes/[id] detail pages + 3 components (ScrutinCard, ScrutinResultBar, VotePositionBadge), tsc PASSED
+- **Last activity** : 2026-04-01 — Completed 14-01 — votes frontend pages and components
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [██████████████████░] 19/21 plans
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [████████████████████░] 20/21 plans
 
 ## Accumulated Context
 
@@ -163,11 +163,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-04-01
-- **Stopped at** : Phase 13 complete — verification PASSED 5/5 (after chamber param normalization fix)
-- **Resume** : Phase 14 — Frontend Votes, Senat & Bicameral (scrutins pages, senateur profils, filtre chambre global, search type badges)
+- **Stopped at** : Phase 14 Plan 01 complete — /votes + /votes/[id] pages + 3 components, tsc PASSED
+- **Resume** : Phase 14 Plan 02 — senator profiles + chamber filter refinements (14-02-PLAN.md)
 
 ## History
 
+- 2026-04-01 : Completed 14-01 — /votes list page (chamber+result filters, infinite scroll) + /votes/[id] detail page (position filter, paginated votes) + 3 components (ScrutinCard, ScrutinResultBar, VotePositionBadge)
 - 2026-04-01 : Phase 13 complete — verification PASSED 5/5. Votes API, cross-type FTS, Scalar UI /api/docs, chamber param normalized across all endpoints
 - 2026-04-01 : Completed 13-02 — search UNION ALL (interventions+scrutins), @scalar/nuxt, defineRouteMeta on all endpoints, /api/docs; 2 tasks, 10 files
 - 2026-04-01 : Completed 13-01 — /api/votes (list + detail), /api/deputies?chamber, deputy voteStats; 2 tasks, 4 files
