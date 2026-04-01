@@ -9,6 +9,11 @@ const inputValue = ref((route.query.q as string) ?? '')
 const q = ref((route.query.q as string) ?? '')
 const activeTag = ref((route.query.tag as string) ?? '')
 const deputyId = ref(route.query.deputyId ? Number(route.query.deputyId) : null)
+const typeFilter = ref<string>((route.query.type as string) ?? '')
+
+// Tab button classes
+const activeClass = 'bg-bronze text-white rounded-full px-4 py-1.5 text-sm font-medium'
+const inactiveClass = 'bg-marble-dark text-ink-muted rounded-full px-4 py-1.5 text-sm font-medium hover:bg-marble-dark/80'
 
 useSeoMeta({
   title: () => q.value ? `Recherche : ${q.value}` : 'Recherche',
@@ -33,13 +38,14 @@ const { data, status, refresh } = useFetch('/api/search', {
     limit: 20,
     ...(activeTag.value ? { tag: activeTag.value } : {}),
     ...(deputyId.value ? { deputyId: deputyId.value } : {}),
+    ...(typeFilter.value ? { type: typeFilter.value } : {}),
   })),
   immediate: false,
   watch: false,
 })
 
 // Reset accumulator and sync URL on filter change
-watch([q, activeTag, deputyId], () => {
+watch([q, activeTag, deputyId, typeFilter], () => {
   allResults.value = []
   page.value = 1
   router.replace({
@@ -47,6 +53,7 @@ watch([q, activeTag, deputyId], () => {
       ...(q.value ? { q: q.value } : {}),
       ...(activeTag.value ? { tag: activeTag.value } : {}),
       ...(deputyId.value ? { deputyId: String(deputyId.value) } : {}),
+      ...(typeFilter.value ? { type: typeFilter.value } : {}),
     },
   })
 })
@@ -152,20 +159,50 @@ function handleFilterTag(slug: string) {
       Aucun résultat pour &laquo;&nbsp;{{ q }}&nbsp;&raquo;
     </p>
 
+    <!-- Type filter pills -->
+    <div v-if="shouldFetch && (allResults.length > 0 || typeFilter)" class="flex gap-2 mb-4">
+      <button :class="[!typeFilter ? activeClass : inactiveClass]" @click="typeFilter = ''">
+        Tous
+      </button>
+      <button :class="[typeFilter === 'intervention' ? activeClass : inactiveClass]" @click="typeFilter = 'intervention'">
+        Interventions
+      </button>
+      <button :class="[typeFilter === 'scrutin' ? activeClass : inactiveClass]" @click="typeFilter = 'scrutin'">
+        Votes
+      </button>
+    </div>
+
     <!-- Results list -->
     <div v-if="allResults.length > 0" class="flex flex-col gap-4">
-      <SearchResultCard
-        v-for="result in allResults"
-        :key="result.id"
-        :speaker-name="result.speakerName"
-        :speaker-role="result.speakerRole"
-        :highlight="result.highlight"
-        :debate="result.debate"
-        :deputy="result.deputy"
-        :tags="result.tags ?? []"
-        :order-in-debate="result.orderInDebate"
-        @filter-tag="handleFilterTag"
-      />
+      <template v-for="result in allResults" :key="result.id">
+        <!-- Intervention -->
+        <SearchResultCard
+          v-if="result.type !== 'scrutin'"
+          type="intervention"
+          :speaker-name="result.speakerName"
+          :speaker-role="result.speakerRole"
+          :highlight="result.highlight"
+          :debate="result.debate"
+          :deputy="result.deputy"
+          :tags="result.tags ?? []"
+          :order-in-debate="result.orderInDebate"
+          @filter-tag="handleFilterTag"
+        />
+        <!-- Scrutin -->
+        <SearchResultCard
+          v-else
+          type="scrutin"
+          :scrutin-id="result.id"
+          :highlight="result.highlight"
+          :title="result.title"
+          :date="result.date"
+          :result="result.result"
+          :votes-for="result.votesFor"
+          :votes-against="result.votesAgainst"
+          :votes-abstain="result.votesAbstain"
+          :chamber="result.chamber"
+        />
+      </template>
     </div>
 
     <!-- Loading spinner -->
