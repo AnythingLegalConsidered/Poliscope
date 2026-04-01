@@ -10,14 +10,23 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
-- **Phase** : 12 — Ingestion Votes & Scrutins — COMPLETE
-- **Plan** : 2/2 — ALL DONE
-- **Status** : Phase 12 complete — 7062 scrutins (5908 AN + 1154 Senat) + 1308512 votes in DB, verification PASSED 4/4, next: Phase 13 (API REST)
-- **Last activity** : 2026-03-31 — Phase 12 verification PASSED (4/4 must-haves)
+- **Phase** : 13 — API REST Universelle + OpenAPI — In progress
+- **Plan** : 1/? — Plan 01 DONE
+- **Status** : Plan 13-01 complete — /api/votes (list+detail), chamber filter on deputies, voteStats on deputy profiles
+- **Last activity** : 2026-04-01 — Completed 13-01-PLAN.md
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [███████████████░] 15/17 plans (partial)
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [████████████████░] 16/17 plans (partial)
 
 ## Accumulated Context
+
+### Key Decisions (Phase 13 — Plan 01)
+
+| Decision | Rationale |
+|----------|-----------|
+| chambre (not chamber) param on /api/votes | Consistent with AN data field naming convention |
+| Votes paginated on /api/votes/:id | 1.3M votes in DB — mandatory pagination, cannot return all |
+| voteStats added to deputy profile | Phase 14 frontend needs vote breakdown per actor |
+| debates/[id].get.ts unchanged | Full select() already returns all columns including chamber |
 
 ### Key Decisions (Phase 12 — Plan 02)
 
@@ -143,12 +152,13 @@ None.
 
 ## Session Continuity
 
-- **Last session** : 2026-03-31
-- **Stopped at** : Phase 12 complete — verification PASSED 4/4
-- **Resume** : Phase 13 — API REST Universelle + OpenAPI (votes endpoints, chambre filter, FTS cross-type, Swagger)
+- **Last session** : 2026-04-01
+- **Stopped at** : Phase 13 Plan 01 complete — votes endpoints + deputies chamber filter
+- **Resume** : Phase 13 Plan 02 — OpenAPI schema + Scalar UI, FTS cross-type search
 
 ## History
 
+- 2026-04-01 : Completed 13-01 — /api/votes (list + detail), /api/deputies?chamber, deputy voteStats; 2 tasks, 4 files
 - 2026-03-31 : Phase 12 complete — verification PASSED (4/4 must-haves). 7062 scrutins + 1308512 votes bicameraux en base
 - 2026-03-31 : Completed 12-02 — Senat scrutins pipeline: 1154 scrutins, 361853 votes, 90.2% match rate via actors.official_id; Dosleg SQL dump text parsing, no PG restore needed
 - 2026-03-31 : Completed 12-01 — AN scrutins pipeline: 5908 scrutins, 946659 votes, 574/577 actors linked; fixed psycopg3 bytes decode + hex-escaped cross_references source_id + wrong syntheseVote field path
