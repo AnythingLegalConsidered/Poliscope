@@ -7,12 +7,16 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const group = query.group as string | undefined
   const searchRaw = query.search as string | undefined
+  const chamber = query.chamber as string | undefined
 
   // Strip SQL wildcard characters from search input before using in ilike
   const search = searchRaw ? searchRaw.replace(/[%_]/g, '') : undefined
 
   // Build WHERE conditions
   const conditions: SQL[] = []
+  if (chamber === 'AN' || chamber === 'Senat') {
+    conditions.push(eq(actors.chamber, chamber))
+  }
   if (group) {
     conditions.push(eq(actors.group, group))
   }

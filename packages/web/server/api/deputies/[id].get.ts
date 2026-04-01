@@ -1,5 +1,5 @@
 import { eq, desc, inArray, sql } from 'drizzle-orm'
-import { actors, interventions, debates, interventionTags, tags } from 'shared/schema'
+import { actors, interventions, debates, interventionTags, tags, votes } from 'shared/schema'
 
 export default defineEventHandler(async (event) => {
   const rawId = getRouterParam(event, 'id')
@@ -114,10 +114,26 @@ export default defineEventHandler(async (event) => {
       count: Number(row.count),
     }))
 
+    // Compute vote position breakdown for this actor
+    const voteStatsRows = await db
+      .select({
+        position: votes.position,
+        count: sql<number>`count(*)`,
+      })
+      .from(votes)
+      .where(eq(votes.actorId, id))
+      .groupBy(votes.position)
+
+    const voteStats = voteStatsRows.map(row => ({
+      position: row.position,
+      count: Number(row.count),
+    }))
+
     return {
       deputy,
       interventions: paginatedResponse(enrichedInterventions, totalInterventions, page, limit),
       tagStats,
+      voteStats,
     }
   }
   catch (error) {
