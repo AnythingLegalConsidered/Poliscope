@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Permettre a n'importe qui de chercher et lire ce qu'un parlementaire a dit sur n'importe quel sujet, en quelques clics.
-**Current focus:** Phase 14 — COMPLETE
+**Current focus:** Phase 15 — Deploiement & Ops (Phase 14 complete)
 
 ## Current Position
 
@@ -171,11 +171,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-04-01
-- **Stopped at** : Phase 14 Plan 02 complete — bicameral nav, chamber filter /deputies, senator badge, SearchResultCard scrutin variant, search typeFilter
-- **Resume** : Phase 15 (if defined) or release preparation
+- **Stopped at** : Phase 14 complete — verification PASSED 5/5
+- **Resume** : Phase 15 — Deploiement & Ops (deploy LXC PVE02, backup pg_dump, systemd timers, health check)
 
 ## History
 
+- 2026-04-01 : Phase 14 complete — verification PASSED 5/5. Scrutins pages, bicameral nav, chamber filter deputies, senator badges, search cross-type with Vote badge
 - 2026-04-01 : Completed 14-02 — bicameral nav (Votes + Parlementaires), chamber filter pills on /deputies, senator badge on /deputies/[id], SearchResultCard scrutin variant (badge Vote + ScrutinResultBar + /votes/:id link), typeFilter pills on /search; 2 tasks, 5 files
 - 2026-04-01 : Completed 14-01 — /votes list page (chamber+result filters, infinite scroll) + /votes/[id] detail page (position filter, paginated votes) + 3 components (ScrutinCard, ScrutinResultBar, VotePositionBadge)
 - 2026-04-01 : Phase 13 complete — verification PASSED 5/5. Votes API, cross-type FTS, Scalar UI /api/docs, chamber param normalized across all endpoints

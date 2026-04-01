@@ -243,11 +243,11 @@ Plans:
   4. La navigation entre AN et Senat est evidente — un toggle ou filtre global de chambre est present sur les pages liste
   5. La recherche retourne des resultats de type "vote" avec un badge distinctif — un utilisateur peut filtrer par type de resultat
 
-**Plans** : TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 14-01-PLAN.md — Pages scrutins (liste + detail) + profils senateurs
-- [ ] 14-02-PLAN.md — Navigation bicamerale (filtre chambre global) + recherche cross-type avec type badges
+- [x] 14-01-PLAN.md — Pages scrutins (liste + detail) + profils senateurs
+- [x] 14-02-PLAN.md — Navigation bicamerale (filtre chambre global) + recherche cross-type avec type badges
 
 ---
 
@@ -290,5 +290,5 @@ Plans:
 | 11. Ingestion Debats CRI | v2.0 | 4/4 | Complete | 2026-03-30 |
 | 12. Ingestion Votes & Scrutins | v2.0 | 2/2 | Complete | 2026-03-31 |
 | 13. API REST Universelle | v2.0 | 2/2 | Complete | 2026-04-01 |
-| 14. Frontend Votes, Senat & Bicameral | v2.0 | 0/2 | Not started | - |
+| 14. Frontend Votes, Senat & Bicameral | v2.0 | 2/2 | Complete | 2026-04-01 |
 | 15. Deploiement & Ops | v2.0 | 0/2 | Not started | - |
