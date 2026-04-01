@@ -8,7 +8,7 @@ defineRouteMeta({
     summary: 'Liste des debats parlementaires',
     description: 'Retourne la liste paginee des seances (AN + Senat) avec filtre chambre optionnel.',
     parameters: [
-      { in: 'query', name: 'chambre', schema: { type: 'string', enum: ['AN', 'Senat'] }, description: 'Filtrer par chambre' },
+      { in: 'query', name: 'chamber', schema: { type: 'string', enum: ['AN', 'Senat'] }, description: 'Filtrer par chambre' },
       { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
       { in: 'query', name: 'limit', schema: { type: 'integer', default: 20, maximum: 100 } },
     ],

@@ -8,7 +8,7 @@ defineRouteMeta({
     summary: 'Liste des scrutins',
     description: 'Retourne la liste paginee des scrutins publics avec filtres chambre, date, resultat.',
     parameters: [
-      { in: 'query', name: 'chambre', schema: { type: 'string', enum: ['AN', 'Senat'] }, description: 'Filtrer par chambre' },
+      { in: 'query', name: 'chamber', schema: { type: 'string', enum: ['AN', 'Senat'] }, description: 'Filtrer par chambre' },
       { in: 'query', name: 'dateFrom', schema: { type: 'string', format: 'date' }, description: 'Date de debut (ISO)' },
       { in: 'query', name: 'dateTo', schema: { type: 'string', format: 'date' }, description: 'Date de fin (ISO)' },
       { in: 'query', name: 'result', schema: { type: 'string', enum: ['adopted', 'rejected'] }, description: 'Filtrer par resultat' },
@@ -21,7 +21,7 @@ defineRouteMeta({
 export default defineEventHandler(async (event) => {
   const { page, limit, offset } = getPaginationParams(event)
   const query = getQuery(event)
-  const chamber = query.chambre as string | undefined
+  const chamber = query.chamber as string | undefined
   const dateFrom = query.dateFrom as string | undefined
   const dateTo = query.dateTo as string | undefined
   const result = query.result as string | undefined
