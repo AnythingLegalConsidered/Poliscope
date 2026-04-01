@@ -12,10 +12,10 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
 - **Phase** : 13 — API REST Universelle + OpenAPI — COMPLETE
 - **Plan** : 2/2 — Plans 01 + 02 DONE
-- **Status** : Phase 13 complete — /api/search cross-type FTS, Scalar UI at /api/docs, OpenAPI on all 8 endpoints
-- **Last activity** : 2026-04-01 — Completed 13-02-PLAN.md
+- **Status** : Phase 13 complete — votes API, cross-type FTS, Scalar UI at /api/docs, OpenAPI on all 8 endpoints, verification PASSED 5/5
+- **Last activity** : 2026-04-01 — Phase 13 verification PASSED (5/5 must-haves after chamber param fix)
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [█████████████████░] 17/18 plans (partial)
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [██████████████████░] 19/21 plans
 
 ## Accumulated Context
 
@@ -163,12 +163,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-04-01
-- **Stopped at** : Phase 13 Plan 02 complete — cross-type search + OpenAPI + Scalar UI
-- **Resume** : Phase 14 — Frontend Votes (scrutins list, vote detail, deputy vote breakdown)
+- **Stopped at** : Phase 13 complete — verification PASSED 5/5 (after chamber param normalization fix)
+- **Resume** : Phase 14 — Frontend Votes, Senat & Bicameral (scrutins pages, senateur profils, filtre chambre global, search type badges)
 
 ## History
 
-- 2026-04-01 : Phase 13 complete — 13-01 votes endpoints + 13-02 cross-type search + OpenAPI Scalar UI on all 8 endpoints
+- 2026-04-01 : Phase 13 complete — verification PASSED 5/5. Votes API, cross-type FTS, Scalar UI /api/docs, chamber param normalized across all endpoints
 - 2026-04-01 : Completed 13-02 — search UNION ALL (interventions+scrutins), @scalar/nuxt, defineRouteMeta on all endpoints, /api/docs; 2 tasks, 10 files
 - 2026-04-01 : Completed 13-01 — /api/votes (list + detail), /api/deputies?chamber, deputy voteStats; 2 tasks, 4 files
 - 2026-03-31 : Phase 12 complete — verification PASSED (4/4 must-haves). 7062 scrutins + 1308512 votes bicameraux en base

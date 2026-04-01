@@ -226,8 +226,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 13-01-PLAN.md — Endpoints /api/votes (list + detail) + chambre filter deputies + voteStats profil
-- [ ] 13-02-PLAN.md — FTS cross-type (UNION interventions + scrutins) + OpenAPI defineRouteMeta + @scalar/nuxt
+- [x] 13-01-PLAN.md — Endpoints /api/votes (list + detail) + chambre filter deputies + voteStats profil
+- [x] 13-02-PLAN.md — FTS cross-type (UNION interventions + scrutins) + OpenAPI defineRouteMeta + @scalar/nuxt
 
 ---
 
@@ -289,6 +289,6 @@ Plans:
 | 10. Ingestion Acteurs & Organes | v2.0 | 3/3 | Complete | 2026-03-30 |
 | 11. Ingestion Debats CRI | v2.0 | 4/4 | Complete | 2026-03-30 |
 | 12. Ingestion Votes & Scrutins | v2.0 | 2/2 | Complete | 2026-03-31 |
-| 13. API REST Universelle | v2.0 | 0/2 | Not started | - |
+| 13. API REST Universelle | v2.0 | 2/2 | Complete | 2026-04-01 |
 | 14. Frontend Votes, Senat & Bicameral | v2.0 | 0/2 | Not started | - |
 | 15. Deploiement & Ops | v2.0 | 0/2 | Not started | - |
