@@ -5,19 +5,29 @@
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Permettre a n'importe qui de chercher et lire ce qu'un parlementaire a dit sur n'importe quel sujet, en quelques clics.
-**Current focus:** Phase 13 — API REST Universelle + OpenAPI
+**Current focus:** Phase 14 — Frontend Votes (Phase 13 complete)
 
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
-- **Phase** : 13 — API REST Universelle + OpenAPI — In progress
-- **Plan** : 1/? — Plan 01 DONE
-- **Status** : Plan 13-01 complete — /api/votes (list+detail), chamber filter on deputies, voteStats on deputy profiles
-- **Last activity** : 2026-04-01 — Completed 13-01-PLAN.md
+- **Phase** : 13 — API REST Universelle + OpenAPI — COMPLETE
+- **Plan** : 2/2 — Plans 01 + 02 DONE
+- **Status** : Phase 13 complete — /api/search cross-type FTS, Scalar UI at /api/docs, OpenAPI on all 8 endpoints
+- **Last activity** : 2026-04-01 — Completed 13-02-PLAN.md
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [████████████████░] 16/17 plans (partial)
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [█████████████████░] 17/18 plans (partial)
 
 ## Accumulated Context
+
+### Key Decisions (Phase 13 — Plan 02)
+
+| Decision | Rationale |
+|----------|-----------|
+| SQL UNION ALL in subquery wrapper (not CTEs) | count(*) OVER() must be on outer query — inside a branch it counts only that branch's rows |
+| Batch tag fetch post-UNION | Correlated subquery inside UNION complex; separate inArray() query simpler and avoids N+1 |
+| Branches assembled conditionally | If ?type=intervention, scrutins branch skipped entirely — more efficient than post-filter |
+| to_tsvector at query time for scrutins | 7k rows, no stored search_vector — acceptable perf without dedicated column |
+| production:'runtime' in nitro.openAPI | Without this, /api/docs and /_openapi.json return 404 in production builds |
 
 ### Key Decisions (Phase 13 — Plan 01)
 
@@ -143,7 +153,7 @@ Progress: Milestone 1 [███████████████████
 - **Phase 10** : URL Tricoteuses a valider (migration Framagit -> git.en-root.org, retourne 403 en research)
 - **Phase 11** : Format XML Senat (Akoma Ntoso) non valide — echantillonner 2-3 CR recents avant implementation
 - **Phase 12** : ~~Schema Dosleg dump PostgreSQL 8.4~~ DONE — Dosleg parsed as text (COPY blocks), no PG restore needed; 1154 scrutins + 361853 votes ingested
-- **Phase 13** : Compatibilite @scalar/nuxt avec Nuxt 4 a confirmer (30 min check)
+- **Phase 13** : ~~@scalar/nuxt compatibilite~~ CONFIRMED — @scalar/nuxt 0.6.18 installs and builds with Nuxt 4.4.2 (TypeScript peer warning non-blocking)
 - **Schema** : ~~Rename `deputies -> actors`~~ DONE — migration appliquee avec succes (618 actors, zero perte)
 
 ### Pending Todos
@@ -153,11 +163,13 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-04-01
-- **Stopped at** : Phase 13 Plan 01 complete — votes endpoints + deputies chamber filter
-- **Resume** : Phase 13 Plan 02 — OpenAPI schema + Scalar UI, FTS cross-type search
+- **Stopped at** : Phase 13 Plan 02 complete — cross-type search + OpenAPI + Scalar UI
+- **Resume** : Phase 14 — Frontend Votes (scrutins list, vote detail, deputy vote breakdown)
 
 ## History
 
+- 2026-04-01 : Phase 13 complete — 13-01 votes endpoints + 13-02 cross-type search + OpenAPI Scalar UI on all 8 endpoints
+- 2026-04-01 : Completed 13-02 — search UNION ALL (interventions+scrutins), @scalar/nuxt, defineRouteMeta on all endpoints, /api/docs; 2 tasks, 10 files
 - 2026-04-01 : Completed 13-01 — /api/votes (list + detail), /api/deputies?chamber, deputy voteStats; 2 tasks, 4 files
 - 2026-03-31 : Phase 12 complete — verification PASSED (4/4 must-haves). 7062 scrutins + 1308512 votes bicameraux en base
 - 2026-03-31 : Completed 12-02 — Senat scrutins pipeline: 1154 scrutins, 361853 votes, 90.2% match rate via actors.official_id; Dosleg SQL dump text parsing, no PG restore needed
