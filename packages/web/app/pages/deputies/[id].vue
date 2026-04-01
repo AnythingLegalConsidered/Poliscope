@@ -81,7 +81,7 @@ const displayedTags = computed(() => {
     <div v-else-if="data">
       <!-- Back link -->
       <NuxtLink to="/deputies" class="text-bronze hover:text-bronze-dark text-sm transition-colors duration-200">
-        &larr; Retour aux députés
+        &larr; Retour aux parlementaires
       </NuxtLink>
 
       <!-- Deputy header -->
@@ -111,6 +111,18 @@ const displayedTags = computed(() => {
             </h1>
             <div class="flex items-center gap-2 mt-1 flex-wrap">
               <GroupBadge v-if="data.deputy?.group" :group="data.deputy.group" />
+              <span
+                v-if="data.deputy?.chamber === 'AN'"
+                class="text-xs bg-bronze/10 text-bronze px-2 py-0.5 rounded-full font-medium"
+              >
+                AN
+              </span>
+              <span
+                v-else-if="data.deputy?.chamber === 'Senat'"
+                class="text-xs bg-ink/10 text-ink px-2 py-0.5 rounded-full font-medium"
+              >
+                Sénat
+              </span>
               <span v-if="data.deputy?.constituency" class="text-sm text-ink-muted">
                 {{ data.deputy.constituency }}
               </span>

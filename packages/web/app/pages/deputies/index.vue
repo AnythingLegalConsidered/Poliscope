@@ -2,8 +2,8 @@
 import { useIntersectionObserver } from '@vueuse/core'
 
 useSeoMeta({
-  title: 'Députés',
-  description: "Liste des députés de l'Assemblée nationale",
+  title: 'Parlementaires',
+  description: 'Liste des parlementaires français',
 })
 
 // Known political groups for the 17th legislature filter
@@ -25,6 +25,24 @@ const GROUPS = [
 const page = ref(1)
 const search = ref('')
 const group = ref<string | null>(null)
+const chamber = ref<string | undefined>(undefined)
+
+// Dynamic page title based on active chamber filter
+const pageTitle = computed(() => {
+  if (chamber.value === 'AN') return "Députés de l'Assemblée nationale"
+  if (chamber.value === 'Senat') return 'Sénateurs'
+  return 'Parlementaires'
+})
+
+// Tab button classes
+const activeClass = 'bg-bronze text-white rounded-full px-4 py-1.5 text-sm font-medium'
+const inactiveClass = 'bg-marble-dark text-ink-muted rounded-full px-4 py-1.5 text-sm font-medium hover:bg-marble-dark/80'
+
+function selectChamber(newVal: string | undefined) {
+  page.value = 1
+  allDeputies.value = []
+  chamber.value = newVal
+}
 
 // Accumulate all loaded deputies across pages
 const allDeputies = ref<any[]>([])
@@ -33,13 +51,13 @@ const allDeputies = ref<any[]>([])
 const sentinel = useTemplateRef('sentinel')
 
 const { data, status } = await useFetch('/api/deputies', {
-  query: { page, limit: 20, search, group },
+  query: { page, limit: 20, search, group, chamber },
   lazy: true,
-  watch: [page, search, group],
+  watch: [page, search, group, chamber],
 })
 
 // Reset list and page when filters change (avoids duplicates — see research pitfall 1)
-watch([search, group], () => {
+watch([search, group, chamber], () => {
   allDeputies.value = []
   page.value = 1
 })
@@ -79,16 +97,29 @@ useIntersectionObserver(
 
 <template>
   <div class="max-w-7xl mx-auto">
-    <h1 class="text-2xl font-bold text-ink mb-6 font-heading">
-      Députés de l'Assemblée nationale
+    <h1 class="text-2xl font-bold text-ink mb-4 font-heading">
+      {{ pageTitle }}
     </h1>
+
+    <!-- Chamber filter pills -->
+    <div class="flex gap-2 mb-4">
+      <button :class="[!chamber ? activeClass : inactiveClass]" @click="selectChamber(undefined)">
+        Tous
+      </button>
+      <button :class="[chamber === 'AN' ? activeClass : inactiveClass]" @click="selectChamber('AN')">
+        Assemblée nationale
+      </button>
+      <button :class="[chamber === 'Senat' ? activeClass : inactiveClass]" @click="selectChamber('Senat')">
+        Sénat
+      </button>
+    </div>
 
     <!-- Search and group filter controls -->
     <div class="flex flex-col sm:flex-row gap-3 mb-6">
       <input
         v-model="search"
         type="search"
-        placeholder="Rechercher un député..."
+        placeholder="Rechercher un parlementaire..."
         class="flex-1 bg-parchment border border-stone-border rounded-lg px-4 py-2 text-sm text-ink placeholder:text-ink-muted/60 focus:outline-none focus:border-bronze/40 transition-colors duration-200"
       />
       <select
@@ -119,7 +150,7 @@ useIntersectionObserver(
       v-else-if="status !== 'pending'"
       class="text-ink-muted text-center py-12"
     >
-      Aucun député trouvé
+      Aucun parlementaire trouvé
     </p>
 
     <!-- Loading spinner -->
@@ -132,7 +163,7 @@ useIntersectionObserver(
       v-if="!hasMore && allDeputies.length > 0"
       class="text-center text-sm text-ink-muted/60 py-6"
     >
-      Tous les députés chargés
+      Tous les parlementaires chargés
     </p>
 
     <!-- Infinite scroll sentinel -->
