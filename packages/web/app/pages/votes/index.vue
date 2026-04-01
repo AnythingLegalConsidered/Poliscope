@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { useIntersectionObserver } from '@vueuse/core'
 
-// Reactive filters
 const chamber = ref<string | undefined>(undefined)
 const result = ref<string | undefined>(undefined)
+const page = ref(1)
+const allScrutins = ref<any[]>([])
+const sentinel = useTemplateRef('sentinel')
 
-// Dynamic page title based on active chamber filter
 const pageTitle = computed(() => {
   if (chamber.value === 'AN') return "Scrutins de l'Assemblée nationale"
   if (chamber.value === 'Senat') return 'Scrutins du Sénat'
@@ -15,17 +16,7 @@ const pageTitle = computed(() => {
 useSeoMeta({
   title: 'Votes',
   description: 'Les scrutins parlementaires',
-  ogType: 'website',
 })
-
-// Reactive page number — useFetch re-fetches automatically when it changes
-const page = ref(1)
-
-// Accumulate all loaded scrutins across pages
-const allScrutins = ref<any[]>([])
-
-// Sentinel element at bottom of list for IntersectionObserver
-const sentinel = useTemplateRef('sentinel')
 
 const { data, status } = await useFetch('/api/votes', {
   query: { page, limit: 20, chamber, result },
@@ -33,7 +24,13 @@ const { data, status } = await useFetch('/api/votes', {
   watch: [page, chamber, result],
 })
 
-// Append new page results to allScrutins — reset on page 1 to handle filter changes without duplicates
+// Reset list and page when filters change (avoids duplicates)
+watch([chamber, result], () => {
+  allScrutins.value = []
+  page.value = 1
+})
+
+// Append new page results; replace on page 1 (filter/search reset)
 watch(
   data,
   (newData) => {
@@ -48,7 +45,6 @@ watch(
   { immediate: true },
 )
 
-// Computed: are there more pages to load?
 const hasMore = computed(() => {
   if (!data.value?.pagination) return false
   return page.value < data.value.pagination.totalPages
@@ -69,18 +65,16 @@ useIntersectionObserver(
 const activeClass = 'bg-bronze text-white rounded-full px-4 py-1.5 text-sm font-medium'
 const inactiveClass = 'bg-marble-dark text-ink-muted rounded-full px-4 py-1.5 text-sm font-medium hover:bg-marble-dark/80'
 
-// Select a chamber filter — reset pagination so infinite scroll restarts from page 1
-function selectChamber(newVal: string | undefined) {
+function selectChamber(val: string | undefined) {
   page.value = 1
   allScrutins.value = []
-  chamber.value = newVal
+  chamber.value = val
 }
 
-// Select a result filter — reset pagination
-function selectResult(newVal: string | undefined) {
+function selectResult(val: string | undefined) {
   page.value = 1
   allScrutins.value = []
-  result.value = newVal
+  result.value = val
 }
 </script>
 
@@ -90,46 +84,28 @@ function selectResult(newVal: string | undefined) {
       {{ pageTitle }}
     </h1>
 
-    <!-- Chamber filter tabs -->
-    <div class="flex gap-2 mb-3 flex-wrap">
-      <button
-        :class="[!chamber ? activeClass : inactiveClass]"
-        @click="selectChamber(undefined)"
-      >
+    <!-- Chamber filter pills -->
+    <div class="flex gap-2 mb-4">
+      <button :class="[!chamber ? activeClass : inactiveClass]" @click="selectChamber(undefined)">
         Tous
       </button>
-      <button
-        :class="[chamber === 'AN' ? activeClass : inactiveClass]"
-        @click="selectChamber('AN')"
-      >
+      <button :class="[chamber === 'AN' ? activeClass : inactiveClass]" @click="selectChamber('AN')">
         Assemblée nationale
       </button>
-      <button
-        :class="[chamber === 'Senat' ? activeClass : inactiveClass]"
-        @click="selectChamber('Senat')"
-      >
+      <button :class="[chamber === 'Senat' ? activeClass : inactiveClass]" @click="selectChamber('Senat')">
         Sénat
       </button>
     </div>
 
-    <!-- Result filter tabs -->
-    <div class="flex gap-2 mb-6 flex-wrap">
-      <button
-        :class="[!result ? activeClass : inactiveClass]"
-        @click="selectResult(undefined)"
-      >
+    <!-- Result filter pills -->
+    <div class="flex gap-2 mb-6">
+      <button :class="[!result ? activeClass : inactiveClass]" @click="selectResult(undefined)">
         Tous
       </button>
-      <button
-        :class="[result === 'adopted' ? activeClass : inactiveClass]"
-        @click="selectResult('adopted')"
-      >
+      <button :class="[result === 'adopted' ? activeClass : inactiveClass]" @click="selectResult('adopted')">
         Adopté
       </button>
-      <button
-        :class="[result === 'rejected' ? activeClass : inactiveClass]"
-        @click="selectResult('rejected')"
-      >
+      <button :class="[result === 'rejected' ? activeClass : inactiveClass]" @click="selectResult('rejected')">
         Rejeté
       </button>
     </div>
