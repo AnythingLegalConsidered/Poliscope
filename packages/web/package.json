@@ -11,13 +11,14 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "shared": "workspace:*",
     "@nuxtjs/sitemap": "^8.0.9",
+    "@scalar/nuxt": "^0.6.18",
     "@tailwindcss/vite": "^4.2.2",
     "@vueuse/core": "^14.2.1",
     "drizzle-orm": "^0.45.1",
     "nuxt": "^4.4.2",
     "postgres": "^3.4.8",
+    "shared": "workspace:*",
     "tailwindcss": "^4.2.2",
     "vue": "^3.5.30",
     "vue-router": "^5.0.4"

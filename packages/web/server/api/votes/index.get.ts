@@ -2,6 +2,22 @@ import { sql, desc, eq, and, gte, lte } from 'drizzle-orm'
 import type { SQL } from 'drizzle-orm'
 import { scrutins } from 'shared/schema'
 
+defineRouteMeta({
+  openAPI: {
+    tags: ['votes'],
+    summary: 'Liste des scrutins',
+    description: 'Retourne la liste paginee des scrutins publics avec filtres chambre, date, resultat.',
+    parameters: [
+      { in: 'query', name: 'chambre', schema: { type: 'string', enum: ['AN', 'Senat'] }, description: 'Filtrer par chambre' },
+      { in: 'query', name: 'dateFrom', schema: { type: 'string', format: 'date' }, description: 'Date de debut (ISO)' },
+      { in: 'query', name: 'dateTo', schema: { type: 'string', format: 'date' }, description: 'Date de fin (ISO)' },
+      { in: 'query', name: 'result', schema: { type: 'string', enum: ['adopted', 'rejected'] }, description: 'Filtrer par resultat' },
+      { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
+      { in: 'query', name: 'limit', schema: { type: 'integer', default: 20, maximum: 100 } },
+    ],
+  },
+})
+
 export default defineEventHandler(async (event) => {
   const { page, limit, offset } = getPaginationParams(event)
   const query = getQuery(event)

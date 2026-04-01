@@ -1,6 +1,17 @@
 import { eq, asc, inArray } from 'drizzle-orm'
 import { debates, interventions, actors, interventionTags, tags } from 'shared/schema'
 
+defineRouteMeta({
+  openAPI: {
+    tags: ['debates'],
+    summary: 'Detail d\'un debat',
+    description: 'Retourne les metadonnees du debat et la liste des interventions avec tags et info acteur.',
+    parameters: [
+      { in: 'path', name: 'id', required: true, schema: { type: 'integer' }, description: 'ID du debat' },
+    ],
+  },
+})
+
 export default defineEventHandler(async (event) => {
   const rawId = getRouterParam(event, 'id')
   const id = Number(rawId)

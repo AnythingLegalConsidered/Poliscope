@@ -1,6 +1,19 @@
 import { eq, desc, inArray, sql } from 'drizzle-orm'
 import { actors, interventions, debates, interventionTags, tags, votes } from 'shared/schema'
 
+defineRouteMeta({
+  openAPI: {
+    tags: ['deputies'],
+    summary: 'Profil d\'un parlementaire',
+    description: 'Retourne le profil complet avec interventions paginee, stats tags et stats votes.',
+    parameters: [
+      { in: 'path', name: 'id', required: true, schema: { type: 'integer' }, description: 'ID du parlementaire' },
+      { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
+      { in: 'query', name: 'limit', schema: { type: 'integer', default: 20, maximum: 100 } },
+    ],
+  },
+})
+
 export default defineEventHandler(async (event) => {
   const rawId = getRouterParam(event, 'id')
   const id = Number(rawId)

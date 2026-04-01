@@ -2,6 +2,21 @@ import { sql, asc, eq, ilike, and } from 'drizzle-orm'
 import { actors } from 'shared/schema'
 import type { SQL } from 'drizzle-orm'
 
+defineRouteMeta({
+  openAPI: {
+    tags: ['deputies'],
+    summary: 'Liste des parlementaires',
+    description: 'Retourne la liste paginee des acteurs (deputes + senateurs) avec filtres.',
+    parameters: [
+      { in: 'query', name: 'chamber', schema: { type: 'string', enum: ['AN', 'Senat'] }, description: 'Filtrer par chambre' },
+      { in: 'query', name: 'group', schema: { type: 'string' }, description: 'Filtrer par groupe politique' },
+      { in: 'query', name: 'search', schema: { type: 'string' }, description: 'Recherche par nom' },
+      { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
+      { in: 'query', name: 'limit', schema: { type: 'integer', default: 20, maximum: 100 } },
+    ],
+  },
+})
+
 export default defineEventHandler(async (event) => {
   const { page, limit, offset } = getPaginationParams(event)
   const query = getQuery(event)

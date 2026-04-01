@@ -2,6 +2,20 @@ import { sql, eq, and, asc } from 'drizzle-orm'
 import type { SQL } from 'drizzle-orm'
 import { scrutins, votes, actors } from 'shared/schema'
 
+defineRouteMeta({
+  openAPI: {
+    tags: ['votes'],
+    summary: 'Detail d\'un scrutin',
+    description: 'Retourne les metadonnees du scrutin et la liste paginee des votes par acteur.',
+    parameters: [
+      { in: 'path', name: 'id', required: true, schema: { type: 'integer' }, description: 'ID du scrutin' },
+      { in: 'query', name: 'position', schema: { type: 'string', enum: ['for', 'against', 'abstain', 'absent'] }, description: 'Filtrer par position' },
+      { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
+      { in: 'query', name: 'limit', schema: { type: 'integer', default: 20, maximum: 100 } },
+    ],
+  },
+})
+
 export default defineEventHandler(async (event) => {
   const rawId = getRouterParam(event, 'id')
   const id = Number(rawId)
