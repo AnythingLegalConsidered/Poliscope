@@ -23,6 +23,10 @@ logs
 .env.*
 !.env.example
 
+# Deployment secrets (example is committed, actual is not)
+!deploy/.env.production.example
+deploy/.env.production
+
 # Python
 __pycache__/
 *.pyc
