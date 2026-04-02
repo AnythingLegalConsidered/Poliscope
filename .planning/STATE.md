@@ -10,14 +10,23 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
-- **Phase** : 14 — Frontend Votes Sénat & Bicaméral — COMPLETE
-- **Plan** : 2/2 — Plans 01 + 02 DONE
-- **Status** : Phase 14 complete — /votes list + detail, bicameral nav, chamber filter /deputies, senator badge on profiles, search cross-type badges Vote, tsc PASSED
-- **Last activity** : 2026-04-01 — Completed 14-02 — bicameral nav + search cross-type
+- **Phase** : 15 — Deploiement & Ops — IN PROGRESS
+- **Plan** : 1/2 — Plan 01 Task 1 DONE, paused at checkpoint Task 2 (human-verify deploy)
+- **Status** : Deployment scripts created — awaiting human deploy to LXC 192.168.2.200
+- **Last activity** : 2026-04-02 — Completed 15-01 Task 1 — deploy/ scripts (provision.sh + deploy.sh + ecosystem.config.cjs + nginx config)
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [█████████████████████] 21/21 plans
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [█████████████████████] 21/21 plans + Phase 15 in progress
 
 ## Accumulated Context
+
+### Key Decisions (Phase 15 — Plan 01)
+
+| Decision | Rationale |
+|----------|-----------|
+| rsync .output (not build on LXC) | .output self-contained; LXC limited RAM, no pnpm needed on server |
+| pm2 startOrRestart (not pm2 restart) | restart fails if process doesn't exist yet — startOrRestart is idempotent |
+| env_file at /opt/poliscope/.env | PM2 loads env file for process — NUXT_* vars override runtimeConfig keys |
+| --skip-build flag in deploy.sh | Iterate deploy without rebuilding when only config changes |
 
 ### Key Decisions (Phase 14 — Plan 02)
 
@@ -170,9 +179,9 @@ None.
 
 ## Session Continuity
 
-- **Last session** : 2026-04-01
-- **Stopped at** : Phase 14 complete — verification PASSED 5/5
-- **Resume** : Phase 15 — Deploiement & Ops (deploy LXC PVE02, backup pg_dump, systemd timers, health check)
+- **Last session** : 2026-04-02
+- **Stopped at** : Phase 15, Plan 01, Task 2 — checkpoint:human-verify (deploy to LXC)
+- **Resume** : After deploying to LXC and confirming app accessible, continue with Phase 15 Plan 02 (backup timers, ingestion refresh, health endpoint enhancement)
 
 ## History
 
