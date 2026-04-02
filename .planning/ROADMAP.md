@@ -262,11 +262,11 @@ Plans:
   3. Le refresh des donnees parlementaires se declenche automatiquement via systemd timer hebdomadaire — les nouvelles seances apparaissent sans intervention manuelle
   4. Un endpoint /api/health retourne un status JSON avec l'etat de la DB et la date du dernier refresh
 
-**Plans** : TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 15-01-PLAN.md — Deploy app sur LXC (provision.sh, PostgreSQL config, Nuxt PM2/systemd)
-- [ ] 15-02-PLAN.md — Backup pg_dump + systemd timers (refresh hebdo) + health check endpoint
+- [ ] 15-01-PLAN.md — Deploy Nuxt app sur LXC (provision.sh + deploy.sh + PM2 + nginx)
+- [ ] 15-02-PLAN.md — Backup pg_dump daily + refresh hebdo systemd timers + health endpoint last_refresh
 
 ---
 
