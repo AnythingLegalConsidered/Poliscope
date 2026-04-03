@@ -1,0 +1,11 @@
+[Unit]
+Description=Poliscope PostgreSQL daily backup
+Requires=postgresql.service
+After=postgresql.service
+
+[Service]
+Type=oneshot
+User=postgres
+ExecStart=/opt/poliscope/scripts/pg-backup.sh
+StandardOutput=journal
+StandardError=journal

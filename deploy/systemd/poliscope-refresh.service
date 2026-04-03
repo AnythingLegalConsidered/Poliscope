@@ -1,0 +1,14 @@
+[Unit]
+Description=Poliscope weekly data refresh
+After=postgresql.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/poliscope/repo/packages/ingestion/scripts
+Environment=DATABASE_URL=postgresql://poliscope:PASSWORD@localhost:5432/poliscope
+ExecStart=/opt/poliscope/repo/packages/ingestion/.venv/bin/python run_all.py
+StandardOutput=append:/opt/poliscope/logs/ingestion.log
+StandardError=append:/opt/poliscope/logs/ingestion.log
+TimeoutStartSec=3600
