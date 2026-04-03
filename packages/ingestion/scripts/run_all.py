@@ -29,7 +29,7 @@ import subprocess
 import sys
 import time
 
-from db import get_connection
+from db import get_connection, write_last_refresh
 
 logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -216,6 +216,14 @@ def main():
     # Summary
     total_time = time.time() - pipeline_start
     print_summary(total_time, errors)
+
+    if errors == 0:
+        try:
+            with get_connection() as conn:
+                write_last_refresh(conn)
+                logger.info("Updated last_refresh in system_metadata")
+        except Exception as e:
+            logger.error("Failed to write last_refresh: %s", e)
 
 
 if __name__ == "__main__":

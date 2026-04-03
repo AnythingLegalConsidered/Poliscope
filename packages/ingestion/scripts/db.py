@@ -9,6 +9,18 @@ def get_connection() -> psycopg.Connection:
     return psycopg.connect(DATABASE_URL)
 
 
+def write_last_refresh(conn) -> None:
+    """Write current timestamp to system_metadata as last_refresh."""
+    conn.execute(
+        """
+        INSERT INTO system_metadata (key, value, updated_at)
+        VALUES ('last_refresh', NOW()::text, NOW())
+        ON CONFLICT (key) DO UPDATE SET value = NOW()::text, updated_at = NOW()
+        """
+    )
+    conn.commit()
+
+
 def upsert_query(
     table: str,
     columns: list[str],

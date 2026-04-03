@@ -199,3 +199,9 @@ export const crossReferences = pgTable('cross_references', {
   index('idx_cross_ref_actor').on(t.actorId),
   index('idx_cross_ref_source').on(t.sourceType, t.sourceId),
 ])
+
+export const systemMetadata = pgTable('system_metadata', {
+  key: text('key').primaryKey(),
+  value: text('value').notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+})
