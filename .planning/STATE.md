@@ -11,13 +11,21 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle
 - **Phase** : 15 — Deploiement & Ops — IN PROGRESS
-- **Plan** : 1/2 — Plan 01 Task 1 DONE, paused at checkpoint Task 2 (human-verify deploy)
-- **Status** : Deployment scripts created — awaiting human deploy to LXC 192.168.2.200
-- **Last activity** : 2026-04-02 — Completed 15-01 Task 1 — deploy/ scripts (provision.sh + deploy.sh + ecosystem.config.cjs + nginx config)
+- **Plan** : 2/2 — Plan 02 Tasks 1+2 DONE, paused at checkpoint Task 3 (human-verify: deploy + timers)
+- **Status** : Backup timers + health last_refresh ready — awaiting LXC deployment and timer verification
+- **Last activity** : 2026-04-03 — Completed 15-02 Tasks 1+2 — system_metadata table, migration 0005, /api/health last_refresh, systemd timers, pg-backup.sh, setup-timers.sh
 
 Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [█████████████████████] 21/21 plans + Phase 15 in progress
 
 ## Accumulated Context
+
+### Key Decisions (Phase 15 — Plan 02)
+
+| Decision | Rationale |
+|----------|-----------|
+| ExecStart uses venv Python binary directly (no source activate) | source activate is a bash builtin, not valid in systemd ExecStart |
+| PASSWORD placeholder in poliscope-refresh.service | Edited manually after setup-timers.sh runs — setup script prints reminder |
+| write_last_refresh only on errors==0 | Partial pipeline success should not update last_refresh — would mislead health endpoint |
 
 ### Key Decisions (Phase 15 — Plan 01)
 
@@ -179,9 +187,9 @@ None.
 
 ## Session Continuity
 
-- **Last session** : 2026-04-02
-- **Stopped at** : Phase 15, Plan 01, Task 2 — checkpoint:human-verify (deploy to LXC)
-- **Resume** : After deploying to LXC and confirming app accessible, continue with Phase 15 Plan 02 (backup timers, ingestion refresh, health endpoint enhancement)
+- **Last session** : 2026-04-03
+- **Stopped at** : Phase 15, Plan 02, Task 3 — checkpoint:human-verify (deploy to LXC + verify timers)
+- **Resume** : After: (1) deploy.sh run, (2) migration 0005 applied, (3) git pull on LXC, (4) setup-timers.sh run, (5) PASSWORD edited in poliscope-refresh.service — then verify health last_refresh + timers active
 
 ## History
 
