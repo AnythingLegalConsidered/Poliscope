@@ -73,31 +73,37 @@ if [ ! -d "packages/web/.output" ]; then
 fi
 
 # ---------------------------------------------------------------------------
-# Step 3: Rsync .output to LXC
+# Step 3: Sync .output to LXC
 # ---------------------------------------------------------------------------
 step "Syncing .output to ${LXC_HOST}:${REMOTE_DIR}/.output/..."
-rsync -avz --delete packages/web/.output/ "${LXC_HOST}:${REMOTE_DIR}/.output/"
+if command -v rsync &>/dev/null; then
+  rsync -avz --delete packages/web/.output/ "${LXC_HOST}:${REMOTE_DIR}/.output/"
+else
+  # Fallback for Windows (no rsync) — clean remote dir first, then scp
+  ssh "${LXC_HOST}" "rm -rf ${REMOTE_DIR}/.output && mkdir -p ${REMOTE_DIR}/.output"
+  scp -r packages/web/.output/* "${LXC_HOST}:${REMOTE_DIR}/.output/"
+fi
 ok ".output synced"
 
 # ---------------------------------------------------------------------------
-# Step 4: Rsync .env.production to LXC as .env
+# Step 4: Upload .env.production to LXC as .env
 # ---------------------------------------------------------------------------
 step "Uploading .env.production to ${LXC_HOST}:${REMOTE_DIR}/.env..."
-rsync -avz deploy/.env.production "${LXC_HOST}:${REMOTE_DIR}/.env"
+scp deploy/.env.production "${LXC_HOST}:${REMOTE_DIR}/.env"
 ok ".env uploaded"
 
 # ---------------------------------------------------------------------------
-# Step 5: Rsync ecosystem.config.cjs to LXC
+# Step 5: Upload ecosystem.config.cjs to LXC
 # ---------------------------------------------------------------------------
 step "Uploading ecosystem.config.cjs to ${LXC_HOST}:${REMOTE_DIR}/..."
-rsync -avz deploy/ecosystem.config.cjs "${LXC_HOST}:${REMOTE_DIR}/ecosystem.config.cjs"
+scp deploy/ecosystem.config.cjs "${LXC_HOST}:${REMOTE_DIR}/ecosystem.config.cjs"
 ok "ecosystem.config.cjs uploaded"
 
 # ---------------------------------------------------------------------------
 # Step 6: Restart app via PM2 on LXC
 # ---------------------------------------------------------------------------
 step "Restarting PM2 app on LXC..."
-ssh "${LXC_HOST}" "cd ${REMOTE_DIR} && pm2 startOrRestart ecosystem.config.cjs --env production && pm2 save"
+ssh "${LXC_HOST}" "cd ${REMOTE_DIR} && pm2 delete poliscope 2>/dev/null; pm2 start ecosystem.config.cjs && pm2 save"
 ok "PM2 restarted and saved"
 
 # ---------------------------------------------------------------------------

@@ -9,11 +9,11 @@ module.exports = {
     cwd: '/opt/poliscope',
     instances: 1,
     exec_mode: 'fork',
+    node_args: '--env-file=/opt/poliscope/.env',
     env: {
       NODE_ENV: 'production',
       NITRO_PORT: '3000',
     },
-    env_file: '/opt/poliscope/.env',
     max_memory_restart: '512M',
     log_date_format: 'YYYY-MM-DD HH:mm:ss',
   }],
