@@ -2,7 +2,8 @@
 phase: 15-deploiement-ops
 plan: "01"
 subsystem: infra
-tags: [nginx, pm2, node22, systemd, rsync, deploy, lxc]
+tags: [nginx, pm2, node22, systemd, scp, deploy, lxc]
+status: complete
 
 requires:
   - phase: 08-infrastructure
@@ -10,19 +11,20 @@ requires:
 
 provides:
   - deploy/provision.sh — one-time LXC setup (Node 22, PM2, nginx, dirs, UFW)
-  - deploy/deploy.sh — repeatable local build + rsync + PM2 restart
-  - deploy/ecosystem.config.cjs — PM2 process config for Nuxt SSR production
+  - deploy/deploy.sh — repeatable local build + scp/rsync + PM2 restart
+  - deploy/ecosystem.config.cjs — PM2 process config with --env-file for .env loading
   - deploy/nginx/poliscope.conf — nginx reverse proxy to localhost:3000
   - deploy/.env.production.example — template with NUXT_DATABASE_URL placeholder
 
 affects: [phase-15-plan-02]
 
 tech-stack:
-  added: [PM2 5.x, Node.js 22 LTS, nginx (debian bookworm)]
+  added: [PM2 6.0.14, Node.js 22.22.2, nginx 1.22.1]
   patterns:
-    - Build .output locally, rsync to LXC — no node_modules on server
+    - Build .output locally, scp to LXC — no node_modules on server
     - PM2 + systemd startup hook for Node process management
     - nginx reverse proxy on port 80 → Node on port 3000
+    - Node 22 --env-file for environment variable loading
 
 key-files:
   created:
@@ -35,99 +37,50 @@ key-files:
     - .gitignore (deploy/.env.production excluded, .env.production.example allowed)
 
 key-decisions:
-  - "rsync .output instead of git pull + build on LXC — minimal LXC resource usage"
-  - "PM2 startOrRestart (not pm2 restart) — handles first deploy when no process exists yet"
-  - "env_file in ecosystem.config.cjs loads /opt/poliscope/.env — aligns with Nuxt runtimeConfig NUXT_* prefix convention"
+  - "scp fallback for Windows (no rsync in Git Bash)"
+  - "node_args --env-file instead of PM2 env_file (unsupported PM2 feature)"
+  - "pm2 delete + start instead of startOrRestart --env production"
   - "provision.sh is idempotent (mkdir -p, apt-get install -y, version guards)"
 
-patterns-established:
-  - "Deploy pattern: pnpm build local → rsync .output → PM2 startOrRestart → pm2 save"
-
-duration: 3min
-completed: 2026-04-02
+duration: multi-session
+started: 2026-04-02
+completed: 2026-04-03
 ---
 
-# Phase 15 Plan 01: Deploiement LXC Summary
+# Phase 15 Plan 01: Deploy Nuxt App on LXC — Complete
 
-**PM2 + nginx deployment stack for LXC 192.168.2.200 — provision.sh + deploy.sh + ecosystem.config.cjs scripts for repeatable production deploys of the Nuxt 3 SSR app**
+**PM2 + nginx deployment on LXC 192.168.2.200 — app accessible and healthy**
 
-## Performance
+## Deployment Result
 
-- **Duration:** ~3 min
-- **Started:** 2026-04-02T06:50:25Z
-- **Completed:** 2026-04-02T06:53:00Z (paused at checkpoint)
-- **Tasks:** 1/2 (Task 2 awaiting human verification)
-- **Files modified:** 6
-
-## Accomplishments
-
-- 4 deployment files created covering the full provision + deploy lifecycle
-- Scripts are idempotent and syntactically valid (bash -n passes)
-- deploy/.env.production properly excluded from git, .example committed
+- **URL** : http://192.168.2.200 → HTTP 200 (Nuxt SSR)
+- **Health** : http://192.168.2.200/api/health → `{"status":"ok","db":"connected"}`
+- **Stack** : Node 22.22.2 + PM2 6.0.14 + nginx 1.22.1
+- **DB** : PostgreSQL connected (13 tables, poliscope user)
 
 ## Task Commits
 
-1. **Task 1: Create deployment scripts and configs** - `bceb8ce` (chore)
-2. **Task 2: Deploy to LXC** — awaiting human-verify checkpoint
+1. **Task 1: Create deployment scripts** — `bceb8ce`
+2. **Task 2: Deploy to LXC** — verified ✅
+3. **Fix: scp fallback + env-file** — post-deploy fix commit
 
-**Plan metadata:** (pending — will be committed after Task 2)
+## Issues Encountered & Fixed
 
-## Files Created/Modified
+| Issue | Root Cause | Fix |
+|-------|-----------|-----|
+| `rsync: command not found` on Windows | Git Bash lacks rsync | Added scp fallback in deploy.sh |
+| `Database connection failed` on health | PM2 `env_file` not a real feature | Switched to `node_args: '--env-file=...'` |
+| `--env production` PM2 warning | Requires `env_production` section | Changed to `pm2 delete + pm2 start` |
+| PG password unknown | Never set/recorded | Reset via ALTER USER |
 
-- `deploy/provision.sh` — one-time LXC setup: Node 22 via NodeSource, PM2 global, nginx, directories, UFW 80/tcp, PM2 systemd startup
-- `deploy/deploy.sh` — local build + rsync .output + .env + ecosystem.config.cjs to LXC, PM2 restart, health check curl
-- `deploy/ecosystem.config.cjs` — PM2 config: poliscope app, /opt/poliscope/.output/server/index.mjs, env_file, max_memory_restart 512M
-- `deploy/nginx/poliscope.conf` — nginx server block, proxy_pass to localhost:3000 with WebSocket upgrade headers
-- `deploy/.env.production.example` — NUXT_DATABASE_URL + NUXT_SITE_URL template
-- `.gitignore` — added `!deploy/.env.production.example` + `deploy/.env.production`
-
-## Decisions Made
+## Key Decisions
 
 | Decision | Rationale |
 |----------|-----------|
-| rsync .output (not build on LXC) | .output is self-contained; LXC has limited RAM, no pnpm needed on server |
-| pm2 startOrRestart (not pm2 restart) | restart fails if process doesn't exist yet; startOrRestart is idempotent |
-| env_file at /opt/poliscope/.env | PM2 loads env file for the process — NUXT_* vars override runtimeConfig keys |
-| --skip-build flag in deploy.sh | Allows iterating deploy without rebuilding when only config changes |
-| Abort with exit 1 if .env.production missing | Prevents deploying without DB credentials, prompts operator to fill template |
-
-## Deviations from Plan
-
-### Auto-fixed Issues
-
-**1. [Rule 1 - Bug] .env.production.example was gitignored by .env.* pattern**
-- **Found during:** Task 1 (staging files for commit)
-- **Issue:** `.env.*` glob in .gitignore blocked `deploy/.env.production.example`; `git add` rejected the file
-- **Fix:** Added `!deploy/.env.production.example` negation in .gitignore before the `deploy/.env.production` exclusion
-- **Files modified:** .gitignore
-- **Committed in:** bceb8ce (Task 1 commit)
+| scp fallback over rsync-only | Windows Git Bash lacks rsync; scp universally available |
+| `node_args: '--env-file=...'` | PM2 env_file not a real feature; Node 22+ --env-file is native |
+| `pm2 delete + pm2 start` | Cleaner restart, no env_production config section needed |
+| DB password reset | No existing password known; generated 24-char random |
 
 ---
-
-**Total deviations:** 1 auto-fixed (Rule 1 — gitignore interaction)
-**Impact on plan:** Essential fix — .example file must be committed to allow new contributors to understand required env vars.
-
-## Issues Encountered
-
-None beyond the gitignore deviation above.
-
-## User Setup Required
-
-Before running Task 2 (deploy), operator must:
-
-1. `cp deploy/.env.production.example deploy/.env.production`
-2. Edit `deploy/.env.production` — set `NUXT_DATABASE_URL` with real PostgreSQL password
-3. Verify SSH access: `ssh root@192.168.2.200`
-4. Clone repo on LXC: `git clone <repo-url> /opt/poliscope/repo` (if not already done)
-5. Run provision: `ssh root@192.168.2.200 'bash /opt/poliscope/repo/deploy/provision.sh'`
-6. Run deploy from local: `bash deploy/deploy.sh`
-
-## Next Phase Readiness
-
-- Task 2 (human-verify: actual deployment) is pending — app not yet deployed
-- After Task 2 approval, Phase 15 Plan 02 (backup + ingestion timers + health endpoint) can begin
-- Blocker: SSH access to LXC + real DB password in .env.production required
-
----
-*Phase: 15-deploiement-ops*
-*Completed: 2026-04-02 (partial — Task 2 pending)*
+*Completed: 2026-04-03*

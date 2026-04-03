@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Permettre a n'importe qui de chercher et lire ce qu'un parlementaire a dit sur n'importe quel sujet, en quelques clics.
-**Current focus:** Phase 15 — Deploiement & Ops (Phase 14 complete)
+**Current focus:** Milestone 2 COMPLETE — Phase 15 deployed and verified
 
 ## Current Position
 
-- **Milestone** : 2 — Base de Donnees Parlementaire Universelle
-- **Phase** : 15 — Deploiement & Ops — IN PROGRESS
-- **Plan** : 2/2 — Plan 02 Tasks 1+2 DONE, paused at checkpoint Task 3 (human-verify: deploy + timers)
-- **Status** : Backup timers + health last_refresh ready — awaiting LXC deployment and timer verification
-- **Last activity** : 2026-04-03 — Completed 15-02 Tasks 1+2 — system_metadata table, migration 0005, /api/health last_refresh, systemd timers, pg-backup.sh, setup-timers.sh
+- **Milestone** : 2 — Base de Donnees Parlementaire Universelle — COMPLETE
+- **Phase** : 15 — Deploiement & Ops — COMPLETE
+- **Plan** : 2/2 — Both plans executed and verified on LXC
+- **Status** : App live at http://192.168.2.200, backup 74MB OK, 2 systemd timers active
+- **Last activity** : 2026-04-03 — Phase 15 complete — deployed app, backup, timers all verified
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [█████████████████████] 21/21 plans + Phase 15 in progress
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [███████████████████████] 23/23 plans DONE
 
 ## Accumulated Context
 
@@ -188,10 +188,12 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-04-03
-- **Stopped at** : Phase 15, Plan 02, Task 3 — checkpoint:human-verify (deploy to LXC + verify timers)
-- **Resume** : After: (1) deploy.sh run, (2) migration 0005 applied, (3) git pull on LXC, (4) setup-timers.sh run, (5) PASSWORD edited in poliscope-refresh.service — then verify health last_refresh + timers active
+- **Stopped at** : Milestone 2 complete — all 15 phases done
+- **Resume** : Milestone audit (/gsd:audit-milestone) or start Milestone 3
 
 ## History
+
+- 2026-04-03 : Phase 15 complete — app deployed to LXC 192.168.2.200, PM2 + nginx healthy, pg_dump backup 74MB OK, 2 systemd timers active (daily backup + weekly refresh), health endpoint returns last_refresh
 
 - 2026-04-01 : Phase 14 complete — verification PASSED 5/5. Scrutins pages, bicameral nav, chamber filter deputies, senator badges, search cross-type with Vote badge
 - 2026-04-01 : Completed 14-02 — bicameral nav (Votes + Parlementaires), chamber filter pills on /deputies, senator badge on /deputies/[id], SearchResultCard scrutin variant (badge Vote + ScrutinResultBar + /votes/:id link), typeFilter pills on /search; 2 tasks, 5 files
