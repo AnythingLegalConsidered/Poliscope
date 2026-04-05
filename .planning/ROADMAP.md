@@ -265,15 +265,34 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 15-01-PLAN.md — Deploy Nuxt app sur LXC (provision.sh + deploy.sh + PM2 + nginx)
-- [ ] 15-02-PLAN.md — Backup pg_dump daily + refresh hebdo systemd timers + health endpoint last_refresh
+- [x] 15-01-PLAN.md — Deploy Nuxt app sur LXC (provision.sh + deploy.sh + PM2 + nginx)
+- [x] 15-02-PLAN.md — Backup pg_dump daily + refresh hebdo systemd timers + health endpoint last_refresh
+
+---
+
+### Phase 16 — Cleanup & Polish v2.0
+
+**Goal** : Corriger la tech debt identifiee par l'audit milestone v2.0 — legacy script, donnees non rendues, badges manquants, sitemap incomplet.
+**Depends on** : Phase 15 (deploiement complete)
+**Requirements** : Aucun nouveau — fermeture de gaps d'integration
+**Gap Closure** : Closes 4 items from v2.0-MILESTONE-AUDIT.md
+**Success Criteria** (what must be TRUE) :
+  1. `ingest_deputies.py` est retire ou corrige — `run_all.py` ne reference plus une table `deputies` inexistante
+  2. Le profil d'un parlementaire affiche ses statistiques de vote (voteStats rendu dans le template)
+  3. Les cartes parlementaires dans la grille affichent un badge AN ou Senat
+  4. Les scrutins apparaissent dans le sitemap (`__sitemap__/urls.ts` inclut les votes)
+
+**Plans:** 1 plan
+
+Plans:
+- [ ] 16-01-PLAN.md — Fix legacy ingest_deputies.py + render voteStats + DeputyCard chamber badge + sitemap scrutins
 
 ---
 
 ## Progress
 
 **Milestone 1 (Phases 1-7) :** Complete — 2026-03-28
-**Milestone 2 (Phases 8-15) :** In progress
+**Milestone 2 (Phases 8-16) :** In progress — gap closure
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -291,4 +310,5 @@ Plans:
 | 12. Ingestion Votes & Scrutins | v2.0 | 2/2 | Complete | 2026-03-31 |
 | 13. API REST Universelle | v2.0 | 2/2 | Complete | 2026-04-01 |
 | 14. Frontend Votes, Senat & Bicameral | v2.0 | 2/2 | Complete | 2026-04-01 |
-| 15. Deploiement & Ops | v2.0 | 0/2 | Not started | - |
+| 15. Deploiement & Ops | v2.0 | 2/2 | Complete | 2026-04-03 |
+| 16. Cleanup & Polish v2.0 | v2.0 | 0/1 | Not started | - |
