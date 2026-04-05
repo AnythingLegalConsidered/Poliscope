@@ -150,6 +150,27 @@ const displayedTags = computed(() => {
         </div>
       </div>
 
+      <!-- Vote stats -->
+      <div v-if="data.voteStats?.length > 0" class="mb-6">
+        <h2 class="text-sm font-semibold text-ink mb-2">Votes</h2>
+        <div class="flex flex-wrap gap-2">
+          <span
+            v-for="stat in data.voteStats"
+            :key="stat.position"
+            class="px-3 py-1 rounded-full text-xs font-medium"
+            :class="{
+              'bg-green-100 text-green-800': stat.position === 'for',
+              'bg-red-100 text-red-800': stat.position === 'against',
+              'bg-gray-100 text-gray-600': stat.position === 'abstain',
+              'bg-stone-100 text-stone-500': stat.position === 'absent',
+            }"
+          >
+            {{ { for: 'Pour', against: 'Contre', abstain: 'Abstention', absent: 'Absent' }[stat.position] || stat.position }}
+            <span class="ml-1 font-semibold">{{ stat.count }}</span>
+          </span>
+        </div>
+      </div>
+
       <!-- Interventions list -->
       <div v-if="filteredInterventions.length > 0">
         <div

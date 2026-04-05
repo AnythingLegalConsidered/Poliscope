@@ -2,6 +2,7 @@
 const props = defineProps<{
   id: number
   fullName: string
+  chamber?: string | null
   group: string | null
   photoUrl: string | null
   constituency: string | null
@@ -48,7 +49,17 @@ const imageError = ref(false)
     <div class="flex-1 min-w-0">
       <p class="font-semibold text-ink text-sm truncate">{{ fullName }}</p>
       <p v-if="constituency" class="text-xs text-ink-muted truncate">{{ constituency }}</p>
-      <GroupBadge v-if="group" :group="group" class="mt-1" />
+      <div class="flex items-center gap-1 mt-1 flex-wrap">
+        <GroupBadge v-if="group" :group="group" />
+        <span
+          v-if="chamber === 'AN'"
+          class="text-xs bg-bronze/10 text-bronze px-2 py-0.5 rounded-full font-medium"
+        >AN</span>
+        <span
+          v-else-if="chamber === 'Senat'"
+          class="text-xs bg-ink/10 text-ink px-2 py-0.5 rounded-full font-medium"
+        >Sénat</span>
+      </div>
     </div>
   </NuxtLink>
 </template>
