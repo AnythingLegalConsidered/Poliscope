@@ -10,14 +10,22 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle — COMPLETE
-- **Phase** : 15 — Deploiement & Ops — COMPLETE
-- **Plan** : 2/2 — Both plans executed and verified on LXC
-- **Status** : App live at http://192.168.2.200, backup 74MB OK, 2 systemd timers active
-- **Last activity** : 2026-04-03 — Phase 15 complete — deployed app, backup, timers all verified
+- **Phase** : 16 — Cleanup & Polish v2 — In progress
+- **Plan** : 1/1 — 16-01 complete
+- **Status** : Gap closure done — pipeline clean, chamber badge live, voteStats visible, sitemap extended
+- **Last activity** : 2026-04-05 — Completed 16-01-PLAN.md — 4 gap items closed in 2 tasks
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [███████████████████████] 23/23 plans DONE
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [███████████████████████] 23/23 plans DONE | Phase 16 [█░] 1/1 plans DONE
 
 ## Accumulated Context
+
+### Key Decisions (Phase 16 — Plan 01)
+
+| Decision | Rationale |
+|----------|-----------|
+| chamber optional prop on DeputyCard | Safe if ever null — badge won't render; no breaking change to existing usages |
+| Inline position label mapping in voteStats (not computed) | 4 static values — a computed or utility function adds indirection without benefit |
+| voteStats placed between tagStats and interventions | Logical reading order: topic tags → vote behavior → detailed interventions |
 
 ### Key Decisions (Phase 15 — Plan 02)
 
@@ -187,11 +195,13 @@ None.
 
 ## Session Continuity
 
-- **Last session** : 2026-04-03
-- **Stopped at** : Milestone 2 complete — all 15 phases done
-- **Resume** : Milestone audit (/gsd:audit-milestone) or start Milestone 3
+- **Last session** : 2026-04-05
+- **Stopped at** : Phase 16 Plan 01 complete — all 4 gap items closed
+- **Resume** : Phase 16 complete — start Phase 17 or Milestone 3 planning
 
 ## History
+
+- 2026-04-05 : Phase 16 Plan 01 complete — 4 Milestone 2 gap items closed: run_all.py Step 6 removed, chamber badge on DeputyCard, voteStats on deputy profile, ~7062 /votes/:id URLs in sitemap
 
 - 2026-04-03 : Phase 15 complete — app deployed to LXC 192.168.2.200, PM2 + nginx healthy, pg_dump backup 74MB OK, 2 systemd timers active (daily backup + weekly refresh), health endpoint returns last_refresh
 
