@@ -4,8 +4,8 @@ Usage:
     python run_all.py                              # Full pipeline (all steps)
     python run_all.py --limit 10                   # Limited debate ingestion
     python run_all.py --skip-actors --skip-organs  # Debates + tags only
-    python run_all.py --skip-deputies --skip-debates --retag-all  # Re-tag only
-    python run_all.py --skip-debates --skip-tags --skip-deputies  # Actors + organs only
+    python run_all.py --skip-debates --retag-all   # Re-tag only
+    python run_all.py --skip-debates --skip-tags   # Actors + organs only
     python run_all.py --senat-zip-path /tmp/cri.zip  # Use pre-downloaded cri.zip
     python run_all.py --skip-scrutins              # Skip scrutin/vote ingestion (AN + Senat)
 
@@ -15,7 +15,7 @@ Pipeline order (dependency-safe):
     Step 3:  ingest_organs_an.py       (AN organs + resolve political_group)
     Step 4:  ingest_organs_senat.py    (Senat organs)
     Step 5:  ingest_memberships_an.py  (AN actor-organ memberships from AMO10 mandats)
-    Step 6:  ingest_deputies.py        (legacy nosdeputes.fr — backward compat)
+    Step 6:  [REMOVED] ingest_deputies.py targeted non-existent 'deputies' table. Use ingest_actors_an.py / ingest_actors_senat.py instead.
     Step 7:  ingest_debates.py         (AN CRI debates + interventions)
     Step 8:  ingest_debates_senat.py   (Senat CRI debates + interventions from cri.zip)
     Step 9:  ingest_scrutins_an.py     (AN public votes — scrutins + individual votes)
@@ -87,7 +87,6 @@ def main():
     parser.add_argument("--skip-actors", action="store_true", help="Skip actor ingestion (AN + Senat)")
     parser.add_argument("--skip-organs", action="store_true", help="Skip organ ingestion (AN + Senat)")
     parser.add_argument("--skip-memberships", action="store_true", help="Skip actor-organ membership ingestion (AN)")
-    parser.add_argument("--skip-deputies", action="store_true", help="Skip legacy nosdeputes.fr deputy ingestion")
     parser.add_argument("--skip-debates", action="store_true", help="Skip AN debate ingestion")
     parser.add_argument("--skip-senat-debates", action="store_true", help="Skip Senat debate ingestion")
     parser.add_argument("--skip-scrutins", action="store_true", help="Skip scrutin/vote ingestion (AN + Senat)")
@@ -106,7 +105,7 @@ def main():
         ("Step 3:  ingest_organs_an.py", not args.skip_organs),
         ("Step 4:  ingest_organs_senat.py", not args.skip_organs),
         ("Step 5:  ingest_memberships_an.py", not args.skip_memberships),
-        ("Step 6:  ingest_deputies.py (legacy)", not args.skip_deputies),
+        # Step 6 REMOVED — ingest_deputies.py targeted non-existent 'deputies' table. Use ingest_actors_an.py / ingest_actors_senat.py instead.
         ("Step 7:  ingest_debates.py (AN CRI)", not args.skip_debates),
         ("Step 8:  ingest_debates_senat.py (Senat CRI)", not args.skip_senat_debates),
         ("Step 9:  ingest_scrutins_an.py (AN votes)", not args.skip_scrutins),
@@ -156,12 +155,7 @@ def main():
     else:
         logger.info("SKIPPED: ingest_memberships_an.py")
 
-    # Step 6: Legacy deputies (nosdeputes.fr — kept for backward compat)
-    if not args.skip_deputies:
-        if not run_script("ingest_deputies.py"):
-            errors += 1
-    else:
-        logger.info("SKIPPED: ingest_deputies.py (legacy)")
+    # Step 6 REMOVED — ingest_deputies.py targeted non-existent 'deputies' table. Use ingest_actors_an.py / ingest_actors_senat.py instead.
 
     # Step 7: AN debates
     if not args.skip_debates:

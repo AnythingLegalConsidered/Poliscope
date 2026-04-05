@@ -47,6 +47,7 @@ export default defineEventHandler(async (event) => {
         firstName: actors.firstName,
         lastName: actors.lastName,
         fullName: actors.fullName,
+        chamber: actors.chamber,
         group: actors.group,
         photoUrl: actors.photoUrl,
         constituency: actors.constituency,
