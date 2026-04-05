@@ -2,20 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-28)
+See: .planning/PROJECT.md (updated 2026-04-05)
 
 **Core value:** Permettre a n'importe qui de chercher et lire ce qu'un parlementaire a dit sur n'importe quel sujet, en quelques clics.
-**Current focus:** Milestone 2 COMPLETE — all 16 phases done, gap closure finalized
+**Current focus:** v2.0 shipped — planning next milestone
 
 ## Current Position
 
-- **Milestone** : 2 — Base de Donnees Parlementaire Universelle — COMPLETE
-- **Phase** : 16 — Cleanup & Polish v2 — COMPLETE
-- **Plan** : 1/1 — all complete
-- **Status** : Phase 16 verified (4/4 must-haves) — Milestone 2 fully complete
-- **Last activity** : 2026-04-05 — Phase 16 complete — 4 tech debt items closed, verification PASSED
+- **Milestone** : v2.0 SHIPPED — all 16 phases done
+- **Phase** : None — between milestones
+- **Status** : v1.0 + v2.0 archived, ready for v3 planning
+- **Last activity** : 2026-04-05 — v2.0 milestone completed and archived
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [████████████████████████] 24/24 plans DONE
+Progress: v1.0 [███████████████████] 17/17 plans SHIPPED | v2.0 [████████████████████████] 22/22 plans SHIPPED
 
 ## Accumulated Context
 
