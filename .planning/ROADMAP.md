@@ -285,14 +285,14 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 16-01-PLAN.md — Fix legacy ingest_deputies.py + render voteStats + DeputyCard chamber badge + sitemap scrutins
+- [x] 16-01-PLAN.md — Fix legacy ingest_deputies.py + render voteStats + DeputyCard chamber badge + sitemap scrutins
 
 ---
 
 ## Progress
 
 **Milestone 1 (Phases 1-7) :** Complete — 2026-03-28
-**Milestone 2 (Phases 8-16) :** In progress — gap closure
+**Milestone 2 (Phases 8-16) :** Complete — 2026-04-05
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -311,4 +311,4 @@ Plans:
 | 13. API REST Universelle | v2.0 | 2/2 | Complete | 2026-04-01 |
 | 14. Frontend Votes, Senat & Bicameral | v2.0 | 2/2 | Complete | 2026-04-01 |
 | 15. Deploiement & Ops | v2.0 | 2/2 | Complete | 2026-04-03 |
-| 16. Cleanup & Polish v2.0 | v2.0 | 0/1 | Not started | - |
+| 16. Cleanup & Polish v2.0 | v2.0 | 1/1 | Complete | 2026-04-05 |

@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Permettre a n'importe qui de chercher et lire ce qu'un parlementaire a dit sur n'importe quel sujet, en quelques clics.
-**Current focus:** Milestone 2 COMPLETE — Phase 15 deployed and verified
+**Current focus:** Milestone 2 COMPLETE — all 16 phases done, gap closure finalized
 
 ## Current Position
 
 - **Milestone** : 2 — Base de Donnees Parlementaire Universelle — COMPLETE
-- **Phase** : 16 — Cleanup & Polish v2 — In progress
-- **Plan** : 1/1 — 16-01 complete
-- **Status** : Gap closure done — pipeline clean, chamber badge live, voteStats visible, sitemap extended
-- **Last activity** : 2026-04-05 — Completed 16-01-PLAN.md — 4 gap items closed in 2 tasks
+- **Phase** : 16 — Cleanup & Polish v2 — COMPLETE
+- **Plan** : 1/1 — all complete
+- **Status** : Phase 16 verified (4/4 must-haves) — Milestone 2 fully complete
+- **Last activity** : 2026-04-05 — Phase 16 complete — 4 tech debt items closed, verification PASSED
 
-Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [███████████████████████] 23/23 plans DONE | Phase 16 [█░] 1/1 plans DONE
+Progress: Milestone 1 [███████████████████] 17/17 plans DONE | Milestone 2 [████████████████████████] 24/24 plans DONE
 
 ## Accumulated Context
 
@@ -196,7 +196,8 @@ None.
 ## Session Continuity
 
 - **Last session** : 2026-04-05
-- **Stopped at** : Phase 16 Plan 01 complete — all 4 gap items closed
+- **Stopped at** : Milestone 2 fully complete — all 16 phases done
+- **Resume** : `/gsd:complete-milestone` or start Milestone 3
 - **Resume** : Phase 16 complete — start Phase 17 or Milestone 3 planning
 
 ## History
