@@ -5,18 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-04-05)
 
 **Core value:** Permettre a n'importe qui de chercher et lire ce qu'un parlementaire a dit sur n'importe quel sujet, en quelques clics.
-**Current focus:** v2.0 shipped — planning next milestone
+**Current focus:** v2.1 — UI Polish & Bug Hunt (Phase 17)
 
 ## Current Position
 
-- **Milestone** : v2.0 SHIPPED — all 16 phases done
-- **Phase** : None — between milestones
-- **Status** : v1.0 + v2.0 archived, ready for v3 planning
-- **Last activity** : 2026-04-05 — v2.0 milestone completed and archived
+- **Milestone** : v2.1 — UI Polish & Bug Hunt
+- **Phase** : 17 — UI Polish & Bug Hunt
+- **Status** : Added, not planned yet — run /gsd:plan-phase 17
+- **Last activity** : 2026-04-10 — Phase 17 added for UI bug hunt + visual polish
 
 Progress: v1.0 [███████████████████] 17/17 plans SHIPPED | v2.0 [████████████████████████] 22/22 plans SHIPPED
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- 2026-04-10 : Phase 17 added — UI Polish & Bug Hunt (v2.1 milestone). Focus: bug fixes visuels, differenciation interventions (vibe Twitter old-school + DA DataCommune conservee), pagination page debat, tests Playwright CLI sur chaque page. Highlight moments importants deferre en v3.
 
 ### Key Decisions (Phase 16 — Plan 01)
 
@@ -194,10 +198,9 @@ None.
 
 ## Session Continuity
 
-- **Last session** : 2026-04-05
-- **Stopped at** : Milestone 2 fully complete — all 16 phases done
-- **Resume** : `/gsd:complete-milestone` or start Milestone 3
-- **Resume** : Phase 16 complete — start Phase 17 or Milestone 3 planning
+- **Last session** : 2026-04-10
+- **Stopped at** : Phase 17 added (UI Polish & Bug Hunt), not planned yet
+- **Resume** : `/gsd:plan-phase 17` (clear context first for fresh window)
 
 ## History
 

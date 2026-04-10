@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import DOMPurify from 'isomorphic-dompurify'
+
 interface Tag {
   id: number
   name: string
@@ -22,6 +24,16 @@ const props = defineProps<{
 }>()
 
 const displayName = computed(() => props.deputy?.fullName ?? props.speakerName ?? '')
+
+const hasHtml = computed(() => /<table[\s>]/i.test(props.content))
+
+const sanitizedContent = computed(() => {
+  if (!hasHtml.value) return ''
+  return DOMPurify.sanitize(props.content, {
+    ALLOWED_TAGS: ['table', 'thead', 'tbody', 'tr', 'th', 'td', 'br', 'p'],
+    ALLOWED_ATTR: ['class'],
+  })
+})
 
 const initials = computed(() => {
   return displayName.value
@@ -72,7 +84,8 @@ const initials = computed(() => {
       </div>
 
       <!-- Intervention content -->
-      <p class="text-sm text-ink/85 leading-relaxed whitespace-pre-wrap">{{ content }}</p>
+      <div v-if="hasHtml" class="text-sm text-ink/85 leading-relaxed intervention-html" v-html="sanitizedContent" />
+      <p v-else class="text-sm text-ink/85 leading-relaxed whitespace-pre-wrap">{{ content }}</p>
     </div>
   </div>
 </template>

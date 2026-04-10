@@ -39,6 +39,31 @@ h1, h2, h3, h4, h5, h6 {
 /* Political group colors are handled via JS util (app/utils/groupColors.ts)
    using inline styles for dynamic color assignment per group acronym. */
 
+/* CRI tables (budget tables from parliamentary debates) */
+.intervention-html table,
+.intervention-html .cri-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.8125rem;
+}
+
+.intervention-html th,
+.intervention-html td {
+  border: 1px solid var(--color-stone-border);
+  padding: 0.375rem 0.625rem;
+  text-align: left;
+}
+
+.intervention-html th {
+  background-color: var(--color-marble-dark);
+  font-weight: 600;
+}
+
+.intervention-html tr:nth-child(even) {
+  background-color: var(--color-parchment);
+}
+
 /* FTS search highlights — ts_headline produces <mark> tags */
 mark {
   background-color: var(--color-bronze-light);

@@ -16,6 +16,7 @@
     "@tailwindcss/vite": "^4.2.2",
     "@vueuse/core": "^14.2.1",
     "drizzle-orm": "^0.45.1",
+    "isomorphic-dompurify": "^3.8.0",
     "nuxt": "^4.4.2",
     "postgres": "^3.4.8",
     "shared": "workspace:*",

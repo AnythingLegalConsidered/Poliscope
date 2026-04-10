@@ -4,6 +4,7 @@
 
 - ✅ **v1.0 MVP — Debats de l'AN** — Phases 1-7 (shipped 2026-03-28)
 - ✅ **v2.0 Base de Donnees Parlementaire Universelle** — Phases 8-16 (shipped 2026-04-05)
+- 🚧 **v2.1 UI Polish & Bug Hunt** — Phase 17 (in progress)
 
 ## Phases
 
@@ -58,3 +59,23 @@
 | 14. Frontend Votes, Senat & Bicameral | v2.0 | 2/2 | Complete | 2026-04-01 |
 | 15. Deploiement & Ops | v2.0 | 2/2 | Complete | 2026-04-03 |
 | 16. Cleanup & Polish v2.0 | v2.0 | 1/1 | Complete | 2026-04-05 |
+| 17. UI Polish & Bug Hunt | v2.1 | 0/? | Not planned | — |
+
+### Phase 17: UI Polish & Bug Hunt
+
+**Goal:** Eliminer tous les bugs d'affichage, ameliorer la lisibilite et la differenciation des interventions/commentaires (inspiration Twitter old-school tout en gardant la DA marble/bronze DataCommune), paginer les pages debats trop longues, et couvrir chaque page via tests Playwright CLI.
+
+**Scope:**
+- Audit visuel systematique de chaque page (home, debats, debat detail, deputes, depute detail, votes, vote detail, search, about, legal)
+- Bug fixes d'affichage (layout, overflow, spacing, typo, responsive)
+- Refonte cards interventions : meilleure differenciation visuelle entre prises de parole (inspiration Twitter old-school, DA DataCommune conservee)
+- Pagination page debat detail (actuellement monolithique et lourde)
+- Suite de tests Playwright CLI : smoke + lisibilite + coherence sur chaque page et fonction principale
+
+**Out of scope (v3):**
+- Highlight automatique des moments importants (trop complexe, deferre)
+- Refonte complete DA
+
+**Depends on:** Phase 16
+
+**Plans:** TBD (run /gsd:plan-phase 17 to break down)

@@ -34,7 +34,7 @@ from tqdm import tqdm
 
 from config import DATABASE_URL  # noqa: F401 — triggers .env load
 from db import get_connection, upsert_query
-from ingest_debates import _clean_unicode, normalize_name
+from ingest_debates import _clean_unicode, _xml_table_to_html, normalize_name
 
 logger = logging.getLogger(__name__)
 
@@ -138,6 +138,35 @@ def iter_xviie_sessions(zip_path: str, start_date: datetime):
 # XML parsing
 # ---------------------------------------------------------------------------
 
+def _extract_intervenant_content(iv) -> str:
+    """Extract content from a Senat <intervenant> element, preserving tables as HTML."""
+    parts: list[str] = []
+
+    if iv.text:
+        t = iv.text.strip()
+        if t:
+            parts.append(_clean_unicode(t))
+
+    for child in iv:
+        tag = etree.QName(child.tag).localname if isinstance(child.tag, str) else str(child.tag)
+
+        if tag.lower() in ("table", "tableau"):
+            html = _xml_table_to_html(child)
+            if html:
+                parts.append(html)
+        else:
+            text = etree.tostring(child, method="text", encoding="unicode").strip()
+            if text:
+                parts.append(_clean_unicode(text))
+
+        if child.tail:
+            t = child.tail.strip()
+            if t:
+                parts.append(_clean_unicode(t))
+
+    return "\n\n".join(parts)
+
+
 def parse_senat_cri_xml(xml_bytes: bytes, session_date: datetime, filename: str) -> dict | None:
     """Parse a Senat CRI XML file (cri:cri namespace format).
 
@@ -194,9 +223,8 @@ def parse_senat_cri_xml(xml_bytes: bytes, session_date: datetime, filename: str)
         # Build display name with civility
         speaker_name = f"{civ} {nom}".strip() if civ else nom
 
-        # Full text content of the intervenant element
-        full_text = etree.tostring(iv, method="text", encoding="unicode").strip()
-        content = _clean_unicode(full_text) if full_text else ""
+        # Extract content preserving HTML tables
+        content = _extract_intervenant_content(iv)
         if not content or len(content) < 5:
             continue
 

@@ -242,13 +242,8 @@ def parse_cri_xml(xml_bytes: bytes) -> dict | None:
 
         href = orateur.get("href", "")
 
-        # Get full text content (strip XML tags)
-        full_text = etree.tostring(para, method="text", encoding="unicode").strip()
-
-        # Remove the speaker name prefix from the text
-        # The text usually starts with "M. Speaker Name. Content..."
-        # We want just the content after the speaker name
-        content = _clean_unicode(_extract_speech_content(full_text, speaker_name_raw))
+        # Extract content preserving HTML tables from CRI XML
+        content = _extract_para_content(para, speaker_name_raw)
 
         # Skip empty interventions (procedural notes, etc.)
         if not content or len(content) < 5:
@@ -273,6 +268,84 @@ def _text(element, tag: str) -> str | None:
     if child is not None and child.text:
         return child.text.strip()
     return None
+
+
+def _extract_para_content(para, speaker_name_raw: str) -> str:
+    """Extract intervention content from a <Para> element.
+
+    Preserves <table> elements as HTML for structured data (budgets, etc.)
+    while extracting plain text for everything else.
+    """
+    # Collect child elements, skipping Orateur and QualiteMouvement (metadata)
+    skip_tags = {"Orateur", "QualiteMouvement"}
+    parts: list[str] = []
+
+    # Text directly inside <Para> before first child
+    if para.text:
+        t = para.text.strip()
+        if t:
+            parts.append(_clean_unicode(t))
+
+    for child in para:
+        tag = etree.QName(child.tag).localname if isinstance(child.tag, str) else str(child.tag)
+        if tag in skip_tags:
+            # Still capture tail text after skipped elements
+            if child.tail:
+                t = child.tail.strip()
+                if t:
+                    parts.append(_clean_unicode(t))
+            continue
+
+        if tag.lower() in ("table", "tableau"):
+            # Preserve table as HTML
+            html = _xml_table_to_html(child)
+            if html:
+                parts.append(html)
+        else:
+            # Extract plain text from other elements
+            text = etree.tostring(child, method="text", encoding="unicode").strip()
+            if text:
+                parts.append(_clean_unicode(text))
+
+        # Tail text after this element
+        if child.tail:
+            t = child.tail.strip()
+            if t:
+                parts.append(_clean_unicode(t))
+
+    content = "\n\n".join(parts)
+
+    # Remove speaker name prefix if present at the start
+    content = _extract_speech_content(content, speaker_name_raw)
+
+    return content
+
+
+def _xml_table_to_html(table_el) -> str:
+    """Convert a CRI XML table element to a clean HTML <table>."""
+    rows = []
+    # CRI tables use various structures: Rangee/Cellule, row/cell, tr/td
+    for row in table_el.iter():
+        tag = etree.QName(row.tag).localname if isinstance(row.tag, str) else str(row.tag)
+        if tag.lower() in ("rangee", "tr", "row"):
+            cells = []
+            for cell in row:
+                cell_tag = etree.QName(cell.tag).localname if isinstance(cell.tag, str) else str(cell.tag)
+                cell_text = etree.tostring(cell, method="text", encoding="unicode").strip()
+                cell_text = _clean_unicode(cell_text)
+                # Detect header cells
+                is_header = cell_tag.lower() in ("entete", "th", "header")
+                html_tag = "th" if is_header else "td"
+                cells.append(f"<{html_tag}>{cell_text}</{html_tag}>")
+            if cells:
+                rows.append("<tr>" + "".join(cells) + "</tr>")
+
+    if not rows:
+        # Fallback: just extract text if structure is unrecognized
+        text = etree.tostring(table_el, method="text", encoding="unicode").strip()
+        return _clean_unicode(text) if text else ""
+
+    return '<table class="cri-table">' + "".join(rows) + "</table>"
 
 
 def _extract_speech_content(full_text: str, speaker_name_raw: str) -> str:
