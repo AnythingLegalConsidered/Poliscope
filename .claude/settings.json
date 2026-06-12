@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm dev:*)",
+      "Bash(ssh poliscope:*)",
+      "Bash(ssh -o StrictHostKeyChecking=no poliscope \"sudo -u postgres psql -d poliscope -c \\\\\"SELECT pg_size_pretty\\(pg_database_size\\('poliscope'\\)\\);\\\\\"\")",
+      "Bash(ssh poliscope-db:*)"
+    ]
+  }
+}
